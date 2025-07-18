@@ -112,7 +112,7 @@ const StartFlightForm: React.FC<StartFlightFormProps> = ({ isOpen, onClose, onFl
       const filePath = `flight_images/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('flight_images')
+        .from('flight-images') // Changed to flight-images
         .upload(filePath, flightImage);
 
       if (uploadError) {
@@ -121,7 +121,7 @@ const StartFlightForm: React.FC<StartFlightFormProps> = ({ isOpen, onClose, onFl
         return;
       }
 
-      const { data: publicUrlData } = supabase.storage.from('flight_images').getPublicUrl(filePath);
+      const { data: publicUrlData } = supabase.storage.from('flight-images').getPublicUrl(filePath); // Changed to flight-images
       flightImageUrl = publicUrlData.publicUrl;
     }
 

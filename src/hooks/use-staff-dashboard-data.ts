@@ -387,11 +387,11 @@ export const useStaffDashboardData = () => {
       const pathSegments = url.pathname.split('/');
       // Find the index of 'public' and take everything after it
       const publicIndex = pathSegments.indexOf('public');
-      const bucketName = pathSegments[publicIndex + 1]; // e.g., 'flight_images'
+      const bucketName = pathSegments[publicIndex + 1]; // e.g., 'flight-images'
       const filePathInStorage = pathSegments.slice(publicIndex + 2).join('/'); // e.g., 'flight_images/user-id-timestamp.jpg'
 
       const { error: storageError } = await supabase.storage
-        .from(bucketName) // Use the extracted bucket name
+        .from('flight-images') // Changed to flight-images
         .remove([filePathInStorage]);
 
       if (storageError) {
