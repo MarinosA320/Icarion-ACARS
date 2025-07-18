@@ -88,7 +88,7 @@ const SocialMedia = () => {
       const filePath = `social_media_posts/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('social_media_posts')
+        .from('social-media-posts') // Changed to social-media-posts
         .upload(filePath, newPostImage);
 
       if (uploadError) {
@@ -97,7 +97,7 @@ const SocialMedia = () => {
         return;
       }
 
-      const { data: publicUrlData } = supabase.storage.from('social_media_posts').getPublicUrl(filePath);
+      const { data: publicUrlData } = supabase.storage.from('social-media-posts').getPublicUrl(filePath); // Changed to social-media-posts
       imageUrl = publicUrlData.publicUrl;
     }
 
@@ -131,7 +131,7 @@ const SocialMedia = () => {
 
       // Delete image from storage
       const { error: storageError } = await supabase.storage
-        .from('social_media_posts') // Ensure this matches your bucket name
+        .from('social-media-posts') // Changed to social-media-posts
         .remove([filePathInStorage]);
 
       if (storageError) {
