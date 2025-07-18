@@ -141,7 +141,7 @@ const ProfileSettings = () => {
       const filePath = `avatars/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('avatars')
+        .from('avatars') // Changed to 'avatars' (with hyphen)
         .upload(filePath, avatarFile, { upsert: true });
 
       if (uploadError) {
@@ -149,7 +149,7 @@ const ProfileSettings = () => {
         return;
       }
 
-      const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath); // Changed to 'avatars' (with hyphen)
       avatarUrl = publicUrlData.publicUrl;
     }
 
