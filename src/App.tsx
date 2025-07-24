@@ -13,7 +13,7 @@ import StaffDashboard from "./pages/StaffDashboard";
 import PlanFlight from "./pages/PlanFlight";
 import MyBookings from "./pages/MyBookings";
 import Announcements from "./pages/Announcements";
-import MyTrainingRequests from "./pages/MyTrainingRequests"; // New Import
+import MyTrainingRequests from "./pages/MyTrainingRequests";
 import Navbar from "./components/Navbar";
 import { supabase } from "./integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -39,9 +39,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!session && event === 'SIGNED_OUT') {
         navigate('/login');
-      } else if (session && event === 'SIGNED_IN') {
-        navigate('/');
-      }
+      } 
+      // Removed: else if (session && event === 'SIGNED_IN') { navigate('/'); }
+      // This redirect is no longer needed as the ProtectedRoute already ensures
+      // the user is logged in, and we don't want to force them to the home page
+      // every time the session refreshes or a tab gains focus.
     });
 
     return () => subscription.unsubscribe();
