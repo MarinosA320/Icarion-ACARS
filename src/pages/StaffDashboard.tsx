@@ -2,43 +2,44 @@ import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserDetailsDialog from '@/components/UserDetailsDialog';
 import UserManagementTab from '@/components/staff/UserManagementTab';
-import TrainingRequestManagementTab from '@/components/staff/TrainingRequestManagementTab';
+import RequestManagementTab from '@/components/staff/RequestManagementTab'; // Changed import
 import LogbookEntryManagementTab from '@/components/staff/LogbookEntryManagementTab';
 import FlightBookingManagementTab from '@/components/staff/FlightBookingManagementTab';
 import JobOpeningManagementTab from '@/components/staff/JobOpeningManagementTab';
 import CreateJobOpeningForm from '@/components/staff/CreateJobOpeningForm';
-import JobApplicationManagementTab from '@/components/staff/JobApplicationManagementTab'; // New import
+import JobApplicationManagementTab from '@/components/staff/JobApplicationManagementTab';
 import { useStaffDashboardData } from '@/hooks/use-staff-dashboard-data';
 
 const StaffDashboard = () => {
   const {
     users,
-    trainingRequests,
+    requests, // Changed from trainingRequests
     flights,
     flightBookings,
     jobOpenings,
-    jobApplications, // New data from hook
+    jobApplications,
     staffMembers,
     loading,
     currentUserIsStaff,
     fetchUsers,
     fetchStaffMembers,
-    fetchTrainingRequests,
+    fetchUserRequests, // Changed from fetchTrainingRequests
     fetchAllFlights,
     fetchAllFlightBookings,
     fetchJobOpenings,
-    fetchJobApplications, // New fetch function
+    fetchJobApplications,
     handleUserUpdate,
-    handleTrainingRequestStatusUpdate,
-    handleAssignInstructor,
+    handleUpdateRequestStatus, // Changed from handleTrainingRequestStatusUpdate
+    handleAssignStaff, // Changed from handleAssignInstructor
+    handleUpdateResolutionNotes, // New handler
     handleBookingStatusUpdate,
     handleDeleteBooking,
     handleDeleteFlight,
     handleCreateJobOpening,
     handleUpdateJobOpening,
     handleDeleteJobOpening,
-    handleUpdateApplicationStatus, // New handler
-    handleDeleteApplication, // New handler
+    handleUpdateApplicationStatus,
+    handleDeleteApplication,
   } = useStaffDashboardData();
 
   const [isUserDetailsDialogOpen, setIsUserDetailsDialogOpen] = useState(false);
@@ -54,8 +55,8 @@ const StaffDashboard = () => {
         fetchUsers();
         fetchStaffMembers();
         break;
-      case 'training-requests':
-        fetchTrainingRequests();
+      case 'requests': // Changed from training-requests
+        fetchUserRequests(); // Changed from fetchTrainingRequests
         fetchStaffMembers();
         break;
       case 'logbook-entries':
@@ -70,13 +71,13 @@ const StaffDashboard = () => {
       case 'job-openings':
         fetchJobOpenings();
         break;
-      case 'job-applications': // New case
+      case 'job-applications':
         fetchJobApplications();
         break;
       default:
         break;
     }
-  }, [activeTab, currentUserIsStaff, fetchUsers, fetchStaffMembers, fetchTrainingRequests, fetchAllFlights, fetchAllFlightBookings, fetchJobOpenings, fetchJobApplications]);
+  }, [activeTab, currentUserIsStaff, fetchUsers, fetchStaffMembers, fetchUserRequests, fetchAllFlights, fetchAllFlightBookings, fetchJobOpenings, fetchJobApplications]);
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Loading Staff Dashboard...</div>;
@@ -98,14 +99,14 @@ const StaffDashboard = () => {
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Staff Dashboard</h1>
 
       <Tabs defaultValue="users" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-5 lg:grid-cols-7"> {/* Adjusted grid-cols */}
+        <TabsList className="grid w-full grid-cols-5 lg:grid-cols-7">
           <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="training-requests">Training Requests</TabsTrigger>
+          <TabsTrigger value="requests">Requests</TabsTrigger> {/* Changed label */}
           <TabsTrigger value="logbook-entries">Logbook Entries</TabsTrigger>
           <TabsTrigger value="flight-bookings">Flight Bookings</TabsTrigger>
           <TabsTrigger value="announcements">Announcements</TabsTrigger>
           <TabsTrigger value="job-openings">Job Openings</TabsTrigger>
-          <TabsTrigger value="job-applications">Job Applications</TabsTrigger> {/* New Tab Trigger */}
+          <TabsTrigger value="job-applications">Job Applications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="mt-6">
@@ -119,12 +120,13 @@ const StaffDashboard = () => {
           />
         </TabsContent>
 
-        <TabsContent value="training-requests" className="mt-6">
-          <TrainingRequestManagementTab
-            trainingRequests={trainingRequests}
+        <TabsContent value="requests" className="mt-6"> {/* Changed value */}
+          <RequestManagementTab
+            requests={requests} // Changed prop
             staffMembers={staffMembers}
-            handleTrainingRequestStatusUpdate={handleTrainingRequestStatusUpdate}
-            handleAssignInstructor={handleAssignInstructor}
+            handleUpdateRequestStatus={handleUpdateRequestStatus} // Changed prop
+            handleAssignStaff={handleAssignStaff} // Changed prop
+            handleUpdateResolutionNotes={handleUpdateResolutionNotes} // New prop
           />
         </TabsContent>
 
@@ -159,7 +161,7 @@ const StaffDashboard = () => {
           />
         </TabsContent>
 
-        <TabsContent value="job-applications" className="mt-6"> {/* New Tab Content */}
+        <TabsContent value="job-applications" className="mt-6">
           <JobApplicationManagementTab
             jobApplications={jobApplications}
             handleUpdateApplicationStatus={handleUpdateApplicationStatus}

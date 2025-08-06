@@ -13,7 +13,7 @@ import StaffDashboard from "./pages/StaffDashboard";
 import PlanFlight from "./pages/PlanFlight";
 import MyBookings from "./pages/MyBookings";
 import Announcements from "./pages/Announcements";
-import MyTrainingRequests from "./pages/MyTrainingRequests";
+import MyRequests from "./pages/MyRequests"; // Changed import
 import LogFlight from "./pages/LogFlight";
 import FlightBriefing from "./pages/FlightBriefing";
 import Careers from "./pages/Careers";
@@ -139,11 +139,11 @@ const App = () => {
                 }
               />
               <Route
-                path="/my-training-requests"
+                path="/my-requests" // Changed route path
                 element={
                   <ProtectedRoute>
                     <Navbar />
-                    <MyTrainingRequests />
+                    <MyRequests /> {/* Changed component name */}
                   </ProtectedRoute>
                 }
               />

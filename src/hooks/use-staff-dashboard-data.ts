@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
+import { RANK_ORDER } from '@/utils/aircraftData'; // Import RANK_ORDER for rank updates
 
 interface Profile {
   id: string;
@@ -16,22 +17,29 @@ interface Profile {
   type_ratings: string[] | null; // New field
 }
 
-interface TrainingRequest {
+interface UserRequest {
   id: string;
   user_id: string;
-  desired_rank: string;
-  aircraft_type: string;
-  preferred_date_time: string;
-  prior_experience: string | null;
-  optional_message: string | null;
+  request_type: string;
   status: string;
+  details: {
+    desired_rank?: string;
+    aircraft_type?: string;
+    preferred_date_time?: string;
+    prior_experience?: string;
+    optional_message?: string;
+    subject?: string;
+    message?: string;
+  } | null;
   created_at: string;
-  instructor_id: string | null;
+  assigned_to: string | null;
+  resolution_notes: string | null;
   user_profile: {
     display_name: string | null;
     email: string | null;
+    rank: string;
   } | null;
-  instructor_profile: {
+  assigned_to_profile: {
     display_name: string | null;
   } | null;
 }
@@ -140,11 +148,11 @@ interface JobApplication {
 
 export const useStaffDashboardData = () => {
   const [users, setUsers] = useState<Profile[]>([]);
-  const [trainingRequests, setTrainingRequests] = useState<TrainingRequest[]>([]);
+  const [requests, setRequests] = useState<UserRequest[]>([]); // Changed from trainingRequests
   const [flights, setFlights] = useState<Flight[]>([]);
   const [flightBookings, setFlightBookings] = useState<FlightBooking[]>([]);
   const [jobOpenings, setJobOpenings] = useState<JobOpening[]>([]);
-  const [jobApplications, setJobApplications] = useState<JobApplication[]>([]); // New state for job applications
+  const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
   const [staffMembers, setStaffMembers] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentUserIsStaff, setCurrentUserIsStaff] = useState(false);
@@ -227,40 +235,40 @@ export const useStaffDashboardData = () => {
     }
   }, []);
 
-  const fetchTrainingRequests = useCallback(async () => {
-    const selectString = "id,user_id,desired_rank,aircraft_type,preferred_date_time,prior_experience,optional_message,status,created_at,instructor_id,instructor_profile:profiles!fk_training_requests_instructor_id(display_name)";
-    console.log("useStaffDashboardData - Training Requests Select String:", selectString);
+  const fetchUserRequests = useCallback(async () => { // Renamed from fetchTrainingRequests
+    const selectString = "*,user_profile:profiles!user_requests_user_id_fkey(display_name,email,rank),assigned_to_profile:profiles!user_requests_assigned_to_fkey(display_name)";
+    console.log("useStaffDashboardData - User Requests Select String:", selectString);
     const { data, error } = await supabase
-      .from('training_requests')
+      .from('user_requests') // Changed table to user_requests
       .select(selectString)
       .order('created_at', { ascending: false });
 
     if (error) {
-      showError('Error fetching training requests: ' + error.message);
-      console.error('Error fetching training requests:', error);
+      showError('Error fetching user requests: ' + error.message);
+      console.error('Error fetching user requests:', error);
       return;
     }
 
     const allRelatedUserIds = new Set<string>();
     data.forEach(req => {
       allRelatedUserIds.add(req.user_id);
-      if (req.instructor_id) {
-        allRelatedUserIds.add(req.instructor_id);
+      if (req.assigned_to) {
+        allRelatedUserIds.add(req.assigned_to);
       }
     });
 
     const userEmails = await fetchEmailsForUserIds(Array.from(allRelatedUserIds));
-    const userDisplayNames = await fetchProfilesData(Array.from(allRelatedUserIds));
+    // user_profile and assigned_to_profile are already embedded, just need to ensure email is there
 
     const requestsWithProfiles = data.map(req => ({
       ...req,
-      user_profile: {
-        display_name: userDisplayNames[req.user_id]?.display_name || null,
-        email: userEmails[req.user_id] || null,
-      },
+      user_profile: req.user_profile ? {
+        ...req.user_profile,
+        email: userEmails[req.user_id] || req.user_profile.email || null, // Ensure email is populated
+      } : null,
     }));
-    setTrainingRequests(requestsWithProfiles as TrainingRequest[]);
-  }, [fetchEmailsForUserIds, fetchProfilesData]);
+    setRequests(requestsWithProfiles as UserRequest[]); // Changed state to requests
+  }, [fetchEmailsForUserIds]);
 
   const fetchAllFlights = useCallback(async () => {
     const { data, error } = await supabase
@@ -333,7 +341,6 @@ export const useStaffDashboardData = () => {
   }, []);
 
   const fetchJobApplications = useCallback(async () => {
-    // Select job_opening and user_profile data, but DO NOT include email in user_profile select
     const { data, error } = await supabase
       .from('job_applications')
       .select("*,job_opening:job_openings(title,questions),user_profile:profiles(display_name,first_name,last_name,discord_username,vatsim_ivao_id,avatar_url,is_staff,rank,type_ratings)") // Added type_ratings
@@ -349,7 +356,6 @@ export const useStaffDashboardData = () => {
     data.forEach(app => allApplicantUserIds.add(app.user_id));
 
     const userEmails = await fetchEmailsForUserIds(Array.from(allApplicantUserIds));
-    // No need to fetch profiles again if user_profile is already embedded, but we need to add email
 
     const applicationsWithEmails = data.map(app => ({
       ...app,
@@ -403,18 +409,28 @@ export const useStaffDashboardData = () => {
     }
   }, [fetchUsers]);
 
-  const handleTrainingRequestStatusUpdate = useCallback(async (requestId: string, newStatus: string, userId: string, desiredRank: string) => {
+  const handleUpdateRequestStatus = useCallback(async (requestId: string, newStatus: string, userId: string, desiredRank?: string) => {
     const { error } = await supabase
-      .from('training_requests')
+      .from('user_requests') // Changed table to user_requests
       .update({ status: newStatus })
       .eq('id', requestId);
 
     if (error) {
       showError('Error updating request status: ' + error.message);
     } else {
-      showSuccess('Training request status updated!');
-      if (newStatus === 'Completed') {
-        if (window.confirm(`Are you sure you want to promote this pilot to ${desiredRank}?`)) {
+      showSuccess('Request status updated!');
+      // If a training/exam request is completed and a desired rank is provided, update pilot's rank
+      if (newStatus === 'Completed' && desiredRank) {
+        const { data: currentProfile, error: profileError } = await supabase
+          .from('profiles')
+          .select('rank')
+          .eq('id', userId)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching current pilot rank:', profileError);
+          showError('Error fetching pilot rank for update.');
+        } else if (currentProfile && RANK_ORDER[desiredRank] > RANK_ORDER[currentProfile.rank]) {
           const { error: rankUpdateError } = await supabase
             .from('profiles')
             .update({ rank: desiredRank })
@@ -426,25 +442,41 @@ export const useStaffDashboardData = () => {
             showSuccess(`Pilot rank updated to ${desiredRank}!`);
             fetchUsers(); // Refresh users to show new rank
           }
+        } else if (currentProfile && RANK_ORDER[desiredRank] <= RANK_ORDER[currentProfile.rank]) {
+          showSuccess(`Pilot's current rank (${currentProfile.rank}) is already equal to or higher than the desired rank (${desiredRank}). Rank not updated.`);
         }
       }
-      fetchTrainingRequests(); // Refresh training requests after update
+      fetchUserRequests(); // Refresh requests after update
     }
-  }, [fetchTrainingRequests, fetchUsers]);
+  }, [fetchUserRequests, fetchUsers]);
 
-  const handleAssignInstructor = useCallback(async (requestId: string, instructorId: string | null) => {
+  const handleAssignStaff = useCallback(async (requestId: string, staffId: string | null) => {
     const { error } = await supabase
-      .from('training_requests')
-      .update({ instructor_id: instructorId })
+      .from('user_requests') // Changed table to user_requests
+      .update({ assigned_to: staffId })
       .eq('id', requestId);
 
     if (error) {
-      showError('Error assigning instructor: ' + error.message);
+      showError('Error assigning staff: ' + error.message);
     } else {
-      showSuccess('Instructor assigned successfully!');
-      fetchTrainingRequests(); // Refresh training requests after update
+      showSuccess('Staff assigned successfully!');
+      fetchUserRequests(); // Refresh requests after update
     }
-  }, [fetchTrainingRequests]);
+  }, [fetchUserRequests]);
+
+  const handleUpdateResolutionNotes = useCallback(async (requestId: string, notes: string) => {
+    const { error } = await supabase
+      .from('user_requests')
+      .update({ resolution_notes: notes })
+      .eq('id', requestId);
+
+    if (error) {
+      showError('Error updating resolution notes: ' + error.message);
+    } else {
+      showSuccess('Resolution notes updated!');
+      fetchUserRequests(); // Refresh requests
+    }
+  }, [fetchUserRequests]);
 
   const handleBookingStatusUpdate = useCallback(async (bookingId: string, newStatus: string) => {
     const { error } = await supabase
@@ -573,7 +605,7 @@ export const useStaffDashboardData = () => {
 
   return {
     users,
-    trainingRequests,
+    requests, // Changed from trainingRequests
     flights,
     flightBookings,
     jobOpenings,
@@ -583,14 +615,15 @@ export const useStaffDashboardData = () => {
     currentUserIsStaff,
     fetchUsers,
     fetchStaffMembers,
-    fetchTrainingRequests,
+    fetchUserRequests, // Changed from fetchTrainingRequests
     fetchAllFlights,
     fetchAllFlightBookings,
     fetchJobOpenings,
     fetchJobApplications,
     handleUserUpdate,
-    handleTrainingRequestStatusUpdate,
-    handleAssignInstructor,
+    handleUpdateRequestStatus, // Changed from handleTrainingRequestStatusUpdate
+    handleAssignStaff, // Changed from handleAssignInstructor
+    handleUpdateResolutionNotes, // New handler
     handleBookingStatusUpdate,
     handleDeleteBooking,
     handleDeleteFlight,

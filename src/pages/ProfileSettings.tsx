@@ -10,6 +10,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import RequestFormSheet from '@/components/RequestFormSheet'; // New import
 
 interface Profile {
   id: string;
@@ -53,82 +54,78 @@ const ProfileSettings = () => {
   const [newEmail, setNewEmail] = useState('');
   const [currentEmail, setCurrentEmail] = useState('');
 
-  const [desiredRank, setDesiredRank] = useState('');
-  const [aircraftType, setAircraftType] = useState('');
-  const [preferredDateTime, setPreferredDateTime] = useState('');
-  const [priorExperience, setPriorExperience] = useState('');
-  const [optionalMessage, setOptionalMessage] = useState('');
-
   const [totalFlights, setTotalFlights] = useState(0);
   const [totalFlightTime, setTotalFlightTime] = useState('0h 0m');
   const [averageLandingRate, setAverageLandingRate] = useState('N/A');
 
+  const [isRequestSheetOpen, setIsRequestSheetOpen] = useState(false); // State for the new sheet
+
   const { theme, setTheme } = useTheme();
 
-  useEffect(() => {
-    const fetchProfileAndFlights = async () => {
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError) {
-        showError('Error fetching user data.');
-        return;
+  const fetchProfileAndFlights = async () => {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+      showError('Error fetching user data.');
+      return;
+    }
+    if (user) {
+      setCurrentEmail(user.email || '');
+      
+      // Fetch profile data
+      const { data: profileData, error: profileError } = await supabase
+        .from('profiles')
+        .select('id, first_name, last_name, display_name, discord_username, vatsim_ivao_id, avatar_url, type_ratings, rank') // Added rank
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        showError('Error fetching profile data.');
+        console.error('Error fetching profile:', profileError);
+      } else {
+        setProfile(profileData);
+        setFirstName(profileData.first_name || '');
+        setLastName(profileData.last_name || '');
+        setDisplayName(profileData.display_name || '');
+        setDiscordUsername(profileData.discord_username || '');
+        setVatsimIvaoId(profileData.vatsim_ivao_id || '');
       }
-      if (user) {
-        setCurrentEmail(user.email || '');
+
+      // Fetch flight data
+      const { data: flightsData, error: flightsError } = await supabase
+        .from('flights')
+        .select('flight_time, landing_rate')
+        .eq('user_id', user.id);
+
+      if (flightsError) {
+        console.error('Error fetching flights:', flightsError);
+      } else {
+        setTotalFlights(flightsData.length);
         
-        // Fetch profile data
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('id, first_name, last_name, display_name, discord_username, vatsim_ivao_id, avatar_url, type_ratings, rank') // Added rank
-          .eq('id', user.id)
-          .single();
+        let totalMinutes = 0;
+        let totalLandingRate = 0;
+        let landingRateCount = 0;
 
-        if (profileError) {
-          showError('Error fetching profile data.');
-          console.error('Error fetching profile:', profileError);
-        } else {
-          setProfile(profileData);
-          setFirstName(profileData.first_name || '');
-          setLastName(profileData.last_name || '');
-          setDisplayName(profileData.display_name || '');
-          setDiscordUsername(profileData.discord_username || '');
-          setVatsimIvaoId(profileData.vatsim_ivao_id || '');
-        }
-
-        // Fetch flight data
-        const { data: flightsData, error: flightsError } = await supabase
-          .from('flights')
-          .select('flight_time, landing_rate')
-          .eq('user_id', user.id);
-
-        if (flightsError) {
-          console.error('Error fetching flights:', flightsError);
-        } else {
-          setTotalFlights(flightsData.length);
-          
-          let totalMinutes = 0;
-          let totalLandingRate = 0;
-          let landingRateCount = 0;
-
-          flightsData.forEach((flight: Flight) => {
-            if (flight.flight_time) {
-              totalMinutes += convertFlightTimeToMinutes(flight.flight_time);
-            }
-            if (flight.landing_rate !== null) {
-              totalLandingRate += flight.landing_rate;
-              landingRateCount++;
-            }
-          });
-
-          setTotalFlightTime(formatMinutesToHoursAndMinutes(totalMinutes));
-          if (landingRateCount > 0) {
-            setAverageLandingRate(Math.round(totalLandingRate / landingRateCount).toString() + ' fpm');
-          } else {
-            setAverageLandingRate('N/A');
+        flightsData.forEach((flight: Flight) => {
+          if (flight.flight_time) {
+            totalMinutes += convertFlightTimeToMinutes(flight.flight_time);
           }
+          if (flight.landing_rate !== null) {
+            totalLandingRate += flight.landing_rate;
+            landingRateCount++;
+          }
+        });
+
+        setTotalFlightTime(formatMinutesToHoursAndMinutes(totalMinutes));
+        if (landingRateCount > 0) {
+          setAverageLandingRate(Math.round(totalLandingRate / landingRateCount).toString() + ' fpm');
+        } else {
+          setAverageLandingRate('N/A');
         }
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     fetchProfileAndFlights();
   }, []);
 
@@ -202,41 +199,6 @@ const ProfileSettings = () => {
     } else {
       showSuccess('Email update request sent! Please check your new email for confirmation.');
       setNewEmail('');
-    }
-  };
-
-  const handleTrainingRequest = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!desiredRank || !aircraftType || !preferredDateTime || !priorExperience) {
-      showError('Please fill all required fields for the request.');
-      return;
-    }
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      showError('User not logged in.');
-      return;
-    }
-
-    const { error } = await supabase.from('training_requests').insert({
-      user_id: user.id,
-      desired_rank: desiredRank,
-      aircraft_type: aircraftType,
-      preferred_date_time: preferredDateTime,
-      prior_experience: priorExperience,
-      optional_message: optionalMessage,
-      status: 'Pending',
-    });
-
-    if (error) {
-      showError('Error submitting request: ' + error.message);
-    } else {
-      showSuccess('Training/Exam request submitted successfully!');
-      setDesiredRank('');
-      setAircraftType('');
-      setPreferredDateTime('');
-      setPriorExperience('');
-      setOptionalMessage('');
     }
   };
 
@@ -390,64 +352,16 @@ const ProfileSettings = () => {
           </CardContent>
         </Card>
 
-        {/* Training/Exam Request Card */}
+        {/* New Request Button Card */}
         <Card className="col-span-1">
           <CardHeader>
-            <CardTitle>Training/Exam Request</CardTitle>
-            <CardDescription>Request training or an exam for a rank upgrade.</CardDescription>
+            <CardTitle>Submit a Request</CardTitle>
+            <CardDescription>Submit training, exam, support, or general inquiries.</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleTrainingRequest} className="space-y-4">
-              <div>
-                <Label htmlFor="desiredRank">Desired Rank</Label>
-                <Select value={desiredRank} onValueChange={setDesiredRank}>
-                  <SelectTrigger id="desiredRank">
-                    <SelectValue placeholder="Select a rank" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="First Officer">First Officer</SelectItem>
-                    <SelectItem value="Captain">Captain</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="aircraftType">Preferred Aircraft Type</Label>
-                <Input
-                  id="aircraftType"
-                  value={aircraftType}
-                  onChange={(e) => setAircraftType(e.target.value)}
-                  placeholder="e.g., A320, B737"
-                />
-              </div>
-              <div>
-                <Label htmlFor="preferredDateTime">Preferred Date/Time</Label>
-                <Input
-                  id="preferredDateTime"
-                  type="datetime-local"
-                  value={preferredDateTime}
-                  onChange={(e) => setPreferredDateTime(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="priorExperience">Prior Experience</Label>
-                <Textarea
-                  id="priorExperience"
-                  value={priorExperience}
-                  onChange={(e) => setPriorExperience(e.target.value)}
-                  placeholder="Describe your prior experience relevant to this rank."
-                />
-              </div>
-              <div>
-                <Label htmlFor="optionalMessage">Optional Message</Label>
-                <Textarea
-                  id="optionalMessage"
-                  value={optionalMessage}
-                  onChange={(e) => setOptionalMessage(e.target.value)}
-                  placeholder="Any additional notes for the staff."
-                />
-              </div>
-              <Button type="submit" className="w-full">Submit Request</Button>
-            </form>
+            <Button onClick={() => setIsRequestSheetOpen(true)} className="w-full">
+              Open Request Form
+            </Button>
           </CardContent>
         </Card>
 
@@ -467,6 +381,15 @@ const ProfileSettings = () => {
           </CardContent>
         </Card>
       </div>
+
+      {profile && (
+        <RequestFormSheet
+          isOpen={isRequestSheetOpen}
+          onClose={() => setIsRequestSheetOpen(false)}
+          onSuccess={fetchProfileAndFlights} // Refresh data if needed, or just close
+          userProfile={profile}
+        />
+      )}
     </div>
   );
 };
