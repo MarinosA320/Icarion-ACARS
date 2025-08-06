@@ -75,6 +75,7 @@ const Logbook = () => {
   const [hasSavedFlight, setHasSavedFlight] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0); // State for current flight index
+  const [showSimbriefUrlInput, setShowSimbriefUrlInput] = useState(false); // New state for SimBrief input visibility
 
   useEffect(() => {
     fetchFlights();
@@ -108,7 +109,8 @@ const Logbook = () => {
 
     let query = supabase
       .from('flights')
-      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at');
+      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at')
+      .order('created_at', { ascending: false });
 
     if (!profileData?.is_staff) {
       query = query.eq('user_id', user.id);
@@ -273,25 +275,33 @@ const Logbook = () => {
           <Button onClick={handleLogVatsimFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingVatsimFlight}>
             {isLoggingVatsimFlight ? 'Checking VATSIM...' : 'Log Active VATSIM Flight'}
           </Button>
+          <Button onClick={() => setShowSimbriefUrlInput(true)} className="px-6 py-3 text-lg w-full md:w-auto" disabled={showSimbriefUrlInput}>
+            Log SimBrief Flight
+          </Button>
           {hasSavedFlight && (
             <Button onClick={handleResumeFlight} className="px-6 py-3 text-lg w-full md:w-auto" variant="secondary">
               Resume Saved Flight
             </Button>
           )}
         </div>
-        <div className="flex flex-col md:flex-row gap-2 items-center mt-4">
-          <Input
-            type="url"
-            placeholder="Paste SimBrief Dispatch URL here..."
-            value={simbriefUrl}
-            onChange={(e) => setSimbriefUrl(e.target.value)}
-            className="flex-grow"
-            disabled={isLoggingSimbriefFlight}
-          />
-          <Button onClick={handleLogSimbriefFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingSimbriefFlight}>
-            {isLoggingSimbriefFlight ? 'Parsing SimBrief...' : 'Log SimBrief Flight'}
-          </Button>
-        </div>
+        {showSimbriefUrlInput && (
+          <div className="flex flex-col md:flex-row gap-2 items-center mt-4">
+            <Input
+              type="url"
+              placeholder="Paste SimBrief Dispatch URL here..."
+              value={simbriefUrl}
+              onChange={(e) => setSimbriefUrl(e.target.value)}
+              className="flex-grow"
+              disabled={isLoggingSimbriefFlight}
+            />
+            <Button onClick={handleLogSimbriefFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingSimbriefFlight}>
+              {isLoggingSimbriefFlight ? 'Parsing SimBrief...' : 'Log SimBrief Flight'}
+            </Button>
+            <Button onClick={() => { setShowSimbriefUrlInput(false); setSimbriefUrl(''); }} variant="outline" className="px-6 py-3 text-lg w-full md:w-auto">
+              Cancel
+            </Button>
+          </div>
+        )}
       </div>
 
       {loading ? (
