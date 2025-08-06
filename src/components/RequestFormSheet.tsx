@@ -96,7 +96,7 @@ const RequestFormSheet: React.FC<RequestFormSheetProps> = ({ isOpen, onClose, on
             details = {
               desired_rank: desiredRank,
               aircraft_type: aircraftType,
-              preferred_date_time: preferredDateTime, // Stored as ISO string, Supabase handles TZ
+              preferred_date_time: preferredDateTime ? new Date(preferredDateTime).toISOString() : null, // Convert to ISO string (UTC)
               prior_experience: priorExperience,
               optional_message: optionalMessage,
             };
@@ -153,6 +153,7 @@ const RequestFormSheet: React.FC<RequestFormSheetProps> = ({ isOpen, onClose, on
     switch (requestType) {
       case 'training':
       case 'exam':
+        const availableRanksForProgression = Object.keys(RANK_ORDER).filter(rank => RANK_ORDER[rank] > RANK_ORDER[userProfile?.rank || 'Visitor']);
         return (
           <>
             <div>
@@ -162,9 +163,13 @@ const RequestFormSheet: React.FC<RequestFormSheetProps> = ({ isOpen, onClose, on
                   <SelectValue placeholder="Select a rank" />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.keys(RANK_ORDER).filter(rank => RANK_ORDER[rank] > RANK_ORDER[userProfile?.rank || 'Visitor']).map(rank => (
-                    <SelectItem key={rank} value={rank}>{rank}</SelectItem>
-                  ))}
+                  {availableRanksForProgression.length > 0 ? (
+                    availableRanksForProgression.map(rank => (
+                      <SelectItem key={rank} value={rank}>{rank}</SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="no-higher-rank" disabled>No higher ranks available</SelectItem>
+                  )}
                 </SelectContent>
               </Select>
             </div>
