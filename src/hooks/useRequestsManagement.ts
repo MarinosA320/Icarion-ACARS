@@ -35,7 +35,7 @@ export const useRequestsManagement = () => {
   const [requests, setRequests] = useState<UserRequest[]>([]);
 
   const fetchUserRequests = useCallback(async () => {
-    const selectString = "*,user_profile:profiles(display_name,rank),assigned_to_profile:profiles(display_name)";
+    const selectString = "*,user_profile:profiles!user_requests_user_id_fkey(display_name,rank),assigned_to_profile:profiles!user_requests_assigned_to_fkey(display_name)"; // Explicitly define foreign keys
     const { data, error } = await supabase
       .from('user_requests')
       .select(selectString)

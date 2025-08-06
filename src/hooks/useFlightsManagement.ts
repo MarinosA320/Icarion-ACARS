@@ -43,7 +43,7 @@ export const useFlightsManagement = () => {
   const fetchAllFlights = useCallback(async () => {
     const { data, error } = await supabase
       .from('flights')
-      .select("*,user_profile:profiles(display_name,is_staff,vatsim_ivao_id)");
+      .select("*,user_profile:profiles!flights_user_id_fkey(display_name,is_staff,vatsim_ivao_id)"); // Explicitly define foreign key
 
     if (error) {
       showError('Error fetching all flights: ' + error.message);

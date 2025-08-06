@@ -37,7 +37,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, currentUserId }
     setLoading(true);
     const { data, error } = await supabase
       .from('comments')
-      .select('*,user_profile:profiles(display_name,avatar_url)') // Simplified select
+      .select('*,user_profile:profiles!comments_user_id_fkey(display_name,avatar_url)') // Explicitly define foreign key
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
 

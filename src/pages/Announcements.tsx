@@ -54,7 +54,7 @@ const Announcements = () => {
   }, []);
 
   const fetchAnnouncements = async () => {
-    const selectString = "*,author_profile:profiles(display_name)"; // Simplified select
+    const selectString = "*,author_profile:profiles!announcements_author_id_fkey(display_name)"; // Explicitly define foreign key
     console.log("Announcements - Select String:", selectString);
     const { data, error } = await supabase
       .from('announcements')

@@ -46,7 +46,7 @@ const SocialMedia = () => {
   const fetchPosts = async () => {
     setLoading(true);
     // Fetch posts and also join with likes to count them and check if current user liked
-    const selectString = "*,user_profile:profiles(display_name,avatar_url),likes(user_id)"; // Simplified select
+    const selectString = "*,user_profile:profiles!social_posts_user_id_fkey(display_name,avatar_url),likes(user_id)"; // Explicitly define foreign key
     console.log("SocialMedia - Select String:", selectString);
     const { data, error } = await supabase
       .from('social_posts')

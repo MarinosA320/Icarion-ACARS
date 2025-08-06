@@ -46,7 +46,7 @@ export const useJobApplicationsManagement = () => {
   const fetchJobApplications = useCallback(async () => {
     const { data, error } = await supabase
       .from('job_applications')
-      .select("*,job_opening:job_openings(title,questions),user_profile:profiles(display_name,first_name,last_name,discord_username,vatsim_ivao_id,avatar_url,is_staff,rank,type_ratings)")
+      .select("*,job_opening:job_openings(title,questions),user_profile:profiles!job_applications_user_id_fkey(display_name,first_name,last_name,discord_username,vatsim_ivao_id,avatar_url,is_staff,rank,type_ratings)") // Explicitly define foreign key
       .order('created_at', { ascending: false });
 
     if (error) {
