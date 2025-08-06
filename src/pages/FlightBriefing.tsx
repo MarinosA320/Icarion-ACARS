@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { showSuccess, showError } from '@/utils/toast';
 import { fetchNotams } from '@/utils/aviationApi';
 import { useLocation } from 'react-router-dom'; // Import useLocation
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 
 const FlightBriefing = () => {
   const location = useLocation();
@@ -62,6 +63,36 @@ const FlightBriefing = () => {
     }
   };
 
+  const renderBriefingSkeletons = () => (
+    <div className="space-y-8">
+      <Skeleton className="h-8 w-1/2 mx-auto" /> {/* Title skeleton */}
+      <Card className="shadow-md rounded-lg">
+        <CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-full" />
+        </CardContent>
+      </Card>
+      <Card className="shadow-md rounded-lg">
+        <CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-full" />
+        </CardContent>
+      </Card>
+      <Card className="shadow-md rounded-lg">
+        <CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-full" />
+        </CardContent>
+      </Card>
+    </div>
+  );
+
   return (
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Flight Briefing</h1>
@@ -110,7 +141,9 @@ const FlightBriefing = () => {
         </CardContent>
       </Card>
 
-      {(depNotams.length > 0 || arrNotams.length > 0) && (
+      {loading && (departureIcao || arrivalIcao) ? (
+        renderBriefingSkeletons()
+      ) : (depNotams.length > 0 || arrNotams.length > 0) && (
         <div className="space-y-8">
           <h2 className="text-2xl font-bold text-center text-gray-900 dark:text-white">Detailed Briefing</h2>
 

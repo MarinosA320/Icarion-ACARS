@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Heart } from 'lucide-react'; // Import Heart icon
 import CommentSection from '@/components/CommentSection'; // New import
 import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 
 interface SocialPost {
   id: string;
@@ -199,6 +200,35 @@ const SocialMedia = () => {
     }
   };
 
+  const renderSkeletons = () => (
+    Array.from({ length: 3 }).map((_, index) => (
+      <Card key={index} className="p-6 shadow-md rounded-lg">
+        <CardHeader className="flex flex-row items-center gap-4 p-0 pb-4">
+          <Skeleton className="h-10 w-10 rounded-full" />
+          <div>
+            <Skeleton className="h-4 w-32 mb-1" />
+            <Skeleton className="h-3 w-24" />
+          </div>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Skeleton className="w-full h-48 rounded-md mb-4" />
+          <Skeleton className="h-4 w-full mb-2" />
+          <Skeleton className="h-4 w-5/6" />
+          <div className="mt-4 flex items-center justify-between">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-20" />
+          </div>
+          <div className="mt-6 border-t pt-4 space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-5/6" />
+            <Skeleton className="h-16 w-full" />
+            <Skeleton className="h-10 w-24 self-end" />
+          </div>
+        </CardContent>
+      </Card>
+    ))
+  );
+
   return (
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Social Media Feed</h1>
@@ -235,13 +265,13 @@ const SocialMedia = () => {
 
       {/* Social Feed */}
       <div className="space-y-6">
-        {loading && posts.length === 0 ? (
-          <p className="text-center text-gray-600 dark:text-gray-400">Loading posts...</p>
+        {loading ? (
+          renderSkeletons()
         ) : posts.length === 0 ? (
           <p className="text-center text-gray-600 dark:text-gray-400">No posts yet. Be the first to share!</p>
         ) : (
           posts.map((post) => (
-            <Card key={post.id} className="p-6 shadow-md rounded-lg">
+            <Card key={post.id} className="p-6 shadow-md rounded-lg transition-transform duration-200 hover:scale-[1.01]">
               <CardHeader className="flex flex-row items-center gap-4 p-0 pb-4">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={post.user_profile?.avatar_url || undefined} alt={post.user_profile?.display_name || "User"} />

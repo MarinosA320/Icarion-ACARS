@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 
 interface FlightBooking {
   id: string;
@@ -85,12 +86,35 @@ const MyBookings = () => {
     }
   };
 
+  const renderSkeletons = () => (
+    Array.from({ length: 3 }).map((_, index) => (
+      <Card key={index} className="flex flex-col shadow-md rounded-lg">
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="flex-grow space-y-2">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-5/6" />
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-4 w-1/3" />
+        </CardContent>
+        <div className="p-6 pt-0 flex gap-2">
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </div>
+      </Card>
+    ))
+  );
+
   return (
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">My Bookings</h1>
 
-      {loading && bookings.length === 0 ? (
-        <p className="text-center text-gray-600 dark:text-gray-400">Loading your bookings...</p>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {renderSkeletons()}
+        </div>
       ) : bookings.length === 0 ? (
         <p className="text-center text-gray-600 dark:text-gray-400">You have no active flight bookings. Go to "Plan Flight" to create one!</p>
       ) : (

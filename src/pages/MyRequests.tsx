@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { showSuccess, showError } from '@/utils/toast';
 import { format } from 'date-fns';
 import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 
 interface UserRequest {
   id: string;
@@ -167,12 +168,30 @@ const MyRequests = () => {
     }
   };
 
+  const renderSkeletons = () => (
+    Array.from({ length: 3 }).map((_, index) => (
+      <Card key={index} className="flex flex-col shadow-md rounded-lg">
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="flex-grow space-y-2">
+          <Skeleton className="h-4 w-1/3" />
+          <Skeleton className="h-4 w-2/3" />
+          <Skeleton className="h-20 w-full" />
+        </CardContent>
+      </Card>
+    ))
+  );
+
   return (
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">My Requests</h1>
 
-      {loading && requests.length === 0 ? (
-        <p className="text-center text-gray-600 dark:text-gray-400">Loading your requests...</p>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {renderSkeletons()}
+        </div>
       ) : requests.length === 0 ? (
         <p className="text-center text-gray-600 dark:text-gray-400">You have not submitted any requests yet.</p>
       ) : (

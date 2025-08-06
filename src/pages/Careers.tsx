@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
 import JobListingCard from '@/components/JobListingCard';
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 
 interface JobOpening {
   id: string;
@@ -40,6 +41,18 @@ const Careers = () => {
     setLoading(false);
   };
 
+  const renderSkeletons = () => (
+    Array.from({ length: 3 }).map((_, index) => (
+      <div key={index} className="flex flex-col space-y-3">
+        <Skeleton className="h-[125px] w-full rounded-xl" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      </div>
+    ))
+  );
+
   return (
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Careers at Icarion VA</h1>
@@ -47,8 +60,10 @@ const Careers = () => {
         Join our team and help us build the future of virtual aviation!
       </p>
 
-      {loading && jobOpenings.length === 0 ? (
-        <p className="text-center text-gray-600 dark:text-gray-400">Loading job openings...</p>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {renderSkeletons()}
+        </div>
       ) : jobOpenings.length === 0 ? (
         <p className="text-center text-gray-600 dark:text-gray-400">No job openings available at the moment. Please check back later!</p>
       ) : (

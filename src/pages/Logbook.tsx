@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Input } from '@/components/ui/input'; // Import Input component
 import { ALL_AIRLINES } from '@/utils/aircraftData'; // Import ALL_AIRLINES
 import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 
 interface Flight {
   id: string;
@@ -230,6 +231,26 @@ const Logbook = () => {
     navigate('/log-flight');
   };
 
+  const renderSkeletons = () => (
+    Array.from({ length: 6 }).map((_, index) => (
+      <Card key={index} className="flex flex-col shadow-md rounded-lg">
+        <CardHeader>
+          <Skeleton className="h-6 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2" />
+          <Skeleton className="h-3 w-1/4" />
+        </CardHeader>
+        <CardContent className="flex-grow">
+          <Skeleton className="h-4 w-2/3 mb-2" />
+          <Skeleton className="h-4 w-1/3" />
+          <Skeleton className="h-48 w-full mt-4 rounded-md" />
+        </CardContent>
+        <div className="p-6 pt-0">
+          <Skeleton className="h-10 w-full" />
+        </div>
+      </Card>
+    ))
+  );
+
   return (
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Flight Logbook</h1>
@@ -260,7 +281,11 @@ const Logbook = () => {
         </div>
       </div>
 
-      {flights.length === 0 ? (
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {renderSkeletons()}
+        </div>
+      ) : flights.length === 0 ? (
         <p className="text-center text-gray-600 dark:text-gray-400">No flights logged yet.</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -5,16 +5,17 @@ import { Link } from 'react-router-dom';
 const HeroSection: React.FC = () => {
   return (
     <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center overflow-hidden bg-gradient-to-br from-icarion-blue-dark to-icarion-blue-DEFAULT text-white p-4">
-      {/* Background Image */}
-      {/* IMPORTANT: Please add a high-quality image named 'hero-background.jpg' to your public/images/ folder. */}
-      {/* Example: public/images/hero-background.jpg */}
-      <div className="absolute inset-0 z-0 opacity-40" style={{ 
-        backgroundImage: 'url(/images/hero-background.jpg)', // Use a real image path here
-        backgroundSize: 'cover', 
+      {/* Background Image with subtle overlay */}
+      <div className="absolute inset-0 z-0" style={{
+        backgroundImage: 'url(/images/hero-background.jpg)', // Ensure this image exists in public/images/
+        backgroundSize: 'cover',
         backgroundPosition: 'center',
-        filter: 'grayscale(50%) blur(2px)', // Subtle effect
-      }}></div>
-      <div className="absolute inset-0 z-0 bg-black opacity-60"></div> {/* Dark overlay for text readability */}
+      }}>
+        {/* Darker overlay on top of the image for better text contrast and depth */}
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+      </div>
+      {/* Gradient overlay for brand color integration */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-icarion-blue-dark to-icarion-blue-DEFAULT opacity-70"></div>
 
       {/* Content */}
       <div className="relative z-10 max-w-4xl mx-auto space-y-6 animate-fade-in-up">

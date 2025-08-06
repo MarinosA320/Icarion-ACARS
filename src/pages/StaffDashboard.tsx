@@ -9,6 +9,7 @@ import JobOpeningManagementTab from '@/components/staff/JobOpeningManagementTab'
 import CreateJobOpeningForm from '@/components/staff/CreateJobOpeningForm';
 import JobApplicationManagementTab from '@/components/staff/JobApplicationManagementTab';
 import { useStaffDashboardData } from '@/hooks/use-staff-dashboard-data';
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 
 const StaffDashboard = () => {
   const {
@@ -80,7 +81,15 @@ const StaffDashboard = () => {
   }, [activeTab, currentUserIsStaff, fetchUsers, fetchStaffMembers, fetchUserRequests, fetchAllFlights, fetchAllFlightBookings, fetchJobOpenings, fetchJobApplications]);
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">Loading Staff Dashboard...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <div className="text-center space-y-4">
+          <Skeleton className="h-10 w-64 mx-auto" />
+          <Skeleton className="h-6 w-96 mx-auto" />
+          <Skeleton className="h-4 w-48 mx-auto" />
+        </div>
+      </div>
+    );
   }
 
   if (!currentUserIsStaff) {

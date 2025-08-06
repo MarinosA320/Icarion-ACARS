@@ -65,17 +65,17 @@ const Navbar = () => {
 
   const navLinks = (
     <>
-      <Link to="/logbook" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Logbook</Link>
-      <Link to="/social-media" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Social Media</Link>
-      <Link to="/plan-flight" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Plan Flight</Link>
-      <Link to="/my-bookings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">My Bookings</Link>
-      <Link to="/my-requests" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">My Requests</Link>
-      <Link to="/announcements" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Announcements</Link>
-      <Link to="/flight-briefing" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Flight Briefing (Beta)</Link>
-      <Link to="/careers" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Careers</Link>
-      <Link to="/profile-settings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Profile Settings</Link>
+      <Link to="/logbook" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Logbook</Link>
+      <Link to="/social-media" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Social Media</Link>
+      <Link to="/plan-flight" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Plan Flight</Link>
+      <Link to="/my-bookings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">My Bookings</Link>
+      <Link to="/my-requests" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">My Requests</Link>
+      <Link to="/announcements" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Announcements</Link>
+      <Link to="/flight-briefing" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Flight Briefing (Beta)</Link>
+      <Link to="/careers" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Careers</Link>
+      <Link to="/profile-settings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Profile Settings</Link>
       {profile?.is_staff && (
-        <Link to="/staff-dashboard" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Staff Dashboard</Link>
+        <Link to="/staff-dashboard" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Staff Dashboard</Link>
       )}
     </>
   );

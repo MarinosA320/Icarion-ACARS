@@ -8,6 +8,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import EditAnnouncementDialog from '@/components/EditAnnouncementDialog';
 import CreateAnnouncementForm from '@/components/CreateAnnouncementForm';
 import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 
 interface Announcement {
   id: string;
@@ -103,6 +104,24 @@ const Announcements = () => {
     }
   };
 
+  const renderSkeletons = () => (
+    Array.from({ length: 3 }).map((_, index) => (
+      <Card key={index} className="p-6 shadow-md rounded-lg">
+        <CardHeader className="p-0 pb-4">
+          <Skeleton className="h-6 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/2" />
+        </CardHeader>
+        <CardContent className="p-0">
+          <Skeleton className="h-20 w-full" />
+          <div className="mt-4 flex gap-2">
+            <Skeleton className="h-8 w-20" />
+            <Skeleton className="h-8 w-20" />
+          </div>
+        </CardContent>
+      </Card>
+    ))
+  );
+
   return (
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Announcements</h1>
@@ -112,8 +131,8 @@ const Announcements = () => {
       )}
 
       <div className="space-y-6">
-        {loading && announcements.length === 0 ? (
-          <p className="text-center text-gray-600 dark:text-gray-400">Loading announcements...</p>
+        {loading ? (
+          renderSkeletons()
         ) : announcements.length === 0 ? (
           <p className="text-center text-gray-600 dark:text-gray-400">No announcements yet.</p>
         ) : (
