@@ -109,7 +109,11 @@ const Navbar = () => {
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.display_name || "User"} />
-                  <AvatarFallback>{profile?.display_name ? profile.display_name.charAt(0) : 'VA'}</AvatarFallback>
+                  <AvatarFallback>
+                    {typeof profile?.display_name === 'string' && profile.display_name.length > 0
+                      ? profile.display_name.charAt(0)
+                      : 'VA'}
+                  </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>

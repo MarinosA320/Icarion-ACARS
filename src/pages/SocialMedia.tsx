@@ -238,7 +238,11 @@ const SocialMedia = () => {
               <CardHeader className="flex flex-row items-center gap-4 p-0 pb-4">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={post.user_profile?.avatar_url || undefined} alt={post.user_profile?.display_name || "User"} />
-                  <AvatarFallback>{post.user_profile?.display_name ? post.user_profile.display_name.charAt(0) : 'VA'}</AvatarFallback>
+                  <AvatarFallback>
+                    {typeof post.user_profile?.display_name === 'string' && post.user_profile.display_name.length > 0
+                      ? post.user_profile.display_name.charAt(0)
+                      : 'VA'}
+                  </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-semibold text-gray-900 dark:text-white">{post.user_profile?.display_name || 'Anonymous Pilot'}</p>

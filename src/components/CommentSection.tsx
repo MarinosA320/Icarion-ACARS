@@ -110,7 +110,11 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, currentUserId }
             <div key={comment.id} className="flex items-start space-x-3 bg-gray-50 dark:bg-gray-700 p-3 rounded-md">
               <Avatar className="h-8 w-8">
                 <AvatarImage src={comment.user_profile?.avatar_url || undefined} alt={comment.user_profile?.display_name || "User"} />
-                <AvatarFallback>{comment.user_profile?.display_name ? comment.user_profile.display_name.charAt(0) : 'VA'}</AvatarFallback>
+                <AvatarFallback>
+                  {typeof comment.user_profile?.display_name === 'string' && comment.user_profile.display_name.length > 0
+                    ? comment.user_profile.display_name.charAt(0)
+                    : 'VA'}
+                </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center justify-between">
