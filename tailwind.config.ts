@@ -56,16 +56,16 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Custom Icarion brand colors
+        // Custom Icarion brand colors - refined for elegance
         icarion: {
           blue: {
-            DEFAULT: "hsl(210 80% 20%)", // Deep Icarion Blue
-            light: "hsl(200 90% 50%)", // Brighter accent blue
-            dark: "hsl(220 85% 10%)", // Even darker for gradients/shadows
+            DEFAULT: "hsl(210 70% 18%)", // Deeper, slightly less saturated blue
+            light: "hsl(200 80% 45%)", // Softer, more refined accent blue
+            dark: "hsl(220 75% 8%)",   // Very deep, almost black-blue for gradients
           },
           gold: {
-            DEFAULT: "hsl(40 90% 55%)", // A subtle gold accent
-            foreground: "hsl(222.2 47.4% 11.2%)",
+            DEFAULT: "hsl(40 40% 50%)", // Muted, antique gold - significantly less saturated
+            foreground: "hsl(222.2 47.4% 11.2%)", // Keep dark foreground for contrast
           },
         },
         sidebar: {

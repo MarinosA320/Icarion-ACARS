@@ -135,7 +135,7 @@ export default function Login() {
           <Checkbox
             id="terms"
             checked={agreedToPolicies}
-            onCheckedChange={(checked) => setAgreedToPolicies(!!checked)}
+            onCheckedChange={(checked) => setAgumedToPolicies(!!checked)}
           />
           <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             I agree to the{' '}
