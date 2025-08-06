@@ -2,15 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { showSuccess, showError } from '@/utils/toast';
 import { format } from 'date-fns';
-import { fetchVatsimPilotData, fetchSimbriefData } from '@/utils/flightDataFetch'; // Updated import
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { Input } from '@/components/ui/input'; // Import Input component
-import { ALL_AIRLINES } from '@/utils/aircraftData'; // Import ALL_AIRLINES
-import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+import { fetchVatsimPilotData, fetchSimbriefData } from '@/utils/flightDataFetch';
+import { useNavigate } from 'react-router-dom';
+import { Input } from '@/components/ui/input';
+import { ALL_AIRLINES } from '@/utils/aircraftData';
+import { fetchProfilesData } from '@/utils/supabaseDataFetch';
+import { Skeleton } from '@/components/ui/skeleton';
+import LogbookFlightPage from '@/components/LogbookFlightPage'; // New import
 
 interface Flight {
   id: string;
@@ -37,7 +37,7 @@ interface Flight {
   arrival_type: string | null;
   remarks: string | null;
   created_at: string;
-  user_id: string; // Add user_id to interface for manual join
+  user_id: string;
   user_profile: {
     display_name: string | null;
     is_staff: boolean | null;
@@ -69,14 +69,14 @@ const Logbook = () => {
   const [flights, setFlights] = useState<Flight[]>([]);
   const [isStaff, setIsStaff] = useState(false);
   const [isLoggingVatsimFlight, setIsLoggingVatsimFlight] = useState(false);
-  const [isLoggingSimbriefFlight, setIsLoggingSimbriefFlight] = useState(false); // New state
-  const [simbriefUrl, setSimbriefUrl] = useState(''); // New state for SimBrief URL
-  const [hasSavedFlight, setHasSavedFlight] = useState(false); // New state for saved flight
-  const [loading, setLoading] = useState(true); // Ensure loading state is defined
+  const [isLoggingSimbriefFlight, setIsLoggingSimbriefFlight] = useState(false);
+  const [simbriefUrl, setSimbriefUrl] = useState('');
+  const [hasSavedFlight, setHasSavedFlight] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0); // State for current flight index
 
   useEffect(() => {
     fetchFlights();
-    // Check for saved flight data in localStorage
     const savedFormData = localStorage.getItem('currentFlightForm');
     setHasSavedFlight(!!savedFormData);
   }, []);
@@ -107,8 +107,7 @@ const Logbook = () => {
 
     let query = supabase
       .from('flights')
-      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at')
-      .order('created_at', { ascending: false });
+      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at');
 
     if (!profileData?.is_staff) {
       query = query.eq('user_id', user.id);
@@ -131,6 +130,7 @@ const Logbook = () => {
       }));
 
       setFlights(flightsWithProfiles as Flight[]);
+      setCurrentPage(0); // Reset to first page on new data fetch
     }
     setLoading(false);
   };
@@ -204,12 +204,11 @@ const Logbook = () => {
       return;
     }
 
-    console.log('Logbook.tsx: Calling fetchSimbriefData with URL:', simbriefUrl); // Added log
+    console.log('Logbook.tsx: Calling fetchSimbriefData with URL:', simbriefUrl);
     const simbriefData = await fetchSimbriefData(simbriefUrl);
 
     if (simbriefData) {
       console.log('SimBrief data successfully retrieved:', simbriefData);
-      // Find the full airline name from ALL_AIRLINES based on ICAO
       const airline = ALL_AIRLINES.find(a => a.name.toUpperCase().includes(simbriefData.airlineIcao))?.name || 'Icarion Virtual';
 
       const dataToPass = {
@@ -221,7 +220,7 @@ const Logbook = () => {
         etd: simbriefData.etd,
         eta: simbriefData.eta,
         aircraftRegistration: simbriefData.aircraftRegistration,
-        airlineName: airline, // Pass the full airline name
+        airlineName: airline,
       };
       console.log('Data prepared for LogFlight page from SimBrief:', dataToPass);
       navigate('/log-flight', { state: { initialFlightData: dataToPass } });
@@ -235,27 +234,34 @@ const Logbook = () => {
     navigate('/log-flight');
   };
 
+  const handlePreviousPage = () => {
+    setCurrentPage(prev => Math.max(0, prev - 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(flights.length - 1, prev + 1));
+  };
+
   const renderSkeletons = () => (
-    Array.from({ length: 6 }).map((_, index) => (
-      <Card key={index} className="flex flex-col shadow-md rounded-lg">
-        <CardHeader>
-          <Skeleton className="h-6 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-1/2" />
-          <Skeleton className="h-3 w-1/4" />
-        </CardHeader>
-        <CardContent className="flex-grow">
-          <Skeleton className="h-4 w-2/3 mb-2" />
-          <Skeleton className="h-4 w-1/3" />
-          <Skeleton className="h-48 w-full mt-4 rounded-md" />
-        </CardContent>
-        <div className="p-6 pt-0">
-          <Skeleton className="h-10 w-full" />
-        </div>
-      </Card>
-    ))
+    <div className="flex flex-col items-center justify-center w-full max-w-3xl mx-auto h-[700px] bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8">
+      <Skeleton className="h-10 w-3/4 mb-6" />
+      <Skeleton className="h-6 w-1/2 mb-4" />
+      <Skeleton className="h-48 w-full rounded-md mb-6" />
+      <div className="grid grid-cols-2 gap-4 w-full">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-full" />
+      </div>
+      <Skeleton className="h-20 w-full mt-6" />
+      <div className="flex justify-between w-full mt-8">
+        <Skeleton className="h-10 w-24" />
+        <Skeleton className="h-10 w-24" />
+      </div>
+    </div>
   );
 
-  console.log('Logbook component rendering. Loading state:', loading); // Debugging line
+  console.log('Logbook component rendering. Loading state:', loading);
 
   return (
     <div className="container mx-auto p-4 pt-24">
@@ -288,91 +294,25 @@ const Logbook = () => {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {renderSkeletons()}
-        </div>
+        renderSkeletons()
       ) : flights.length === 0 ? (
-        <p className="text-center text-gray-600 dark:text-gray-400">No flights logged yet.</p>
+        <p className="text-center text-gray-600 dark:text-gray-400">No flights logged yet. Start by logging a flight!</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {flights.map((flight) => (
-            <Card key={flight.id} className="flex flex-col shadow-md rounded-lg">
-              <CardHeader>
-                <CardTitle className="text-lg">
-                  {flight.departure_airport} to {flight.arrival_airport}
-                </CardTitle>
-                <CardDescription className="text-sm">
-                  {flight.aircraft_type} - {flight.flight_time}
-                </CardDescription>
-                {isStaff && flight.user_profile?.display_name && (
-                  <p className="text-xs text-muted-foreground">Pilot: {flight.user_profile.display_name}</p>
-                )}
-              </CardHeader>
-              <CardContent className="flex-grow">
-                <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-                  Logged on: {format(new Date(flight.created_at), 'PPP p')}
-                </p>
-                {flight.landing_rate !== null && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Landing Rate: {flight.landing_rate} fpm
-                  </p>
-                )}
-                {flight.flight_image_url && (
-                  <img src={flight.flight_image_url} alt="Flight" className="mt-4 rounded-md object-cover w-full h-48" />
-                )}
-              </CardContent>
-              <div className="p-6 pt-0">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full">View Details</Button>
-                  </DialogTrigger>
-                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Flight Details: {flight.flight_number || 'N/A'}</DialogTitle>
-                      <DialogDescription>
-                        Detailed information about your flight from {flight.departure_airport} to {flight.arrival_airport}.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="grid grid-cols-2 gap-4 py-4 text-sm">
-                      <div className="col-span-2 font-semibold text-lg">Basic Info</div>
-                      <div><span className="font-medium">Aircraft Type:</span> {flight.aircraft_type}</div>
-                      <div><span className="font-medium">Flight Time:</span> {flight.flight_time}</div>
-                      <div><span className="font-medium">Landing Rate:</span> {flight.landing_rate || 'N/A'} fpm</div>
-                      <div><span className="font-medium">Pilot Role:</span> {flight.pilot_role}</div>
-                      <div><span className="font-medium">Flight Rules:</span> {flight.flight_rules || 'N/A'}</div>
-                      <div><span className="font-medium">Flight Number:</span> {flight.flight_number || 'N/A'}</div>
-
-                      <div className="col-span-2 font-semibold text-lg mt-4">Timestamps</div>
-                      <div><span className="font-medium">ETD:</span> {flight.etd ? format(new Date(flight.etd), 'PPP p') : 'N/A'}</div>
-                      <div><span className="font-medium">ATD:</span> {flight.atd ? format(new Date(flight.atd), 'PPP p') : 'N/A'}</div>
-                      <div><span className="font-medium">ETA:</span> {flight.eta ? format(new Date(flight.eta), 'PPP p') : 'N/A'}</div>
-                      <div><span className="font-medium">ATA:</span> {flight.ata ? format(new Date(flight.ata), 'PPP p') : 'N/A'}</div>
-
-                      <div className="col-span-2 font-semibold text-lg mt-4">Flight Plan & Remarks</div>
-                      <div className="col-span-2"><span className="font-medium">Flight Plan:</span> <p className="whitespace-pre-wrap">{flight.flight_plan || 'N/A'}</p></div>
-                      <div className="col-span-2"><span className="font-medium">Remarks:</span> <p className="whitespace-pre-wrap">{flight.remarks || 'N/A'}</p></div>
-
-                      <div className="col-span-2 font-semibold text-lg mt-4">Airport Details</div>
-                      <div><span className="font-medium">Departure Runway:</span> {flight.departure_runway || 'N/A'}</div>
-                      <div><span className="font-medium">Arrival Runway:</span> {flight.arrival_runway || 'N/A'}</div>
-                      <div><span className="font-medium">Taxiways Used:</span> {flight.taxiways_used || 'N/A'}</div>
-                      <div><span className="font-medium">Departure Gate:</span> {flight.gates_used_dep || 'N/A'}</div>
-                      <div><span className="font-medium">Arrival Gate:</span> {flight.gates_used_arr || 'N/A'}</div>
-                      <div><span className="font-medium">Departure Type:</span> {flight.departure_type || 'N/A'}</div>
-                      <div><span className="font-medium">Arrival Type:</span> {flight.arrival_type || 'N/A'}</div>
-
-                      {flight.flight_image_url && (
-                        <div className="col-span-2 mt-4">
-                          <span className="font-medium">Flight Image:</span>
-                          <img src={flight.flight_image_url} alt="Flight" className="mt-2 rounded-md object-cover w-full max-h-96" />
-                        </div>
-                      )}
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </Card>
-          ))}
+        <div className="relative w-full max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 min-h-[600px] flex flex-col">
+          {flights[currentPage] && (
+            <LogbookFlightPage flight={flights[currentPage]} isStaff={isStaff} />
+          )}
+          <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <Button onClick={handlePreviousPage} disabled={currentPage === 0}>
+              Previous Flight
+            </Button>
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              Flight {currentPage + 1} of {flights.length}
+            </span>
+            <Button onClick={handleNextPage} disabled={currentPage === flights.length - 1}>
+              Next Flight
+            </Button>
+          </div>
         </div>
       )}
     </div>
