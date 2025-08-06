@@ -43,7 +43,7 @@ export default function Login() {
               },
             },
           }}
-          theme="light"
+          // Removed theme="light" to allow dynamic theming
           redirectTo={window.location.origin + '/'}
           localization={{
             variables: {
@@ -135,7 +135,7 @@ export default function Login() {
           <Checkbox
             id="terms"
             checked={agreedToPolicies}
-            onCheckedChange={(checked) => setAgumedToPolicies(!!checked)}
+            onCheckedChange={(checked) => setAgreedToPolicies(!!checked)}
           />
           <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             I agree to the{' '}
