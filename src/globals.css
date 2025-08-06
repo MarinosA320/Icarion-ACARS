@@ -142,3 +142,23 @@
 .delay-200 { animation-delay: 0.2s; }
 .delay-400 { animation-delay: 0.4s; }
 .delay-600 { animation-delay: 0.6s; }
+
+/* Logbook Page Slide Transition */
+.page-slide-enter {
+  opacity: 0;
+  transform: translateX(100%);
+}
+.page-slide-enter-active {
+  opacity: 1;
+  transform: translateX(0%);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+.page-slide-exit {
+  opacity: 1;
+  transform: translateX(0%);
+}
+.page-slide-exit-active {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}

@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { ALL_AIRLINES } from '@/utils/aircraftData';
 import { fetchProfilesData } from '@/utils/supabaseDataFetch';
 import { Skeleton } from '@/components/ui/skeleton';
-import LogbookFlightPage from '@/components/LogbookFlightPage'; // New import
+import LogbookFlightPage from '@/components/LogbookFlightPage';
+import { CSSTransition, TransitionGroup } from 'react-transition-group'; // New imports for animation
 
 interface Flight {
   id: string;
@@ -107,7 +108,8 @@ const Logbook = () => {
 
     let query = supabase
       .from('flights')
-      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at');
+      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at')
+      .order('created_at', { ascending: false });
 
     if (!profileData?.is_staff) {
       query = query.eq('user_id', user.id);
@@ -296,12 +298,26 @@ const Logbook = () => {
       {loading ? (
         renderSkeletons()
       ) : flights.length === 0 ? (
-        <p className="text-center text-gray-600 dark:text-gray-400">No flights logged yet. Start by logging a flight!</p>
+        <div className="relative w-full max-w-3xl mx-auto bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col items-center justify-center text-center">
+          <h2 className="text-2xl font-bold text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT mb-4">Your Pilot Logbook</h2>
+          <p className="text-lg text-gray-600 dark:text-gray-400">No flights logged yet. Start your aviation journey!</p>
+          <p className="text-sm text-muted-foreground mt-2">Use the buttons above to log your first flight.</p>
+        </div>
       ) : (
-        <div className="relative w-full max-w-3xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-xl p-8 min-h-[600px] flex flex-col">
-          {flights[currentPage] && (
-            <LogbookFlightPage flight={flights[currentPage]} isStaff={isStaff} />
-          )}
+        <div className="relative w-full max-w-3xl mx-auto bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col">
+          <TransitionGroup className="relative flex-grow overflow-hidden">
+            <CSSTransition
+              key={currentPage}
+              timeout={300} // Duration of the animation
+              classNames="page-slide"
+            >
+              <div className="absolute inset-0"> {/* Wrapper for animation */}
+                {flights[currentPage] && (
+                  <LogbookFlightPage flight={flights[currentPage]} isStaff={isStaff} />
+                )}
+              </div>
+            </CSSTransition>
+          </TransitionGroup>
           <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
             <Button onClick={handlePreviousPage} disabled={currentPage === 0}>
               Previous Flight
