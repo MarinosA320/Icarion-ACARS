@@ -72,6 +72,7 @@ const Logbook = () => {
   const [isLoggingSimbriefFlight, setIsLoggingSimbriefFlight] = useState(false); // New state
   const [simbriefUrl, setSimbriefUrl] = useState(''); // New state for SimBrief URL
   const [hasSavedFlight, setHasSavedFlight] = useState(false); // New state for saved flight
+  const [loading, setLoading] = useState(true); // Ensure loading state is defined
 
   useEffect(() => {
     fetchFlights();
@@ -81,9 +82,11 @@ const Logbook = () => {
   }, []);
 
   const fetchFlights = async () => {
+    setLoading(true);
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       showError('User not logged in.');
+      setLoading(false);
       return;
     }
 
@@ -96,6 +99,7 @@ const Logbook = () => {
     if (profileError) {
       console.error('Error fetching staff status:', profileError);
       showError('Error fetching user profile.');
+      setLoading(false);
       return;
     }
 
@@ -115,20 +119,20 @@ const Logbook = () => {
     if (error) {
       showError('Error fetching flights: ' + error.message);
       console.error('Error fetching flights:', error);
-      return;
+    } else {
+      const allUserIds = new Set<string>();
+      data.forEach(flight => allUserIds.add(flight.user_id));
+
+      const profilesMap = await fetchProfilesData(Array.from(allUserIds));
+
+      const flightsWithProfiles = data.map(flight => ({
+        ...flight,
+        user_profile: profilesMap[flight.user_id] || null,
+      }));
+
+      setFlights(flightsWithProfiles as Flight[]);
     }
-
-    const allUserIds = new Set<string>();
-    data.forEach(flight => allUserIds.add(flight.user_id));
-
-    const profilesMap = await fetchProfilesData(Array.from(allUserIds));
-
-    const flightsWithProfiles = data.map(flight => ({
-      ...flight,
-      user_profile: profilesMap[flight.user_id] || null,
-    }));
-
-    setFlights(flightsWithProfiles as Flight[]);
+    setLoading(false);
   };
 
   const handleLogVatsimFlight = async () => {
@@ -250,6 +254,8 @@ const Logbook = () => {
       </Card>
     ))
   );
+
+  console.log('Logbook component rendering. Loading state:', loading); // Debugging line
 
   return (
     <div className="container mx-auto p-4 pt-24">
