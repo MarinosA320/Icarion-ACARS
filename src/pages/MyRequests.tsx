@@ -82,7 +82,9 @@ const MyRequests = () => {
         return;
       }
 
+      // Removed 'email' from the direct profiles join as it's not in public.profiles
       const selectString = "*,user_profile:profiles!user_requests_user_id_fkey(display_name),assigned_to_profile:profiles!user_requests_assigned_to_fkey(display_name)";
+      console.log("MyRequests - Select String:", selectString);
       const { data, error } = await supabase
         .from('user_requests')
         .select(selectString)

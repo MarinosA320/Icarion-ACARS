@@ -236,8 +236,8 @@ export const useStaffDashboardData = () => {
   }, []);
 
   const fetchUserRequests = useCallback(async () => { // Renamed from fetchTrainingRequests
-    // Changed select string to directly join with profiles using the new foreign key
-    const selectString = "*,user_profile:profiles!user_id(display_name,email,rank),assigned_to_profile:profiles!assigned_to(display_name)";
+    // Removed 'email' from the direct profiles join as it's not in public.profiles
+    const selectString = "*,user_profile:profiles!user_id(display_name,rank),assigned_to_profile:profiles!assigned_to(display_name)";
     console.log("useStaffDashboardData - User Requests Select String:", selectString);
     const { data, error } = await supabase
       .from('user_requests') // Changed table to user_requests
@@ -250,15 +250,9 @@ export const useStaffDashboardData = () => {
       return;
     }
 
-    // The user_profile.email should now be directly available from the join if the profile has an email.
-    // If not, the fetchEmailsForUserIds can still act as a fallback or for other cases.
     const allRelatedUserIds = new Set<string>();
     data.forEach(req => {
-      if (req.user_profile?.email) {
-        // Email is already fetched via join, no need to fetch again
-      } else {
-        allRelatedUserIds.add(req.user_id);
-      }
+      allRelatedUserIds.add(req.user_id);
       if (req.assigned_to) {
         allRelatedUserIds.add(req.assigned_to);
       }
@@ -270,7 +264,7 @@ export const useStaffDashboardData = () => {
       ...req,
       user_profile: req.user_profile ? {
         ...req.user_profile,
-        email: req.user_profile.email || userEmailsFallback[req.user_id] || null, // Ensure email is populated
+        email: userEmailsFallback[req.user_id] || null, // Ensure email is populated
       } : null,
     }));
     setRequests(requestsWithProfiles as UserRequest[]); // Changed state to requests
