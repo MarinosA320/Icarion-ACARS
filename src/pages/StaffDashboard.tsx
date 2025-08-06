@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserDetailsDialog from '@/components/UserDetailsDialog';
 import UserManagementTab from '@/components/staff/UserManagementTab';
-import RequestManagementTab from '@/components/staff/RequestManagementTab'; // Changed import
+import RequestManagementTab from '@/components/staff/RequestManagementTab';
 import LogbookEntryManagementTab from '@/components/staff/LogbookEntryManagementTab';
 import FlightBookingManagementTab from '@/components/staff/FlightBookingManagementTab';
 import JobOpeningManagementTab from '@/components/staff/JobOpeningManagementTab';
@@ -13,7 +13,7 @@ import { useStaffDashboardData } from '@/hooks/use-staff-dashboard-data';
 const StaffDashboard = () => {
   const {
     users,
-    requests, // Changed from trainingRequests
+    requests,
     flights,
     flightBookings,
     jobOpenings,
@@ -23,15 +23,15 @@ const StaffDashboard = () => {
     currentUserIsStaff,
     fetchUsers,
     fetchStaffMembers,
-    fetchUserRequests, // Changed from fetchTrainingRequests
+    fetchUserRequests,
     fetchAllFlights,
     fetchAllFlightBookings,
     fetchJobOpenings,
     fetchJobApplications,
     handleUserUpdate,
-    handleUpdateRequestStatus, // Changed from handleTrainingRequestStatusUpdate
-    handleAssignStaff, // Changed from handleAssignInstructor
-    handleUpdateResolutionNotes, // New handler
+    handleUpdateRequestStatus,
+    handleAssignStaff,
+    handleUpdateResolutionNotes,
     handleBookingStatusUpdate,
     handleDeleteBooking,
     handleDeleteFlight,
@@ -55,9 +55,9 @@ const StaffDashboard = () => {
         fetchUsers();
         fetchStaffMembers();
         break;
-      case 'requests': // Changed from training-requests
-        fetchUserRequests(); // Changed from fetchTrainingRequests
-        fetchStaffMembers();
+      case 'requests':
+        fetchUserRequests();
+        fetchStaffMembers(); // Staff members are needed for assignment dropdown
         break;
       case 'logbook-entries':
         fetchAllFlights();
@@ -101,7 +101,7 @@ const StaffDashboard = () => {
       <Tabs defaultValue="users" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-5 lg:grid-cols-7">
           <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="requests">Requests</TabsTrigger> {/* Changed label */}
+          <TabsTrigger value="requests">Requests</TabsTrigger>
           <TabsTrigger value="logbook-entries">Logbook Entries</TabsTrigger>
           <TabsTrigger value="flight-bookings">Flight Bookings</TabsTrigger>
           <TabsTrigger value="announcements">Announcements</TabsTrigger>
@@ -120,13 +120,13 @@ const StaffDashboard = () => {
           />
         </TabsContent>
 
-        <TabsContent value="requests" className="mt-6"> {/* Changed value */}
+        <TabsContent value="requests" className="mt-6">
           <RequestManagementTab
-            requests={requests} // Changed prop
+            requests={requests}
             staffMembers={staffMembers}
-            handleUpdateRequestStatus={handleUpdateRequestStatus} // Changed prop
-            handleAssignStaff={handleAssignStaff} // Changed prop
-            handleUpdateResolutionNotes={handleUpdateResolutionNotes} // New prop
+            handleUpdateRequestStatus={handleUpdateRequestStatus}
+            handleAssignStaff={handleAssignStaff}
+            handleUpdateResolutionNotes={handleUpdateResolutionNotes}
           />
         </TabsContent>
 
