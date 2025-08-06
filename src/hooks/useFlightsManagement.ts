@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
-import { fetchEmailsForUserIds } from '@/utils/supabaseDataFetch';
+import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
 
 interface Flight {
   id: string;
@@ -29,21 +29,22 @@ interface Flight {
   arrival_type: string | null;
   remarks: string | null;
   created_at: string;
-  user_profile: { // Made non-nullable, properties can be null
+  user_profile: {
     display_name: string | null;
     is_staff: boolean | null;
     email: string | null;
     vatsim_ivao_id: string | null;
-  };
+  } | null;
 }
 
 export const useFlightsManagement = () => {
   const [flights, setFlights] = useState<Flight[]>([]);
 
   const fetchAllFlights = useCallback(async () => {
+    // Fetch flights without direct profile join
     const { data, error } = await supabase
       .from('flights')
-      .select("*,user_profile:profiles!flights_user_id_fkey(display_name,is_staff,vatsim_ivao_id)"); // Explicitly define foreign key
+      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at');
 
     if (error) {
       showError('Error fetching all flights: ' + error.message);
@@ -54,19 +55,13 @@ export const useFlightsManagement = () => {
     const allFlightUserIds = new Set<string>();
     data.forEach(flight => allFlightUserIds.add(flight.user_id));
 
-    const userEmails = await fetchEmailsForUserIds(Array.from(allFlightUserIds));
+    const profilesMap = await fetchProfilesData(Array.from(allFlightUserIds));
 
-    const flightsWithProfiles = data.map(flight => {
-      const profileFromJoin = flight.user_profile;
-      return {
-        ...flight,
-        user_profile: {
-          ...(profileFromJoin || {}), // Ensure it's an object even if null
-          email: userEmails[flight.user_id] || null,
-        },
-      } as Flight; // Cast to Flight to satisfy type
-    });
-    setFlights(flightsWithProfiles);
+    const flightsWithProfiles = data.map(flight => ({
+      ...flight,
+      user_profile: profilesMap[flight.user_id] || null,
+    }));
+    setFlights(flightsWithProfiles as Flight[]);
   }, []);
 
   const handleDeleteFlight = useCallback(async (flightId: string, flightImageUrl: string | null) => {

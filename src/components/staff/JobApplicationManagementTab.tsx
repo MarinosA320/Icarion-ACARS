@@ -33,7 +33,7 @@ interface JobApplication {
     title: string;
     questions: Question[] | null;
   } | null;
-  user_profile: { // Embedded user profile details
+  user_profile: {
     display_name: string | null;
     email: string | null;
     first_name: string | null;
@@ -41,8 +41,8 @@ interface JobApplication {
     discord_username: string | null;
     vatsim_ivao_id: string | null;
     avatar_url: string | null;
-    is_staff: boolean;
-    rank: string;
+    is_staff: boolean | null;
+    rank: string | null;
   } | null;
 }
 

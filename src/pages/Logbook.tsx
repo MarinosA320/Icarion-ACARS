@@ -9,6 +9,7 @@ import { fetchVatsimPilotData, fetchSimbriefData } from '@/utils/flightDataFetch
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { Input } from '@/components/ui/input'; // Import Input component
 import { ALL_AIRLINES } from '@/utils/aircraftData'; // Import ALL_AIRLINES
+import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
 
 interface Flight {
   id: string;
@@ -35,9 +36,10 @@ interface Flight {
   arrival_type: string | null;
   remarks: string | null;
   created_at: string;
+  user_id: string; // Add user_id to interface for manual join
   user_profile: {
-    display_name: string;
-    is_staff: boolean;
+    display_name: string | null;
+    is_staff: boolean | null;
     vatsim_ivao_id: string | null;
   } | null;
 }
@@ -98,11 +100,9 @@ const Logbook = () => {
 
     setIsStaff(profileData?.is_staff || false);
 
-    const selectString = "*,user_profile:profiles!flights_user_id_fkey(display_name,is_staff,vatsim_ivao_id)"; // Explicitly define foreign key
-    console.log("Logbook - Select String:", selectString);
     let query = supabase
       .from('flights')
-      .select(selectString)
+      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at')
       .order('created_at', { ascending: false });
 
     if (!profileData?.is_staff) {
@@ -114,9 +114,20 @@ const Logbook = () => {
     if (error) {
       showError('Error fetching flights: ' + error.message);
       console.error('Error fetching flights:', error);
-    } else {
-      setFlights(data as Flight[]);
+      return;
     }
+
+    const allUserIds = new Set<string>();
+    data.forEach(flight => allUserIds.add(flight.user_id));
+
+    const profilesMap = await fetchProfilesData(Array.from(allUserIds));
+
+    const flightsWithProfiles = data.map(flight => ({
+      ...flight,
+      user_profile: profilesMap[flight.user_id] || null,
+    }));
+
+    setFlights(flightsWithProfiles as Flight[]);
   };
 
   const handleLogVatsimFlight = async () => {

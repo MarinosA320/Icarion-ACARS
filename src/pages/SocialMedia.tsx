@@ -10,6 +10,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Heart } from 'lucide-react'; // Import Heart icon
 import CommentSection from '@/components/CommentSection'; // New import
+import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
 
 interface SocialPost {
   id: string;
@@ -45,25 +46,31 @@ const SocialMedia = () => {
 
   const fetchPosts = async () => {
     setLoading(true);
-    // Fetch posts and also join with likes to count them and check if current user liked
-    const selectString = "*,user_profile:profiles!social_posts_user_id_fkey(display_name,avatar_url),likes(user_id)"; // Explicitly define foreign key
-    console.log("SocialMedia - Select String:", selectString);
+    // Fetch posts without direct profile join
     const { data, error } = await supabase
       .from('social_posts')
-      .select(selectString)
+      .select('id,user_id,image_url,caption,created_at,likes(user_id)')
       .order('created_at', { ascending: false });
 
     if (error) {
       showError('Error fetching social posts: ' + error.message);
       console.error('Error fetching social posts:', error);
-    } else {
-      const postsWithLikes = data.map(post => ({
-        ...post,
-        likes_count: post.likes ? post.likes.length : 0,
-        has_liked: post.likes ? post.likes.some((like: { user_id: string }) => like.user_id === currentUserId) : false,
-      }));
-      setPosts(postsWithLikes as SocialPost[]);
+      setLoading(false);
+      return;
     }
+
+    const allUserIds = new Set<string>();
+    data.forEach(post => allUserIds.add(post.user_id));
+
+    const profilesMap = await fetchProfilesData(Array.from(allUserIds));
+
+    const postsWithProfilesAndLikes = data.map(post => ({
+      ...post,
+      user_profile: profilesMap[post.user_id] || null,
+      likes_count: post.likes ? post.likes.length : 0,
+      has_liked: post.likes ? post.likes.some((like: { user_id: string }) => like.user_id === currentUserId) : false,
+    }));
+    setPosts(postsWithProfilesAndLikes as SocialPost[]);
     setLoading(false);
   };
 

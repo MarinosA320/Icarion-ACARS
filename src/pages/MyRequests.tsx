@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { showSuccess, showError } from '@/utils/toast';
 import { format } from 'date-fns';
+import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
 
 interface UserRequest {
   id: string;
@@ -34,43 +35,21 @@ const MyRequests = () => {
   const [requests, setRequests] = useState<UserRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchEmailsForUserIds = useCallback(async (userIds: string[]) => {
-    if (userIds.length === 0) {
-      return {};
+  const getRequestTypeDisplay = (type: string) => {
+    switch (type) {
+      case 'training': return 'Training Request';
+      case 'exam': return 'Exam Request';
+      case 'contact': return 'General Contact';
+      case 'new_member_orientation': return 'New Member Orientation';
+      case 'advisory_real_pilot': return 'Advisory for Real Pilot Career';
+      case 'improvement_request': return 'Request for Improvement';
+      case 'report_member': return 'Report a Member';
+      case 'tech_support': return 'Technical Support';
+      case 'report_staff': return 'Report a Staff Member';
+      case 'other': return 'Other Request';
+      default: return type;
     }
-    try {
-      const response = await supabase.functions.invoke('get-user-emails', {
-        body: { user_ids: userIds },
-      });
-      if (response.error) {
-        console.error('Error invoking get-user-emails function:', response.error);
-        return {};
-      }
-      return response.data;
-    } catch (error) {
-      console.error('Network error invoking get-user-emails function:', error);
-      return {};
-    }
-  }, []);
-
-  const fetchProfilesData = useCallback(async (userIds: string[]) => {
-    if (userIds.length === 0) {
-      return {};
-    }
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, display_name');
-
-    if (error) {
-      console.error('Error fetching profiles data for user IDs:', error);
-      return {};
-    }
-    const profilesMap: { [key: string]: { display_name: string | null } } = {};
-    data.forEach(profile => {
-      profilesMap[profile.id] = { display_name: profile.display_name };
-    });
-    return profilesMap;
-  }, []);
+  };
 
   useEffect(() => {
     const fetchUserRequests = async () => {
@@ -82,12 +61,10 @@ const MyRequests = () => {
         return;
       }
 
-      // Removed 'email' from the direct profiles join as it's not in public.profiles
-      const selectString = "*,user_profile:profiles!user_requests_user_id_fkey(display_name),assigned_to_profile:profiles!user_requests_assigned_to_fkey(display_name)";
-      console.log("MyRequests - Select String:", selectString);
+      // Fetch requests without direct profile joins
       const { data, error } = await supabase
         .from('user_requests')
-        .select(selectString)
+        .select('id,user_id,request_type,status,details,created_at,assigned_to,resolution_notes')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
@@ -106,22 +83,19 @@ const MyRequests = () => {
         }
       });
 
-      const userEmails = await fetchEmailsForUserIds(Array.from(allRelatedUserIds));
-      // user_profile and assigned_to_profile are already embedded, just need to add email to user_profile
+      const profilesMap = await fetchProfilesData(Array.from(allRelatedUserIds));
 
       const requestsWithProfiles = data.map(req => ({
         ...req,
-        user_profile: req.user_profile ? {
-          ...req.user_profile,
-          email: userEmails[req.user_id] || null,
-        } : null,
+        user_profile: profilesMap[req.user_id] || null,
+        assigned_to_profile: req.assigned_to ? profilesMap[req.assigned_to] || null : null,
       }));
       setRequests(requestsWithProfiles as UserRequest[]);
       setLoading(false);
     };
 
     fetchUserRequests();
-  }, [fetchEmailsForUserIds]);
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -135,22 +109,6 @@ const MyRequests = () => {
         return 'text-red-500';
       default:
         return 'text-gray-500';
-    }
-  };
-
-  const getRequestTypeDisplay = (type: string) => {
-    switch (type) {
-      case 'training': return 'Training Request';
-      case 'exam': return 'Exam Request';
-      case 'contact': return 'General Contact';
-      case 'new_member_orientation': return 'New Member Orientation';
-      case 'advisory_real_pilot': return 'Advisory for Real Pilot Career';
-      case 'improvement_request': return 'Request for Improvement';
-      case 'report_member': return 'Report a Member';
-      case 'tech_support': return 'Technical Support';
-      case 'report_staff': return 'Report a Staff Member';
-      case 'other': return 'Other Request';
-      default: return type;
     }
   };
 

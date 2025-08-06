@@ -20,7 +20,7 @@ interface FlightBooking {
   eta: string | null;
   status: string;
   created_at: string;
-  user_profile: { // Changed from 'profiles'
+  user_profile: {
     display_name: string | null;
     email: string | null;
   } | null;

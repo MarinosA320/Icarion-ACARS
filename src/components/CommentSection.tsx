@@ -6,6 +6,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { showSuccess, showError } from '@/utils/toast';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
 
 interface Comment {
   id: string;
@@ -35,18 +36,30 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId, currentUserId }
 
   const fetchComments = async () => {
     setLoading(true);
+    // Fetch comments without direct profile join
     const { data, error } = await supabase
       .from('comments')
-      .select('*,user_profile:profiles!comments_user_id_fkey(display_name,avatar_url)') // Explicitly define foreign key
+      .select('id,post_id,user_id,content,created_at')
       .eq('post_id', postId)
       .order('created_at', { ascending: true });
 
     if (error) {
       showError('Error fetching comments: ' + error.message);
       console.error('Error fetching comments:', error);
-    } else {
-      setComments(data as Comment[]);
+      setLoading(false);
+      return;
     }
+
+    const allUserIds = new Set<string>();
+    data.forEach(comment => allUserIds.add(comment.user_id));
+
+    const profilesMap = await fetchProfilesData(Array.from(allUserIds));
+
+    const commentsWithProfiles = data.map(comment => ({
+      ...comment,
+      user_profile: profilesMap[comment.user_id] || null,
+    }));
+    setComments(commentsWithProfiles as Comment[]);
     setLoading(false);
   };
 

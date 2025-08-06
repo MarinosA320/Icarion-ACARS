@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
-import { fetchEmailsForUserIds } from '@/utils/supabaseDataFetch';
+import { fetchEmailsForUserIds, fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
 import { RANK_ORDER } from '@/utils/aircraftData';
 
 interface UserRequest {
@@ -21,24 +21,24 @@ interface UserRequest {
   created_at: string;
   assigned_to: string | null;
   resolution_notes: string | null;
-  user_profile: { // Made non-nullable, properties can be null
+  user_profile: {
     display_name: string | null;
     email: string | null;
-    rank: string | null; // Rank can be null if profile is incomplete
-  };
-  assigned_to_profile: { // Made non-nullable, properties can be null
+    rank: string | null;
+  } | null;
+  assigned_to_profile: {
     display_name: string | null;
-  };
+  } | null;
 }
 
 export const useRequestsManagement = () => {
   const [requests, setRequests] = useState<UserRequest[]>([]);
 
   const fetchUserRequests = useCallback(async () => {
-    const selectString = "*,user_profile:profiles!user_requests_user_id_fkey(display_name,rank),assigned_to_profile:profiles!user_requests_assigned_to_fkey(display_name)"; // Explicitly define foreign keys
+    // Fetch requests without direct profile joins
     const { data, error } = await supabase
       .from('user_requests')
-      .select(selectString)
+      .select('id,user_id,request_type,status,details,created_at,assigned_to,resolution_notes')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -55,24 +55,14 @@ export const useRequestsManagement = () => {
       }
     });
 
-    const userEmailsFallback = await fetchEmailsForUserIds(Array.from(allRelatedUserIds));
+    const profilesMap = await fetchProfilesData(Array.from(allRelatedUserIds));
 
-    const requestsWithProfiles = data.map(req => {
-      const profileFromJoin = req.user_profile;
-      const assignedToProfileFromJoin = req.assigned_to_profile;
-
-      return {
-        ...req,
-        user_profile: {
-          ...(profileFromJoin || {}), // Ensure it's an object even if null
-          email: userEmailsFallback[req.user_id] || null,
-        },
-        assigned_to_profile: {
-          ...(assignedToProfileFromJoin || {}), // Ensure it's an object even if null
-        },
-      } as UserRequest; // Cast to UserRequest to satisfy type
-    });
-    setRequests(requestsWithProfiles);
+    const requestsWithProfiles = data.map(req => ({
+      ...req,
+      user_profile: profilesMap[req.user_id] || null,
+      assigned_to_profile: req.assigned_to ? profilesMap[req.assigned_to] || null : null,
+    }));
+    setRequests(requestsWithProfiles as UserRequest[]);
   }, []);
 
   const handleUpdateRequestStatus = useCallback(async (requestId: string, newStatus: string, userId: string, desiredRank?: string) => {

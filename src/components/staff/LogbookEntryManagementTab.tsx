@@ -32,9 +32,9 @@ interface Flight {
   arrival_type: string | null;
   remarks: string | null;
   created_at: string;
-  user_profile: { // Changed from 'profiles'
-    display_name: string;
-    is_staff: boolean;
+  user_profile: {
+    display_name: string | null; // Changed to allow null
+    is_staff: boolean | null; // Changed to allow null
     email: string | null;
   } | null;
 }

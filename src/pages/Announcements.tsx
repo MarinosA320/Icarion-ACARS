@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import EditAnnouncementDialog from '@/components/EditAnnouncementDialog';
 import CreateAnnouncementForm from '@/components/CreateAnnouncementForm';
+import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
 
 interface Announcement {
   id: string;
@@ -14,7 +15,7 @@ interface Announcement {
   content: string;
   author_id: string | null;
   created_at: string;
-  author_profile: { // Changed from 'profiles'
+  author_profile: {
     display_name: string | null;
   } | null;
 }
@@ -54,19 +55,32 @@ const Announcements = () => {
   }, []);
 
   const fetchAnnouncements = async () => {
-    const selectString = "*,author_profile:profiles!announcements_author_id_fkey(display_name)"; // Explicitly define foreign key
-    console.log("Announcements - Select String:", selectString);
+    // Fetch announcements without direct profile join
     const { data, error } = await supabase
       .from('announcements')
-      .select(selectString)
+      .select('id,title,content,author_id,created_at')
       .order('created_at', { ascending: false });
 
     if (error) {
       showError('Error fetching announcements: ' + error.message);
       console.error('Error fetching announcements:', error);
-    } else {
-      setAnnouncements(data as Announcement[]);
+      return;
     }
+
+    const allAuthorIds = new Set<string>();
+    data.forEach(ann => {
+      if (ann.author_id) {
+        allAuthorIds.add(ann.author_id);
+      }
+    });
+
+    const profilesMap = await fetchProfilesData(Array.from(allAuthorIds));
+
+    const announcementsWithProfiles = data.map(announcement => ({
+      ...announcement,
+      author_profile: announcement.author_id ? profilesMap[announcement.author_id] || null : null,
+    }));
+    setAnnouncements(announcementsWithProfiles as Announcement[]);
   };
 
   const handleEditClick = (announcement: Announcement) => {

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
-import { fetchEmailsForUserIds } from '@/utils/supabaseDataFetch';
+import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
 
 interface FlightBooking {
   id: string;
@@ -16,19 +16,20 @@ interface FlightBooking {
   eta: string | null;
   status: string;
   created_at: string;
-  user_profile: { // Made non-nullable, properties can be null
+  user_profile: {
     display_name: string | null;
     email: string | null;
-  };
+  } | null;
 }
 
 export const useFlightBookingsManagement = () => {
   const [flightBookings, setFlightBookings] = useState<FlightBooking[]>([]);
 
   const fetchAllFlightBookings = useCallback(async () => {
+    // Fetch flight bookings without direct profile join
     const { data, error } = await supabase
       .from('flight_bookings')
-      .select("*,user_profile:profiles!flight_bookings_user_id_fkey(display_name)"); // Explicitly define foreign key
+      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,aircraft_registration,flight_number,airline_name,etd,eta,status,created_at');
 
     if (error) {
       showError('Error fetching all flight bookings: ' + error.message);
@@ -39,19 +40,13 @@ export const useFlightBookingsManagement = () => {
     const allBookingUserIds = new Set<string>();
     data.forEach(booking => allBookingUserIds.add(booking.user_id));
 
-    const userEmails = await fetchEmailsForUserIds(Array.from(allBookingUserIds));
+    const profilesMap = await fetchProfilesData(Array.from(allBookingUserIds));
 
-    const bookingsWithEmails = data.map(booking => {
-      const profileFromJoin = booking.user_profile;
-      return {
-        ...booking,
-        user_profile: {
-          ...(profileFromJoin || {}), // Ensure it's an object even if null
-          email: userEmails[booking.user_id] || null,
-        },
-      } as FlightBooking; // Cast to FlightBooking to satisfy type
-    });
-    setFlightBookings(bookingsWithEmails);
+    const bookingsWithProfiles = data.map(booking => ({
+      ...booking,
+      user_profile: profilesMap[booking.user_id] || null,
+    }));
+    setFlightBookings(bookingsWithProfiles as FlightBooking[]);
   }, []);
 
   const handleBookingStatusUpdate = useCallback(async (bookingId: string, newStatus: string) => {
