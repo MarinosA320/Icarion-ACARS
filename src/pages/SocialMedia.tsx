@@ -9,6 +9,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { formatDistanceToNow } from 'date-fns';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Heart } from 'lucide-react'; // Import Heart icon
+import CommentSection from '@/components/CommentSection'; // New import
 
 interface SocialPost {
   id: string;
@@ -283,6 +284,7 @@ const SocialMedia = () => {
                     </AlertDialog>
                   )}
                 </div>
+                <CommentSection postId={post.id} currentUserId={currentUserId} />
               </CardContent>
             </Card>
           ))
