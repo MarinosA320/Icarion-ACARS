@@ -68,7 +68,7 @@ const formatMinutesToHHMM = (totalMinutes: number | undefined): string => {
 const Logbook = () => {
   const navigate = useNavigate();
   const [flights, setFlights] = useState<Flight[]>([]);
-  const [isStaff, setIsStaff] = useState(false);
+  const [isStaff, setIsStaff] = useState(false); // Keep this for displaying pilot name in LogbookFlightPage
   const [isLoggingVatsimFlight, setIsLoggingVatsimFlight] = useState(false);
   const [isLoggingSimbriefFlight, setIsLoggingSimbriefFlight] = useState(false);
   const [simbriefUrl, setSimbriefUrl] = useState('');
@@ -92,6 +92,7 @@ const Logbook = () => {
       return;
     }
 
+    // Fetch staff status for display purposes in LogbookFlightPage
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('is_staff, vatsim_ivao_id')
@@ -101,22 +102,18 @@ const Logbook = () => {
     if (profileError) {
       console.error('Error fetching staff status:', profileError);
       showError('Error fetching user profile.');
-      setLoading(false);
-      return;
+      // Continue loading flights even if profile fetch fails, but set isStaff to false
+      setIsStaff(false);
+    } else {
+      setIsStaff(profileData?.is_staff || false);
     }
 
-    setIsStaff(profileData?.is_staff || false);
-
-    let query = supabase
+    // Always fetch only the current user's flights for the personal logbook
+    const { data, error } = await supabase
       .from('flights')
       .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at')
+      .eq('user_id', user.id) // Filter by current user's ID
       .order('created_at', { ascending: false });
-
-    if (!profileData?.is_staff) {
-      query = query.eq('user_id', user.id);
-    }
-
-    const { data, error } = await query;
 
     if (error) {
       showError('Error fetching flights: ' + error.message);
