@@ -82,7 +82,7 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white dark:bg-gray-800 shadow-md p-4 flex items-center justify-between sticky top-0 z-50">
-      <Link to="/" className="text-2xl font-bold text-primary dark:text-primary-foreground">
+      <Link to="/" className="text-2xl font-bold text-icarion-blue-DEFAULT dark:text-primary-foreground">
         Icarion VA
       </Link>
 
