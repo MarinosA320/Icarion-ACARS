@@ -27,7 +27,7 @@ interface JobApplication {
     title: string;
     questions: Question[] | null;
   } | null;
-  user_profile: {
+  user_profile: { // Made non-nullable, properties can be null
     display_name: string | null;
     email: string | null;
     first_name: string | null;
@@ -35,9 +35,9 @@ interface JobApplication {
     discord_username: string | null;
     vatsim_ivao_id: string | null;
     avatar_url: string | null;
-    is_staff: boolean;
-    rank: string;
-  } | null;
+    is_staff: boolean | null;
+    rank: string | null;
+  };
 }
 
 export const useJobApplicationsManagement = () => {
@@ -60,14 +60,17 @@ export const useJobApplicationsManagement = () => {
 
     const userEmails = await fetchEmailsForUserIds(Array.from(allApplicantUserIds));
 
-    const applicationsWithEmails = data.map(app => ({
-      ...app,
-      user_profile: app.user_profile ? {
-        ...app.user_profile,
-        email: userEmails[app.user_id] || null,
-      } : null,
-    }));
-    setJobApplications(applicationsWithEmails as JobApplication[]);
+    const applicationsWithEmails = data.map(app => {
+      const profileFromJoin = app.user_profile;
+      return {
+        ...app,
+        user_profile: {
+          ...(profileFromJoin || {}), // Ensure it's an object even if null
+          email: userEmails[app.user_id] || null,
+        },
+      } as JobApplication; // Cast to JobApplication to satisfy type
+    });
+    setJobApplications(applicationsWithEmails);
   }, []);
 
   const handleUpdateApplicationStatus = useCallback(async (applicationId: string, newStatus: string) => {

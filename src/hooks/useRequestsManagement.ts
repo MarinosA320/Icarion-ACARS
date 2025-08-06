@@ -21,14 +21,14 @@ interface UserRequest {
   created_at: string;
   assigned_to: string | null;
   resolution_notes: string | null;
-  user_profile: {
+  user_profile: { // Made non-nullable, properties can be null
     display_name: string | null;
     email: string | null;
-    rank: string;
-  } | null;
-  assigned_to_profile: {
+    rank: string | null; // Rank can be null if profile is incomplete
+  };
+  assigned_to_profile: { // Made non-nullable, properties can be null
     display_name: string | null;
-  } | null;
+  };
 }
 
 export const useRequestsManagement = () => {
@@ -57,14 +57,22 @@ export const useRequestsManagement = () => {
 
     const userEmailsFallback = await fetchEmailsForUserIds(Array.from(allRelatedUserIds));
 
-    const requestsWithProfiles = data.map(req => ({
-      ...req,
-      user_profile: req.user_profile ? {
-        ...req.user_profile,
-        email: userEmailsFallback[req.user_id] || null,
-      } : null,
-    }));
-    setRequests(requestsWithProfiles as UserRequest[]);
+    const requestsWithProfiles = data.map(req => {
+      const profileFromJoin = req.user_profile;
+      const assignedToProfileFromJoin = req.assigned_to_profile;
+
+      return {
+        ...req,
+        user_profile: {
+          ...(profileFromJoin || {}), // Ensure it's an object even if null
+          email: userEmailsFallback[req.user_id] || null,
+        },
+        assigned_to_profile: {
+          ...(assignedToProfileFromJoin || {}), // Ensure it's an object even if null
+        },
+      } as UserRequest; // Cast to UserRequest to satisfy type
+    });
+    setRequests(requestsWithProfiles);
   }, []);
 
   const handleUpdateRequestStatus = useCallback(async (requestId: string, newStatus: string, userId: string, desiredRank?: string) => {

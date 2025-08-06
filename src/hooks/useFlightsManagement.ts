@@ -29,12 +29,12 @@ interface Flight {
   arrival_type: string | null;
   remarks: string | null;
   created_at: string;
-  user_profile: {
-    display_name: string;
-    is_staff: boolean;
+  user_profile: { // Made non-nullable, properties can be null
+    display_name: string | null;
+    is_staff: boolean | null;
     email: string | null;
     vatsim_ivao_id: string | null;
-  } | null;
+  };
 }
 
 export const useFlightsManagement = () => {
@@ -56,14 +56,17 @@ export const useFlightsManagement = () => {
 
     const userEmails = await fetchEmailsForUserIds(Array.from(allFlightUserIds));
 
-    const flightsWithProfiles = data.map(flight => ({
-      ...flight,
-      user_profile: flight.user_profile ? {
-        ...flight.user_profile,
-        email: userEmails[flight.user_id] || null,
-      } : null,
-    }));
-    setFlights(flightsWithProfiles as Flight[]);
+    const flightsWithProfiles = data.map(flight => {
+      const profileFromJoin = flight.user_profile;
+      return {
+        ...flight,
+        user_profile: {
+          ...(profileFromJoin || {}), // Ensure it's an object even if null
+          email: userEmails[flight.user_id] || null,
+        },
+      } as Flight; // Cast to Flight to satisfy type
+    });
+    setFlights(flightsWithProfiles);
   }, []);
 
   const handleDeleteFlight = useCallback(async (flightId: string, flightImageUrl: string | null) => {

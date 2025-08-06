@@ -16,10 +16,10 @@ interface FlightBooking {
   eta: string | null;
   status: string;
   created_at: string;
-  user_profile: {
+  user_profile: { // Made non-nullable, properties can be null
     display_name: string | null;
     email: string | null;
-  } | null;
+  };
 }
 
 export const useFlightBookingsManagement = () => {
@@ -41,14 +41,17 @@ export const useFlightBookingsManagement = () => {
 
     const userEmails = await fetchEmailsForUserIds(Array.from(allBookingUserIds));
 
-    const bookingsWithEmails = data.map(booking => ({
-      ...booking,
-      user_profile: booking.user_profile ? {
-        ...booking.user_profile,
-        email: userEmails[booking.user_id] || null,
-      } : null,
-    }));
-    setFlightBookings(bookingsWithEmails as FlightBooking[]);
+    const bookingsWithEmails = data.map(booking => {
+      const profileFromJoin = booking.user_profile;
+      return {
+        ...booking,
+        user_profile: {
+          ...(profileFromJoin || {}), // Ensure it's an object even if null
+          email: userEmails[booking.user_id] || null,
+        },
+      } as FlightBooking; // Cast to FlightBooking to satisfy type
+    });
+    setFlightBookings(bookingsWithEmails);
   }, []);
 
   const handleBookingStatusUpdate = useCallback(async (bookingId: string, newStatus: string) => {
