@@ -19,6 +19,7 @@ interface FlightBooking {
   eta: string | null;
   status: string;
   created_at: string;
+  // Removed user_profile as it's not fetched by this component
 }
 
 const MyBookings = () => {
@@ -41,7 +42,7 @@ const MyBookings = () => {
 
     const { data, error } = await supabase
       .from('flight_bookings')
-      .select('*')
+      .select('*') // No need to join profiles here, as it's the current user's bookings
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 

@@ -236,8 +236,8 @@ export const useStaffDashboardData = () => {
   }, []);
 
   const fetchUserRequests = useCallback(async () => { // Renamed from fetchTrainingRequests
-    // Removed 'email' from the direct profiles join as it's not in public.profiles
-    const selectString = "*,user_profile:profiles!user_id(display_name,rank),assigned_to_profile:profiles!assigned_to(display_name)";
+    // Simplified select string for user_profile and assigned_to_profile
+    const selectString = "*,user_profile:profiles(display_name,rank),assigned_to_profile:profiles(display_name)";
     console.log("useStaffDashboardData - User Requests Select String:", selectString);
     const { data, error } = await supabase
       .from('user_requests') // Changed table to user_requests
@@ -271,9 +271,10 @@ export const useStaffDashboardData = () => {
   }, [fetchEmailsForUserIds]);
 
   const fetchAllFlights = useCallback(async () => {
+    // Simplified select string for user_profile
     const { data, error } = await supabase
       .from('flights')
-      .select("id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at");
+      .select("*,user_profile:profiles(display_name,is_staff,vatsim_ivao_id)");
 
     if (error) {
       showError('Error fetching all flights: ' + error.message);
@@ -285,24 +286,23 @@ export const useStaffDashboardData = () => {
     data.forEach(flight => allFlightUserIds.add(flight.user_id));
 
     const userEmails = await fetchEmailsForUserIds(Array.from(allFlightUserIds));
-    const userProfiles = await fetchProfilesData(Array.from(allFlightUserIds));
+    // userProfiles are now directly joined, so no need for fetchProfilesData here
 
     const flightsWithProfiles = data.map(flight => ({
       ...flight,
-      user_profile: {
-        display_name: userProfiles[flight.user_id]?.display_name || null,
-        is_staff: userProfiles[flight.user_id]?.is_staff || false,
+      user_profile: flight.user_profile ? { // Use the directly joined user_profile
+        ...flight.user_profile,
         email: userEmails[flight.user_id] || null,
-        vatsim_ivao_id: userProfiles[flight.user_id]?.vatsim_ivao_id || null,
-      },
+      } : null,
     }));
     setFlights(flightsWithProfiles as Flight[]);
-  }, [fetchEmailsForUserIds, fetchProfilesData]);
+  }, [fetchEmailsForUserIds]);
 
   const fetchAllFlightBookings = useCallback(async () => {
+    // Simplified select string for user_profile
     const { data, error } = await supabase
       .from('flight_bookings')
-      .select("id,user_id,departure_airport,arrival_airport,aircraft_type,aircraft_registration,flight_number,airline_name,etd,eta,status,created_at");
+      .select("*,user_profile:profiles(display_name)");
 
     if (error) {
       showError('Error fetching all flight bookings: ' + error.message);
@@ -314,17 +314,17 @@ export const useStaffDashboardData = () => {
     data.forEach(booking => allBookingUserIds.add(booking.user_id));
 
     const userEmails = await fetchEmailsForUserIds(Array.from(allBookingUserIds));
-    const userProfiles = await fetchProfilesData(Array.from(allBookingUserIds));
+    // userProfiles are now directly joined, so no need for fetchProfilesData here
 
     const bookingsWithEmails = data.map(booking => ({
       ...booking,
-      user_profile: {
-        display_name: userProfiles[booking.user_id]?.display_name || null,
+      user_profile: booking.user_profile ? { // Use the directly joined user_profile
+        ...booking.user_profile,
         email: userEmails[booking.user_id] || null,
-      },
+      } : null,
     }));
     setFlightBookings(bookingsWithEmails as FlightBooking[]);
-  }, [fetchEmailsForUserIds, fetchProfilesData]);
+  }, [fetchEmailsForUserIds]);
 
   const fetchJobOpenings = useCallback(async () => {
     const { data, error } = await supabase
@@ -343,7 +343,7 @@ export const useStaffDashboardData = () => {
   const fetchJobApplications = useCallback(async () => {
     const { data, error } = await supabase
       .from('job_applications')
-      .select("*,job_opening:job_openings(title,questions),user_profile:profiles(display_name,first_name,last_name,discord_username,vatsim_ivao_id,avatar_url,is_staff,rank,type_ratings)") // Added type_ratings
+      .select("*,job_opening:job_openings(title,questions),user_profile:profiles(display_name,first_name,last_name,discord_username,vatsim_ivao_id,avatar_url,is_staff,rank,type_ratings)") // This already uses simplified profiles select
       .order('created_at', { ascending: false });
 
     if (error) {

@@ -98,7 +98,7 @@ const Logbook = () => {
 
     setIsStaff(profileData?.is_staff || false);
 
-    const selectString = "*,user_profile:profiles!flights_user_id_fkey(display_name,is_staff,vatsim_ivao_id)";
+    const selectString = "*,user_profile:profiles(display_name,is_staff,vatsim_ivao_id)"; // Simplified select
     console.log("Logbook - Select String:", selectString);
     let query = supabase
       .from('flights')
