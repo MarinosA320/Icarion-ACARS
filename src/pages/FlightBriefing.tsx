@@ -66,7 +66,7 @@ const FlightBriefing = () => {
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Flight Briefing</h1>
 
-      <Card className="max-w-3xl mx-auto mb-8">
+      <Card className="max-w-3xl mx-auto mb-8 shadow-md rounded-lg">
         <CardHeader>
           <CardTitle>Get Your Briefing</CardTitle>
           <CardDescription>Enter airport ICAO codes and route to get NOTAM information.</CardDescription>
@@ -116,7 +116,7 @@ const FlightBriefing = () => {
 
           {/* Departure Airport Briefing */}
           {departureIcao && depNotams.length > 0 && (
-            <Card>
+            <Card className="shadow-md rounded-lg">
               <CardHeader>
                 <CardTitle>Departure Airport: {departureIcao.toUpperCase()}</CardTitle>
               </CardHeader>
@@ -142,7 +142,7 @@ const FlightBriefing = () => {
 
           {/* Arrival Airport Briefing */}
           {arrivalIcao && arrNotams.length > 0 && (
-            <Card>
+            <Card className="shadow-md rounded-lg">
               <CardHeader>
                 <CardTitle>Arrival Airport: {arrivalIcao.toUpperCase()}</CardTitle>
               </CardHeader>
@@ -167,7 +167,7 @@ const FlightBriefing = () => {
           )}
 
           {/* Enroute Information */}
-          <Card>
+          <Card className="shadow-md rounded-lg">
             <CardHeader>
               <CardTitle>Enroute Information</CardTitle>
             </CardHeader>
@@ -198,7 +198,7 @@ const FlightBriefing = () => {
           </Card>
 
           {/* Airport Charts (AIP) */}
-          <Card>
+          <Card className="shadow-md rounded-lg">
             <CardHeader>
               <CardTitle>Airport Charts (AIP)</CardTitle>
             </CardHeader>
@@ -216,7 +216,7 @@ const FlightBriefing = () => {
           </Card>
 
           {/* Short Briefing Summary */}
-          <Card>
+          <Card className="shadow-md rounded-lg">
             <CardHeader>
               <CardTitle>Short Briefing Summary</CardTitle>
             </CardHeader>

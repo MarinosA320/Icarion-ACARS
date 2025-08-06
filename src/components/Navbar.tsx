@@ -65,24 +65,24 @@ const Navbar = () => {
 
   const navLinks = (
     <>
-      <Link to="/logbook" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors">Logbook</Link>
-      <Link to="/social-media" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors">Social Media</Link>
-      <Link to="/plan-flight" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors">Plan Flight</Link>
-      <Link to="/my-bookings" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors">My Bookings</Link>
-      <Link to="/my-requests" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors">My Requests</Link> {/* Changed link */}
-      <Link to="/announcements" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors">Announcements</Link>
-      <Link to="/flight-briefing" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors">Flight Briefing (Beta)</Link>
-      <Link to="/careers" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors">Careers</Link>
-      <Link to="/profile-settings" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors">Profile Settings</Link>
+      <Link to="/logbook" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Logbook</Link>
+      <Link to="/social-media" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Social Media</Link>
+      <Link to="/plan-flight" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Plan Flight</Link>
+      <Link to="/my-bookings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">My Bookings</Link>
+      <Link to="/my-requests" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">My Requests</Link>
+      <Link to="/announcements" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Announcements</Link>
+      <Link to="/flight-briefing" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Flight Briefing (Beta)</Link>
+      <Link to="/careers" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Careers</Link>
+      <Link to="/profile-settings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Profile Settings</Link>
       {profile?.is_staff && (
-        <Link to="/staff-dashboard" className="text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primary-foreground transition-colors">Staff Dashboard</Link>
+        <Link to="/staff-dashboard" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-primary-foreground transition-colors">Staff Dashboard</Link>
       )}
     </>
   );
 
   return (
-    <nav className="bg-white dark:bg-gray-800 shadow-md p-4 flex items-center justify-between sticky top-0 z-50">
-      <Link to="/" className="text-2xl font-bold text-icarion-blue-DEFAULT dark:text-primary-foreground">
+    <nav className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg p-4 flex items-center justify-between sticky top-0 z-50">
+      <Link to="/" className="text-2xl font-bold text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT">
         Icarion VA
       </Link>
 

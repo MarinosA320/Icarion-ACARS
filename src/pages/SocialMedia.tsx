@@ -204,7 +204,7 @@ const SocialMedia = () => {
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Social Media Feed</h1>
 
       {/* New Post Section */}
-      <Card className="mb-8 p-6">
+      <Card className="mb-8 p-6 shadow-md rounded-lg">
         <CardHeader className="p-0 pb-4">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Create New Post</h2>
         </CardHeader>
@@ -241,7 +241,7 @@ const SocialMedia = () => {
           <p className="text-center text-gray-600 dark:text-gray-400">No posts yet. Be the first to share!</p>
         ) : (
           posts.map((post) => (
-            <Card key={post.id} className="p-6">
+            <Card key={post.id} className="p-6 shadow-md rounded-lg">
               <CardHeader className="flex flex-row items-center gap-4 p-0 pb-4">
                 <Avatar className="h-10 w-10">
                   <AvatarImage src={post.user_profile?.avatar_url || undefined} alt={post.user_profile?.display_name || "User"} />

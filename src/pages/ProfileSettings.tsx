@@ -208,7 +208,7 @@ const ProfileSettings = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Profile Information Card */}
-        <Card className="col-span-1">
+        <Card className="col-span-1 shadow-md rounded-lg">
           <CardHeader>
             <CardTitle>Profile Information</CardTitle>
             <CardDescription>Update your public display name and contact details.</CardDescription>
@@ -288,7 +288,7 @@ const ProfileSettings = () => {
         </Card>
 
         {/* Account Security Card */}
-        <Card className="col-span-1">
+        <Card className="col-span-1 shadow-md rounded-lg">
           <CardHeader>
             <CardTitle>Account Security</CardTitle>
             <CardDescription>Manage your password and email address.</CardDescription>
@@ -331,7 +331,7 @@ const ProfileSettings = () => {
         </Card>
 
         {/* Flight Statistics Card */}
-        <Card className="col-span-1">
+        <Card className="col-span-1 shadow-md rounded-lg">
           <CardHeader>
             <CardTitle>Flight Statistics</CardTitle>
             <CardDescription>Your flight performance and activity.</CardDescription>
@@ -353,7 +353,7 @@ const ProfileSettings = () => {
         </Card>
 
         {/* New Request Button Card */}
-        <Card className="col-span-1">
+        <Card className="col-span-1 shadow-md rounded-lg">
           <CardHeader>
             <CardTitle>Submit a Request</CardTitle>
             <CardDescription>Submit training, exam, support, or general inquiries.</CardDescription>
@@ -366,7 +366,7 @@ const ProfileSettings = () => {
         </Card>
 
         {/* Day/Night Mode Toggle Card */}
-        <Card className="col-span-full lg:col-span-1">
+        <Card className="col-span-full lg:col-span-1 shadow-md rounded-lg">
           <CardHeader>
             <CardTitle>Display Mode</CardTitle>
             <CardDescription>Toggle between light and dark themes.</CardDescription>

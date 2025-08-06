@@ -96,7 +96,7 @@ const MyBookings = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {bookings.map((booking) => (
-            <Card key={booking.id} className="flex flex-col">
+            <Card key={booking.id} className="flex flex-col shadow-md rounded-lg">
               <CardHeader>
                 <CardTitle className="text-lg">
                   {booking.departure_airport} to {booking.arrival_airport}

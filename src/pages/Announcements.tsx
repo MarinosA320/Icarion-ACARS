@@ -118,7 +118,7 @@ const Announcements = () => {
           <p className="text-center text-gray-600 dark:text-gray-400">No announcements yet.</p>
         ) : (
           announcements.map((announcement) => (
-            <Card key={announcement.id} className="p-6">
+            <Card key={announcement.id} className="p-6 shadow-md rounded-lg">
               <CardHeader className="p-0 pb-4">
                 <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">{announcement.title}</CardTitle>
                 <CardDescription className="text-sm text-muted-foreground">

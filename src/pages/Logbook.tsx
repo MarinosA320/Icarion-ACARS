@@ -265,7 +265,7 @@ const Logbook = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {flights.map((flight) => (
-            <Card key={flight.id} className="flex flex-col">
+            <Card key={flight.id} className="flex flex-col shadow-md rounded-lg">
               <CardHeader>
                 <CardTitle className="text-lg">
                   {flight.departure_airport} to {flight.arrival_airport}

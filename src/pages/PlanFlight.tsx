@@ -248,7 +248,7 @@ const PlanFlight = () => {
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Plan Your Flight</h1>
 
-      <Card className="max-w-2xl mx-auto">
+      <Card className="max-w-2xl mx-auto shadow-md rounded-lg">
         <CardHeader>
           <CardTitle>Create New Flight Booking</CardTitle>
           <CardDescription>Plan your next flight by filling in the details below.</CardDescription>
@@ -302,7 +302,7 @@ const PlanFlight = () => {
                       <SelectItem key={type} value={type}>{type}</SelectItem>
                     ))
                   ) : (
-                    <SelectItem value="no-aircraft-available" disabled>No aircraft available for selected airline/rank/ratings</SelectItem>
+                    <SelectItem value="no-aircraft-available" disabled>No aircraft available for your rank/ratings</SelectItem>
                   )}
                 </SelectContent>
               </Select>

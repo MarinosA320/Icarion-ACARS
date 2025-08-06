@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showSuccess, showError } from '@/utils/toast';
 import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'; // Import Card components
 
 import { useFlightForm } from '@/hooks/use-flight-form';
 import { useUserProfileAndAircraftData } from '@/hooks/use-user-profile-aircraft-data';
@@ -145,46 +146,51 @@ const LogFlight = () => {
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Log Your Flight</h1>
 
-      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
-        <p className="text-lg text-gray-600 dark:text-gray-400 mb-6 text-center">
-          Fill in the details for your flight from {formState.departureAirport || 'N/A'} to {formState.arrivalAirport || 'N/A'}.
-        </p>
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-          <div className="col-span-full md:col-span-1">
-            <Label htmlFor="fullName">Full Name</Label>
-            <Input id="fullName" value={fullName} disabled className="bg-gray-100 dark:bg-gray-700" />
-          </div>
-          <div className="col-span-full md:col-span-1">
-            <Label htmlFor="vatsimIvaoId">VATSIM/IVAO ID</Label>
-            <Input id="vatsimIvaoId" value={userProfile?.vatsim_ivao_id || 'N/A'} disabled className="bg-gray-100 dark:bg-gray-700" />
-          </div>
+      <Card className="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+        <CardHeader className="p-0 pb-4">
+          <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">Flight Details</CardTitle>
+          <CardDescription className="text-lg text-gray-600 dark:text-gray-400">
+            Fill in the details for your flight from {formState.departureAirport || 'N/A'} to {formState.arrivalAirport || 'N/A'}.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+            <div className="col-span-full md:col-span-1">
+              <Label htmlFor="fullName">Full Name</Label>
+              <Input id="fullName" value={fullName} disabled className="bg-gray-100 dark:bg-gray-700" />
+            </div>
+            <div className="col-span-full md:col-span-1">
+              <Label htmlFor="vatsimIvaoId">VATSIM/IVAO ID</Label>
+              <Input id="vatsimIvaoId" value={userProfile?.vatsim_ivao_id || 'N/A'} disabled className="bg-gray-100 dark:bg-gray-700" />
+            </div>
 
-          <FlightDetailsForm
-            formState={formState}
-            userRank={userProfile?.rank || ''}
-            filteredAircraftTypes={filteredAircraftTypes}
-            aircraftRegistrations={aircraftRegistrations}
-            handleChange={handleChange}
-            handleAircraftTypeChange={(value) => handleChange('selectedAircraftType', value)}
-            handleAirlineChange={(value) => handleChange('selectedAirline', value)}
-          />
+            <FlightDetailsForm
+              formState={formState}
+              userRank={userProfile?.rank || ''}
+              filteredAircraftTypes={filteredAircraftTypes}
+              aircraftRegistrations={aircraftRegistrations}
+              handleChange={handleChange}
+              handleAircraftTypeChange={(value) => handleChange('selectedAircraftType', value)}
+              handleAirlineChange={(value) => handleChange('selectedAirline', value)}
+            />
 
-          <FlightPlanAndRemarks
-            flightPlan={formState.flightPlan}
-            remarks={formState.remarks}
-            handleChange={handleChange}
-          />
+            <FlightPlanAndRemarks
+              flightPlan={formState.flightPlan}
+              remarks={formState.remarks}
+              handleChange={handleChange}
+            />
 
-          <FlightImageUpload
-            handleImageChange={handleImageChange}
-          />
+            <FlightImageUpload
+              handleImageChange={handleImageChange}
+            />
 
-          <FlightActionButtons
-            loading={loading}
-            // clearForm is no longer passed here, it's handled in handleSubmit
-          />
-        </form>
-      </div>
+            <FlightActionButtons
+              loading={loading}
+              // clearForm is no longer passed here, it's handled in handleSubmit
+            />
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };
