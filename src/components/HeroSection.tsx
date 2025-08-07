@@ -26,11 +26,7 @@ const HeroSection: React.FC = () => {
           Experience the thrill of virtual aviation with a community dedicated to realism, professionalism, and unforgettable flights.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4 animate-fade-in delay-400">
-          <Link to="/plan-flight">
-            <Button size="lg" className="px-8 py-3 text-lg font-semibold bg-icarion-blue-light hover:bg-icarion-blue-DEFAULT text-white transition-all duration-300 transform hover:scale-105">
-              Plan Your First Flight
-            </Button>
-          </Link>
+          {/* Removed "Plan Your First Flight" button */}
           <Link to="/logbook">
             <Button size="lg" variant="outline" className="px-8 py-3 text-lg font-semibold border-white text-white hover:bg-white hover:text-icarion-blue-DEFAULT transition-all duration-300 transform hover:scale-105">
               View Logbook
