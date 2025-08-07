@@ -6,12 +6,14 @@ import { useEffect, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import PolicyDialog from '@/components/PolicyDialog'; // New import
+import PolicyDialog from '@/components/PolicyDialog';
+import { useTheme } from 'next-themes'; // Import useTheme
 
 export default function Login() {
   const navigate = useNavigate();
   const [agreedToPolicies, setAgreedToPolicies] = useState(false);
   const [isPolicyDialogOpen, setIsPolicyDialogOpen] = useState(false);
+  const { theme } = useTheme(); // Get current theme
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -37,13 +39,21 @@ export default function Login() {
             variables: {
               default: {
                 colors: {
-                  brand: 'hsl(var(--primary))',
-                  brandAccent: 'hsl(var(--primary-foreground))',
+                  brand: 'hsl(var(--primary))', // Uses the dynamic --primary from globals.css
+                  brandAccent: 'hsl(var(--primary-foreground))', // Uses the dynamic --primary-foreground from globals.css
+                  // Explicitly set buttonText to ensure contrast, especially in dark mode
+                  buttonText: theme === 'dark' ? 'hsl(222.2 47.4% 11.2%)' : 'hsl(210 40% 98%)', // Dark text for light button (dark mode), light text for dark button (light mode)
+                  inputBackground: 'hsl(var(--input))',
+                  inputBorder: 'hsl(var(--border))',
+                  inputBorderHover: 'hsl(var(--ring))',
+                  inputBorderFocus: 'hsl(var(--ring))',
+                  inputText: 'hsl(var(--foreground))',
+                  inputPlaceholder: 'hsl(var(--muted-foreground))',
+                  text: 'hsl(var(--foreground))', // General text color for labels etc.
                 },
               },
             },
           }}
-          // Removed theme="light" to allow dynamic theming
           redirectTo={window.location.origin + '/'}
           localization={{
             variables: {
@@ -65,6 +75,41 @@ export default function Login() {
                 social_provider_text: 'Sign up with {{provider}}',
                 link_text: 'Don\'t have an account? Sign Up',
                 confirmation_text: 'Check your email for the confirmation link.',
+                // Custom fields for registration
+                additionalData: {
+                  first_name: {
+                    label: 'First Name',
+                    type: 'text',
+                    placeholder: 'Your first name',
+                    required: true,
+                  },
+                  last_name: {
+                    label: 'Last Name',
+                    type: 'text',
+                    placeholder: 'Your last name',
+                    required: true,
+                  },
+                  display_name: {
+                    label: 'Display Name (Visible to others)',
+                    type: 'text',
+                    placeholder: 'Your display name',
+                    required: true,
+                  },
+                  discord_username: {
+                    label: 'Discord Username',
+                    type: 'text',
+                    placeholder: 'Your Discord username (e.g., user#1234)',
+                    required: false,
+                  },
+                  vatsim_ivao_id: {
+                    label: 'VATSIM ID (CID) or IVAO ID (VID)',
+                    type: 'text',
+                    placeholder: 'Your VATSIM or IVAO ID (optional)',
+                    required: false,
+                  },
+                },
+                form_id: 'sign-up-form',
+                element_id: 'sign-up-button',
               },
               forgotten_password: {
                 email_label: 'Email',
@@ -90,7 +135,6 @@ export default function Login() {
             social_provider_text: 'Sign up with {{provider}}',
             link_text: 'Don\'t have an account? Sign Up',
             confirmation_text: 'Check your email for the confirmation link.',
-            // Custom fields for registration
             additionalData: {
               first_name: {
                 label: 'First Name',
@@ -123,11 +167,8 @@ export default function Login() {
                 required: false,
               },
             },
-            // Custom agreement checkbox
-            form_id: 'sign-up-form', // Assign an ID to the form for custom elements
-            element_id: 'sign-up-button', // Assign an ID to the submit button
-            // This is a workaround as Auth UI doesn't directly support custom validation for its button.
-            // We'll handle the agreement check outside the Auth component's direct flow.
+            form_id: 'sign-up-form',
+            element_id: 'sign-up-button',
           }}
         />
         {/* Custom agreement checkbox and policy link */}
@@ -144,8 +185,6 @@ export default function Login() {
             </Button>
           </Label>
         </div>
-        {/* Override the default Supabase Auth UI sign-up button if needed, or rely on its internal validation */}
-        {/* For now, we'll let the Auth UI handle its own button, but the checkbox will be a visual cue */}
       </div>
       <PolicyDialog isOpen={isPolicyDialogOpen} onClose={() => setIsPolicyDialogOpen(false)} />
     </div>
