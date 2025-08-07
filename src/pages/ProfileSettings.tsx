@@ -133,6 +133,11 @@ const ProfileSettings = () => {
     e.preventDefault();
     if (!profile) return;
 
+    if (!firstName.trim() || !lastName.trim() || !displayName.trim() || !discordUsername.trim()) {
+      showError('First Name, Last Name, Display Name, and Discord Username are required.');
+      return;
+    }
+
     let avatarUrl = profile.avatar_url;
     if (avatarFile) {
       const fileExt = avatarFile.name.split('.').pop();
@@ -228,6 +233,7 @@ const ProfileSettings = () => {
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="Your first name"
+                  required
                 />
               </div>
               <div>
@@ -237,6 +243,7 @@ const ProfileSettings = () => {
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Your last name"
+                  required
                 />
               </div>
               <div>
@@ -246,6 +253,7 @@ const ProfileSettings = () => {
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Your display name"
+                  required
                 />
               </div>
               <div>
@@ -254,7 +262,8 @@ const ProfileSettings = () => {
                   id="discordUsername"
                   value={discordUsername}
                   onChange={(e) => setDiscordUsername(e.target.value)}
-                  placeholder="Your Discord username"
+                  placeholder="Your Discord username (e.g., user#1234)"
+                  required
                 />
               </div>
               <div>
@@ -263,7 +272,7 @@ const ProfileSettings = () => {
                   id="vatsimIvaoId"
                   value={vatsimIvaoId}
                   onChange={(e) => setVatsimIvaoId(e.target.value)}
-                  placeholder="Your VATSIM or IVAO ID"
+                  placeholder="Your VATSIM or IVAO ID (optional)"
                 />
               </div>
               {profile && (
