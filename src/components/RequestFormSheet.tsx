@@ -208,6 +208,7 @@ const RequestFormSheet: React.FC<RequestFormSheetProps> = ({ isOpen, onClose, on
                 value={priorExperience}
                 onChange={(e) => setPriorExperience(e.target.value)}
                 placeholder="Describe your prior experience relevant to this request."
+                rows={3} // Made more compact
                 disabled={loading}
               />
             </div>
@@ -218,6 +219,7 @@ const RequestFormSheet: React.FC<RequestFormSheetProps> = ({ isOpen, onClose, on
                 value={optionalMessage}
                 onChange={(e) => setOptionalMessage(e.target.value)}
                 placeholder="Any additional notes for the staff."
+                rows={3} // Made more compact
                 disabled={loading}
               />
             </div>
@@ -251,7 +253,7 @@ const RequestFormSheet: React.FC<RequestFormSheetProps> = ({ isOpen, onClose, on
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Provide details for your request..."
-                rows={6}
+                rows={4} // Made more compact
                 required
                 disabled={loading}
               />
@@ -272,7 +274,7 @@ const RequestFormSheet: React.FC<RequestFormSheetProps> = ({ isOpen, onClose, on
             Select a request type and fill in the details.
           </SheetDescription>
         </SheetHeader>
-        <form onSubmit={handleSubmit} className="grid gap-4 py-4 flex-grow overflow-y-auto">
+        <form onSubmit={handleSubmit} className="grid gap-3 py-4 flex-grow overflow-y-auto"> {/* Changed gap-4 to gap-3 */}
           <div>
             <Label htmlFor="requestType">Request Type</Label>
             <Select value={requestType} onValueChange={setRequestType} disabled={loading}>
