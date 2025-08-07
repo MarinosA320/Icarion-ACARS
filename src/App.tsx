@@ -10,10 +10,10 @@ import ProfileSettings from "./pages/ProfileSettings";
 import Logbook from "./pages/Logbook";
 import SocialMedia from "./pages/SocialMedia";
 import StaffDashboard from "./pages/StaffDashboard";
-import PlanFlight from "./pages/PlanFlight";
+// import PlanFlight from "./pages/PlanFlight"; // Removed
 import MyBookings from "./pages/MyBookings";
 import Announcements from "./pages/Announcements";
-import MyRequests from "./pages/MyRequests"; // Changed import
+import MyRequests from "./pages/MyRequests";
 import LogFlight from "./pages/LogFlight";
 import FlightBriefing from "./pages/FlightBriefing";
 import Careers from "./pages/Careers";
@@ -111,15 +111,7 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/plan-flight"
-                element={
-                  <ProtectedRoute>
-                    <Navbar />
-                    <PlanFlight />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Removed Plan Flight Route */}
               <Route
                 path="/my-bookings"
                 element={
@@ -139,11 +131,11 @@ const App = () => {
                 }
               />
               <Route
-                path="/my-requests" // Changed route path
+                path="/my-requests"
                 element={
                   <ProtectedRoute>
                     <Navbar />
-                    <MyRequests /> {/* Changed component name */}
+                    <MyRequests />
                   </ProtectedRoute>
                 }
               />

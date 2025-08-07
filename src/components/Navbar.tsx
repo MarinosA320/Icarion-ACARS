@@ -67,7 +67,7 @@ const Navbar = () => {
     <>
       <Link to="/logbook" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Logbook</Link>
       <Link to="/social-media" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Social Media</Link>
-      <Link to="/plan-flight" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Plan Flight</Link>
+      {/* Removed Plan Flight Link */}
       <Link to="/my-bookings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">My Bookings</Link>
       <Link to="/my-requests" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">My Requests</Link>
       <Link to="/announcements" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Announcements</Link>
