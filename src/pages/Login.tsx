@@ -1,7 +1,7 @@
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } => 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
@@ -41,8 +41,7 @@ export default function Login() {
                 colors: {
                   brand: 'hsl(var(--primary))', // Uses the dynamic --primary from globals.css
                   brandAccent: 'hsl(var(--primary-foreground))', // Uses the dynamic --primary-foreground from globals.css
-                  // Explicitly set buttonText to ensure contrast, especially in dark mode
-                  buttonText: theme === 'dark' ? 'hsl(222.2 47.4% 11.2%)' : 'hsl(210 40% 98%)', // Dark text for light button (dark mode), light text for dark button (light mode)
+                  buttonText: 'hsl(222.2 47.4% 11.2%)', // Always use a very dark color for button text
                   inputBackground: 'hsl(var(--input))',
                   inputBorder: 'hsl(var(--border))',
                   inputBorderHover: 'hsl(var(--ring))',
