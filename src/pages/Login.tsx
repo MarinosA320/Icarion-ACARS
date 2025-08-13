@@ -7,13 +7,21 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import PolicyDialog from '@/components/PolicyDialog';
-import { useTheme } from 'next-themes'; // Import useTheme
+import { useTheme } from 'next-themes';
+import DynamicBackground from '@/components/DynamicBackground'; // New import
+
+const loginBackgroundImages = [
+  '/images/login-backgrounds/Screenshot 2025-05-16 202149.png',
+  '/images/login-backgrounds/Screenshot 2025-08-03 193621.png',
+  '/images/login-backgrounds/pasted-image-2025-08-13T12-35-42-278Z.png',
+  '/images/login-backgrounds/pasted-image-2025-08-13T12-36-43-571Z.png',
+];
 
 export default function Login() {
   const navigate = useNavigate();
   const [agreedToPolicies, setAgreedToPolicies] = useState(false);
   const [isPolicyDialogOpen, setIsPolicyDialogOpen] = useState(false);
-  const { theme } = useTheme(); // Get current theme
+  const { theme } = useTheme();
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -26,8 +34,11 @@ export default function Login() {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+    <DynamicBackground images={loginBackgroundImages} interval={10000} className="min-h-screen flex items-center justify-center p-4">
+      {/* Darker overlay on top of the image for better text contrast and depth */}
+      <div className="absolute inset-0 bg-black opacity-50"></div>
+      
+      <div className="relative z-10 w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
         <h2 className="text-2xl font-bold text-center mb-6 text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT">
           Welcome to Icarion Virtual Airline
         </h2>
@@ -39,16 +50,16 @@ export default function Login() {
             variables: {
               default: {
                 colors: {
-                  brand: 'hsl(var(--primary))', // Uses the dynamic --primary from globals.css
-                  brandAccent: 'hsl(var(--primary-foreground))', // Uses the dynamic --primary-foreground from globals.css
-                  buttonText: 'hsl(222.2 47.4% 11.2%)', // Always use a very dark color for button text
+                  brand: 'hsl(var(--primary))',
+                  brandAccent: 'hsl(var(--primary-foreground))',
+                  buttonText: 'hsl(222.2 47.4% 11.2%)',
                   inputBackground: 'hsl(var(--input))',
                   inputBorder: 'hsl(var(--border))',
                   inputBorderHover: 'hsl(var(--ring))',
                   inputBorderFocus: 'hsl(var(--ring))',
                   inputText: 'hsl(var(--foreground))',
                   inputPlaceholder: 'hsl(var(--muted-foreground))',
-                  text: 'hsl(var(--foreground))', // General text color for labels etc.
+                  text: 'hsl(var(--foreground))',
                 },
               },
             },
@@ -74,7 +85,6 @@ export default function Login() {
                 social_provider_text: 'Sign up with {{provider}}',
                 link_text: 'Don\'t have an account? Sign Up',
                 confirmation_text: 'Check your email for the confirmation link.',
-                // Custom fields for registration
                 additionalData: {
                   first_name: {
                     label: 'First Name',
@@ -186,6 +196,6 @@ export default function Login() {
         </div>
       </div>
       <PolicyDialog isOpen={isPolicyDialogOpen} onClose={() => setIsPolicyDialogOpen(false)} />
-    </div>
+    </DynamicBackground>
   );
 }
