@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 import DynamicBackground from '@/components/DynamicBackground'; // New import
 
 const flightBriefingBackgroundImages = [
-  '/images/backgrounds/briefing.jpg', // Using the new image as requested
+  '/images/backgrounds/briefing.jpg', // Using only this image as requested
 ];
 
 const FlightBriefing = () => {
