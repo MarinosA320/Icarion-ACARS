@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner"; // Removed 'toast' from here
+import { Toaster as Sonner } from "sonner"; // Removed 'toast' from here
 import { toast } from "sonner"; // Added direct import for 'toast' from 'sonner'
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -11,12 +11,11 @@ import ProfileSettings from "./pages/ProfileSettings";
 import Logbook from "./pages/Logbook";
 import SocialMedia from "./pages/SocialMedia";
 import StaffDashboard from "./pages/StaffDashboard";
-import MyBookings from "./pages/MyBookings";
 import Announcements from "./pages/Announcements";
 import LogFlight from "./pages/LogFlight";
 import FlightBriefing from "./pages/FlightBriefing";
 import Careers from "./pages/Careers";
-import Contact from "./pages/Contact"; // New import
+import Contact from "./pages/Contact";
 import Navbar from "./components/Navbar";
 import { supabase } from "./integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -138,15 +137,7 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/my-bookings"
-                element={
-                  <ProtectedRoute>
-                    <Navbar />
-                    <MyBookings />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Removed /my-bookings route */}
               <Route
                 path="/announcements"
                 element={

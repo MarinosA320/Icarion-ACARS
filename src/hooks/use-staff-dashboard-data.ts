@@ -4,10 +4,9 @@ import { showError } from '@/utils/toast';
 
 import { useUsersManagement } from './useUsersManagement';
 import { useFlightsManagement } from './useFlightsManagement';
-import { useFlightBookingsManagement } from './useFlightBookingsManagement';
 import { useJobOpeningsManagement } from './useJobOpeningsManagement';
 import { useJobApplicationsManagement } from './useJobApplicationsManagement';
-import { useTrainingRequestsManagement } from './useTrainingRequestsManagement'; // New import
+import { useTrainingRequestsManagement } from './useTrainingRequestsManagement';
 
 export const useStaffDashboardData = () => {
   const [loading, setLoading] = useState(true);
@@ -16,10 +15,9 @@ export const useStaffDashboardData = () => {
   // Integrate all specialized hooks
   const { users, staffMembers, fetchUsers, fetchStaffMembers, handleUserUpdate } = useUsersManagement();
   const { flights, fetchAllFlights, handleDeleteFlight } = useFlightsManagement();
-  const { flightBookings, fetchAllFlightBookings, handleBookingStatusUpdate, handleDeleteBooking } = useFlightBookingsManagement();
   const { jobOpenings, fetchJobOpenings, handleCreateJobOpening, handleUpdateJobOpening, handleDeleteJobOpening } = useJobOpeningsManagement();
   const { jobApplications, fetchJobApplications, handleUpdateApplicationStatus, handleDeleteApplication } = useJobApplicationsManagement();
-  const { trainingRequests, fetchAllTrainingRequests, handleUpdateTrainingRequest, handleDeleteTrainingRequest } = useTrainingRequestsManagement(); // New hook integration
+  const { trainingRequests, fetchAllTrainingRequests, handleUpdateTrainingRequest, handleDeleteTrainingRequest } = useTrainingRequestsManagement();
 
   useEffect(() => {
     const checkStaffStatus = async () => {
@@ -52,10 +50,9 @@ export const useStaffDashboardData = () => {
   return {
     users,
     flights,
-    flightBookings,
     jobOpenings,
     jobApplications,
-    trainingRequests, // Expose training requests
+    trainingRequests,
     staffMembers,
     loading,
     currentUserIsStaff,
@@ -63,20 +60,17 @@ export const useStaffDashboardData = () => {
     fetchUsers,
     fetchStaffMembers,
     fetchAllFlights,
-    fetchAllFlightBookings,
     fetchJobOpenings,
     fetchJobApplications,
-    fetchAllTrainingRequests, // Expose fetch for training requests
+    fetchAllTrainingRequests,
     handleUserUpdate,
-    handleBookingStatusUpdate,
-    handleDeleteBooking,
     handleDeleteFlight,
     handleCreateJobOpening,
     handleUpdateJobOpening,
     handleDeleteJobOpening,
     handleUpdateApplicationStatus,
     handleDeleteApplication,
-    handleUpdateTrainingRequest, // Expose update for training requests
-    handleDeleteTrainingRequest, // Expose delete for training requests
+    handleUpdateTrainingRequest,
+    handleDeleteTrainingRequest,
   };
 };

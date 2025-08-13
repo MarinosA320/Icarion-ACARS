@@ -4,11 +4,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { showSuccess, showError } from '@/utils/toast';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'; // Import Card components
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
 import { useFlightForm } from '@/hooks/use-flight-form';
 import { useUserProfileAndAircraftData } from '@/hooks/use-user-profile-aircraft-data';
-import { AIRCRAFT_MIN_RANKS, hasRequiredRank, hasTypeRating, AIRCRAFT_FAMILIES } from '@/utils/aircraftData'; // New imports for validation
+import { AIRCRAFT_MIN_RANKS, hasRequiredRank, hasTypeRating, AIRCRAFT_FAMILIES } from '@/utils/aircraftData';
 
 import FlightDetailsForm from '@/components/log-flight/FlightDetailsForm';
 import FlightPlanAndRemarks from '@/components/log-flight/FlightPlanAndRemarks';
@@ -22,10 +22,10 @@ const LogFlight = () => {
   const {
     formState,
     flightImage,
-    bookingId,
+    // Removed bookingId as it's no longer used
     handleChange,
     handleImageChange,
-    clearForm, // Keep clearForm here for successful submission
+    clearForm,
   } = useFlightForm();
 
   const {
@@ -115,27 +115,17 @@ const LogFlight = () => {
       departure_type: formState.departureType,
       arrival_type: formState.arrivalType,
       remarks: formState.remarks || null,
-      volanta_tracking_link: formState.volantaTrackingLink || null, // Include new field
+      volanta_tracking_link: formState.volantaTrackingLink || null,
     });
 
     if (error) {
       showError('Error logging flight: ' + error.message);
       console.error('Error logging flight:', error);
     } else {
-      if (bookingId) {
-        const { error: updateBookingError } = await supabase
-          .from('flight_bookings')
-          .update({ status: 'completed' })
-          .eq('id', bookingId);
-
-        if (updateBookingError) {
-          console.error('Error updating booking status:', updateBookingError);
-          showError('Flight logged, but failed to update booking status.');
-        }
-      }
+      // Removed bookingId update logic
       showSuccess('Flight logged successfully!');
-      clearForm(); // Clear saved data on successful submission
-      navigate('/logbook'); // Navigate back to logbook
+      clearForm();
+      navigate('/logbook');
     }
     setLoading(false);
   };
@@ -186,7 +176,6 @@ const LogFlight = () => {
 
             <FlightActionButtons
               loading={loading}
-              // clearForm is no longer passed here, it's handled in handleSubmit
             />
           </form>
         </CardContent>

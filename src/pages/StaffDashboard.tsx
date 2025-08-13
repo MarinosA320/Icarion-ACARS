@@ -3,43 +3,38 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import UserDetailsDialog from '@/components/UserDetailsDialog';
 import UserManagementTab from '@/components/staff/UserManagementTab';
 import LogbookEntryManagementTab from '@/components/staff/LogbookEntryManagementTab';
-import FlightBookingManagementTab from '@/components/staff/FlightBookingManagementTab';
 import JobOpeningManagementTab from '@/components/staff/JobOpeningManagementTab';
 import CreateJobOpeningForm from '@/components/staff/CreateJobOpeningForm';
 import JobApplicationManagementTab from '@/components/staff/JobApplicationManagementTab';
-import TrainingRequestManagementTab from '@/components/staff/TrainingRequestManagementTab'; // New import
+import TrainingRequestManagementTab from '@/components/staff/TrainingRequestManagementTab';
 import { useStaffDashboardData } from '@/hooks/use-staff-dashboard-data';
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+import { Skeleton } from '@/components/ui/skeleton';
 
 const StaffDashboard = () => {
   const {
     users,
     flights,
-    flightBookings,
     jobOpenings,
     jobApplications,
-    trainingRequests, // New
+    trainingRequests,
     staffMembers,
     loading,
     currentUserIsStaff,
     fetchUsers,
     fetchStaffMembers,
     fetchAllFlights,
-    fetchAllFlightBookings,
     fetchJobOpenings,
     fetchJobApplications,
-    fetchAllTrainingRequests, // New
+    fetchAllTrainingRequests,
     handleUserUpdate,
-    handleBookingStatusUpdate,
-    handleDeleteBooking,
     handleDeleteFlight,
     handleCreateJobOpening,
     handleUpdateJobOpening,
     handleDeleteJobOpening,
     handleUpdateApplicationStatus,
     handleDeleteApplication,
-    handleUpdateTrainingRequest, // New
-    handleDeleteTrainingRequest, // New
+    handleUpdateTrainingRequest,
+    handleDeleteTrainingRequest,
   } = useStaffDashboardData();
 
   const [isUserDetailsDialogOpen, setIsUserDetailsDialogOpen] = useState(false);
@@ -58,9 +53,6 @@ const StaffDashboard = () => {
       case 'logbook-entries':
         fetchAllFlights();
         break;
-      case 'flight-bookings':
-        fetchAllFlightBookings();
-        break;
       case 'announcements':
         // Announcements are managed on their own page now, no data fetch needed here
         break;
@@ -70,13 +62,13 @@ const StaffDashboard = () => {
       case 'job-applications':
         fetchJobApplications();
         break;
-      case 'training-requests': // New case
+      case 'training-requests':
         fetchAllTrainingRequests();
         break;
       default:
         break;
     }
-  }, [activeTab, currentUserIsStaff, fetchUsers, fetchStaffMembers, fetchAllFlights, fetchAllFlightBookings, fetchJobOpenings, fetchJobApplications, fetchAllTrainingRequests]);
+  }, [activeTab, currentUserIsStaff, fetchUsers, fetchStaffMembers, fetchAllFlights, fetchJobOpenings, fetchJobApplications, fetchAllTrainingRequests]);
 
   if (loading) {
     return (
@@ -106,14 +98,14 @@ const StaffDashboard = () => {
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Staff Dashboard</h1>
 
       <Tabs defaultValue="users" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7"> {/* Adjusted grid-cols */}
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="logbook-entries">Logbook Entries</TabsTrigger>
-          <TabsTrigger value="flight-bookings">Flight Bookings</TabsTrigger>
+          {/* Removed Flight Bookings Tab */}
           <TabsTrigger value="announcements">Announcements</TabsTrigger>
           <TabsTrigger value="job-openings">Job Openings</TabsTrigger>
           <TabsTrigger value="job-applications">Job Applications</TabsTrigger>
-          <TabsTrigger value="training-requests">Training Requests</TabsTrigger> {/* New Tab */}
+          <TabsTrigger value="training-requests">Training Requests</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="mt-6">
@@ -134,13 +126,7 @@ const StaffDashboard = () => {
           />
         </TabsContent>
 
-        <TabsContent value="flight-bookings" className="mt-6">
-          <FlightBookingManagementTab
-            flightBookings={flightBookings}
-            handleBookingStatusUpdate={handleBookingStatusUpdate}
-            handleDeleteBooking={handleDeleteBooking}
-          />
-        </TabsContent>
+        {/* Removed Flight Bookings Content */}
 
         <TabsContent value="announcements" className="mt-6">
           <p className="text-center text-gray-600 dark:text-gray-400">
@@ -167,7 +153,7 @@ const StaffDashboard = () => {
           />
         </TabsContent>
 
-        <TabsContent value="training-requests" className="mt-6"> {/* New Tab Content */}
+        <TabsContent value="training-requests" className="mt-6">
           <TrainingRequestManagementTab
             trainingRequests={trainingRequests}
             staffMembers={staffMembers}

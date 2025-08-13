@@ -38,7 +38,7 @@ interface FlightFormState {
   arrivalType: string;
   landingRate: string;
   remarks: string;
-  volantaTrackingLink: string; // New field
+  volantaTrackingLink: string;
 }
 
 const initialFormState: FlightFormState = {
@@ -65,14 +65,14 @@ const initialFormState: FlightFormState = {
   arrivalType: 'Normal',
   landingRate: '',
   remarks: '',
-  volantaTrackingLink: '', // Initialize new field
+  volantaTrackingLink: '',
 };
 
 export const useFlightForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialFlightData = location.state?.initialFlightData as InitialFlightData | undefined;
-  const bookingId = location.state?.bookingId as string | undefined;
+  // Removed bookingId from here
 
   const [formState, setFormState] = useState<FlightFormState>(initialFormState);
   const [flightImage, setFlightImage] = useState<File | null>(null);
@@ -119,15 +119,15 @@ export const useFlightForm = () => {
       arrivalType: loadedData.arrivalType || prevState.arrivalType,
       landingRate: loadedData.landingRate || prevState.landingRate,
       remarks: loadedData.remarks || prevState.remarks,
-      volantaTrackingLink: loadedData.volantaTrackingLink || prevState.volantaTrackingLink, // Load new field
+      volantaTrackingLink: loadedData.volantaTrackingLink || prevState.volantaTrackingLink,
     }));
     setFlightImage(null); // Image cannot be persisted via localStorage
 
     // Clear initialFlightData from location state after use to prevent re-applying on subsequent renders
-    if (initialFlightData || bookingId) {
+    if (initialFlightData) { // Removed bookingId from condition
       navigate(location.pathname, { replace: true, state: {} });
     }
-  }, [navigate, location.pathname, location.state, initialFlightData, bookingId]);
+  }, [navigate, location.pathname, location.state, initialFlightData]);
 
   // Save data to localStorage whenever form fields change
   useEffect(() => {
@@ -151,7 +151,7 @@ export const useFlightForm = () => {
   return {
     formState,
     flightImage,
-    bookingId,
+    // Removed bookingId from return
     handleChange,
     handleImageChange,
     clearForm,

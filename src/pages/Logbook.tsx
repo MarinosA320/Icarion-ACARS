@@ -11,7 +11,7 @@ import { ALL_AIRLINES } from '@/utils/aircraftData';
 import { fetchProfilesData } from '@/utils/supabaseDataFetch';
 import { Skeleton } from '@/components/ui/skeleton';
 import LogbookFlightPage from '@/components/LogbookFlightPage';
-import { CSSTransition, TransitionGroup } from 'react-transition-group'; // New imports for animation
+import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 interface Flight {
   id: string;
@@ -68,14 +68,14 @@ const formatMinutesToHHMM = (totalMinutes: number | undefined): string => {
 const Logbook = () => {
   const navigate = useNavigate();
   const [flights, setFlights] = useState<Flight[]>([]);
-  const [isStaff, setIsStaff] = useState(false); // Keep this for displaying pilot name in LogbookFlightPage
+  const [isStaff, setIsStaff] = useState(false);
   const [isLoggingVatsimFlight, setIsLoggingVatsimFlight] = useState(false);
   const [isLoggingSimbriefFlight, setIsLoggingSimbriefFlight] = useState(false);
   const [simbriefUrl, setSimbriefUrl] = useState('');
   const [hasSavedFlight, setHasSavedFlight] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(0); // State for current flight index
-  const [showSimbriefUrlInput, setShowSimbriefUrlInput] = useState(false); // New state for SimBrief input visibility
+  const [currentPage, setCurrentPage] = useState(0);
+  const [showSimbriefUrlInput, setShowSimbriefUrlInput] = useState(false);
 
   useEffect(() => {
     fetchFlights();
@@ -95,7 +95,6 @@ const Logbook = () => {
 
     console.log('Logbook: Fetching flights for user ID:', user.id);
 
-    // Fetch staff status for display purposes in LogbookFlightPage
     const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('is_staff, vatsim_ivao_id')
@@ -111,11 +110,10 @@ const Logbook = () => {
       console.log('Logbook: User staff status:', profileData?.is_staff);
     }
 
-    // Always fetch only the current user's flights for the personal logbook
     const { data, error } = await supabase
       .from('flights')
       .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at')
-      .eq('user_id', user.id) // Filter by current user's ID
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -134,7 +132,7 @@ const Logbook = () => {
       }));
 
       setFlights(flightsWithProfiles as Flight[]);
-      setCurrentPage(0); // Reset to first page on new data fetch
+      setCurrentPage(0);
       console.log('Logbook: Flights set in state:', flightsWithProfiles);
     }
     setLoading(false);
@@ -319,10 +317,10 @@ const Logbook = () => {
           <TransitionGroup className="relative flex-grow overflow-hidden">
             <CSSTransition
               key={currentPage}
-              timeout={300} // Duration of the animation
+              timeout={300}
               classNames="page-slide"
             >
-              <div className="absolute inset-0"> {/* Wrapper for animation */}
+              <div className="absolute inset-0">
                 {flights[currentPage] && (
                   <LogbookFlightPage flight={flights[currentPage]} isStaff={isStaff} />
                 )}

@@ -67,11 +67,11 @@ const Navbar = () => {
     <>
       <Link to="/logbook" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Logbook</Link>
       <Link to="/social-media" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Social Media</Link>
-      <Link to="/my-bookings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">My Bookings</Link>
+      {/* Removed My Bookings Link */}
       <Link to="/announcements" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Announcements</Link>
       <Link to="/flight-briefing" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Flight Briefing (Beta)</Link>
       <Link to="/careers" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Careers</Link>
-      <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Contact</Link> {/* New Link */}
+      <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Contact</Link>
       <Link to="/profile-settings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Profile Settings</Link>
       {profile?.is_staff && (
         <Link to="/staff-dashboard" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Staff Dashboard</Link>
