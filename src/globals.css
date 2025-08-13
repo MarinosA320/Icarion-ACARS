@@ -62,13 +62,13 @@
     --popover-foreground: 210 40% 98%;
 
     --primary: 210 40% 90%; /* Adjusted: Slightly darker light blue for dark mode primary */
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%; /* Made this light for dark mode text */
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted-foreground: 215 20.2% 85.1%; /* Made this lighter for dark mode placeholders */
 
     --accent: 200 80% 45%; /* Refined Icarion Blue Light (Accent) */
     --accent-foreground: 222.2 47.4% 11.2%;

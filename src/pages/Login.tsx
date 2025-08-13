@@ -52,7 +52,7 @@ export default function Login() {
                 colors: {
                   brand: 'hsl(var(--primary))',
                   brandAccent: 'hsl(var(--primary-foreground))',
-                  buttonText: 'hsl(222.2 47.4% 11.2%)',
+                  buttonText: 'hsl(var(--primary-foreground))', // Changed to use dynamic variable
                   inputBackground: 'hsl(var(--input))',
                   inputBorder: 'hsl(var(--border))',
                   inputBorderHover: 'hsl(var(--ring))',
