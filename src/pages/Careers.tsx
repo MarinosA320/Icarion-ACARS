@@ -70,13 +70,13 @@ const Careers = () => {
         </p>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {renderSkeletons()}
           </div>
         ) : jobOpenings.length === 0 ? (
           <p className="text-center text-gray-600 dark:text-gray-400">No job openings available at the moment. Please check back later!</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
             {jobOpenings.map((job) => (
               <JobListingCard key={job.id} job={job} />
             ))}
