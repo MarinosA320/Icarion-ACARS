@@ -48,11 +48,11 @@ export default function Login() {
           appearance={{
             theme: ThemeSupa,
             variables: {
-              default: {
+              default: { // These apply to both unless overridden by light/dark
                 colors: {
                   brand: 'hsl(var(--primary))',
-                  brandAccent: 'hsl(var(--primary-foreground))',
-                  buttonText: 'hsl(var(--primary-foreground))', // Changed to use dynamic variable
+                  brandAccent: 'hsl(var(--accent))',
+                  buttonText: 'hsl(var(--primary-foreground))',
                   inputBackground: 'hsl(var(--input))',
                   inputBorder: 'hsl(var(--border))',
                   inputBorderHover: 'hsl(var(--ring))',
@@ -62,8 +62,23 @@ export default function Login() {
                   text: 'hsl(var(--foreground))',
                 },
               },
+              dark: { // Explicit overrides for dark theme using hex values
+                colors: {
+                  brand: '#E0F2FE', // light blue from --primary in dark
+                  brandAccent: '#1E90FF', // vibrant blue from --accent in dark
+                  buttonText: '#F8FAFC', // off-white from --primary-foreground in dark
+                  inputBackground: '#273142', // dark grey from --input in dark
+                  inputBorder: '#273142', // dark grey from --border in dark
+                  inputBorderHover: '#BEE3F8', // light blue from --ring in dark
+                  inputBorderFocus: '#BEE3F8', // light blue from --ring in dark
+                  inputText: '#F8FAFC', // off-white from --foreground in dark
+                  inputPlaceholder: '#D1D5DB', // light grey from --muted-foreground in dark
+                  text: '#F8FAFC', // off-white from --foreground in dark
+                }
+              }
             },
           }}
+          theme={theme === 'dark' ? 'dark' : 'light'} // Make theme dynamic
           redirectTo={window.location.origin + '/'}
           localization={{
             variables: {
@@ -189,7 +204,7 @@ export default function Login() {
           />
           <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             I agree to the{' '}
-            <Button variant="link" className="p-0 h-auto text-sm" onClick={() => setIsPolicyDialogOpen(true)}>
+            <Button variant="link" className="p-0 h-auto text-sm text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT hover:underline">
               Terms of Service, Privacy Policy, and Rules & Regulations
             </Button>
           </Label>
