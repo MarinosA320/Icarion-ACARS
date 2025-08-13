@@ -11,12 +11,10 @@ const backgroundImages = [
 
 const HeroSection: React.FC = () => {
   return (
-    <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center overflow-hidden text-white p-4">
+    <section className="relative w-full h-[calc(100vh-64px)] flex items-center justify-center text-center overflow-hidden text-white p-4">
       <DynamicBackground images={backgroundImages} interval={8000} className="absolute inset-0 z-0">
-        {/* Darker overlay on top of the image for better text contrast and depth */}
-        {/* <div className="absolute inset-0 bg-black opacity-50"></div> */}
         {/* Gradient overlay for brand color integration */}
-        {/* <div className="absolute inset-0 z-0 bg-gradient-to-br from-icarion-blue-dark to-icarion-blue-DEFAULT opacity-70"></div> */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-icarion-blue-dark to-icarion-blue-DEFAULT opacity-70"></div>
       </DynamicBackground>
 
       {/* Content */}
