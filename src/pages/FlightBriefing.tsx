@@ -9,7 +9,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { fetchNotams } from '@/utils/aviationApi';
 import { useLocation } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import DynamicBackground from '@/components/DynamicBackground';
+import BackgroundCarousel from '@/components/BackgroundCarousel';
 
 const flightBriefingBackgroundImages = [
   '/images/backgrounds/briefing.jpg',
@@ -96,7 +96,7 @@ const FlightBriefing = () => {
   );
 
   return (
-    <DynamicBackground images={flightBriefingBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
+    <BackgroundCarousel images={flightBriefingBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
       <div className="absolute inset-0 bg-black opacity-50"></div>
       
       <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
@@ -284,7 +284,7 @@ const FlightBriefing = () => {
           </div>
         )}
       </div>
-    </DynamicBackground>
+    </BackgroundCarousel>
   );
 };
 

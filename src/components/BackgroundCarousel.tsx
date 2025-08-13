@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
-interface DynamicBackgroundProps {
+interface BackgroundCarouselProps {
   images: string[];
   interval?: number; // Interval in milliseconds to change images
   children: React.ReactNode;
   className?: string;
 }
 
-const DynamicBackground: React.FC<DynamicBackgroundProps> = ({
+const BackgroundCarousel: React.FC<BackgroundCarouselProps> = ({
   images,
   interval = 8000, // Default to 8 seconds
   children,
@@ -17,15 +17,15 @@ const DynamicBackground: React.FC<DynamicBackgroundProps> = ({
 
   useEffect(() => {
     if (images.length === 0) {
-      console.log("DynamicBackground: No images provided.");
+      console.log("BackgroundCarousel: No images provided.");
       return;
     }
-    console.log("DynamicBackground: Images array:", images);
+    console.log("BackgroundCarousel: Images array:", images);
 
     const timer = setInterval(() => {
       setCurrentImageIndex((prevIndex) => {
         const nextIndex = (prevIndex + 1) % images.length;
-        console.log(`DynamicBackground: Changing image from index ${prevIndex} to ${nextIndex}. Current image: ${images[nextIndex]}`);
+        console.log(`BackgroundCarousel: Changing image from index ${prevIndex} to ${nextIndex}. Current image: ${images[nextIndex]}`);
         return nextIndex;
       });
     }, interval);
@@ -56,4 +56,4 @@ const DynamicBackground: React.FC<DynamicBackgroundProps> = ({
   );
 };
 
-export default DynamicBackground;
+export default BackgroundCarousel;
