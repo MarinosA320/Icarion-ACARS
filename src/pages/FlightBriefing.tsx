@@ -3,18 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
+import { Textarea } => '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { showSuccess, showError } from '@/utils/toast';
 import { fetchNotams } from '@/utils/aviationApi';
 import { useLocation } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import DynamicBackground from '@/components/DynamicBackground';
+// import DynamicBackground from '@/components/DynamicBackground'; // Temporarily removed
 
-const flightBriefingBackgroundImages = [
-  '/images/backgrounds/flight-briefing-new-bg.jpg', // New placeholder image path
-  // You can add more image paths here if you want a rotating background
-];
+// const flightBriefingBackgroundImages = [
+//   '/images/backgrounds/flight-briefing-new-bg.jpg',
+// ];
 
 const FlightBriefing = () => {
   const location = useLocation();
@@ -100,11 +99,8 @@ const FlightBriefing = () => {
   );
 
   return (
-    <DynamicBackground images={flightBriefingBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
-      {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="absolute inset-0 bg-black opacity-50"></div>
-      
-      <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 pt-24 bg-blue-100 dark:bg-blue-900"> {/* Temporary background */}
+      <div className="relative z-10 w-full max-w-5xl mx-auto text-gray-900 dark:text-white"> {/* Adjusted text color for temporary background */}
         <h1 className="text-3xl font-bold mb-8 text-center">Flight Briefing</h1>
 
         <Card className="max-w-3xl mx-auto mb-8 shadow-md rounded-lg bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white">
@@ -289,7 +285,7 @@ const FlightBriefing = () => {
           </div>
         )}
       </div>
-    </DynamicBackground>
+    </div>
   );
 };
 
