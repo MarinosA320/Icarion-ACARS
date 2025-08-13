@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import BackgroundCarousel from './BackgroundCarousel'; // Import the new component
+import DynamicBackground from './DynamicBackground'; // Import the new component
 
 const backgroundImages = [
   '/images/backgrounds/hero-bg-1.jpg', // Replace with your actual image paths
@@ -12,10 +12,10 @@ const backgroundImages = [
 const HeroSection: React.FC = () => {
   return (
     <section className="relative w-full h-[calc(100vh-64px)] flex items-center justify-center text-center overflow-hidden text-white p-4">
-      <BackgroundCarousel images={backgroundImages} interval={8000} className="absolute inset-0 z-0">
+      <DynamicBackground images={backgroundImages} interval={8000} className="absolute inset-0 z-0">
         {/* Gradient overlay for brand color integration */}
         <div className="absolute inset-0 z-0 bg-gradient-to-br from-icarion-blue-dark to-icarion-blue-DEFAULT opacity-70"></div>
-      </BackgroundCarousel>
+      </DynamicBackground>
 
       {/* Content */}
       <div className="relative z-10 max-w-2xl mx-auto space-y-6 animate-fade-in-up">

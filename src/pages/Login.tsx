@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import PolicyDialog from '@/components/PolicyDialog';
 import { useTheme } from 'next-themes';
-import BackgroundCarousel from '@/components/BackgroundCarousel';
+import DynamicBackground from '@/components/DynamicBackground';
 
 const loginBackgroundImages = [
   '/images/login-backgrounds/login-bg-1.png',
@@ -34,7 +34,7 @@ export default function Login() {
   }, [navigate]);
 
   return (
-    <BackgroundCarousel images={loginBackgroundImages} interval={10000} className="min-h-screen flex items-center justify-center p-4">
+    <DynamicBackground images={loginBackgroundImages} interval={10000} className="min-h-screen flex items-center justify-center p-4">
       {/* Darker overlay on top of the image for better text contrast and depth */}
       <div className="absolute inset-0 bg-black opacity-50"></div>
       
@@ -259,6 +259,6 @@ export default function Login() {
         </div>
       </div>
       <PolicyDialog isOpen={isPolicyDialogOpen} onClose={() => setIsPolicyDialogOpen(false)} />
-    </BackgroundCarousel>
+    </DynamicBackground>
   );
 }
