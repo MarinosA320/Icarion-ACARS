@@ -42,7 +42,7 @@ const DynamicBackground: React.FC<DynamicBackgroundProps> = ({
       {images.map((image, index) => (
         <div
           key={image}
-          className={`absolute inset-0 bg-contain bg-no-repeat bg-center transition-opacity duration-1000 ease-in-out`}
+          className={`absolute inset-0 bg-cover bg-no-repeat bg-center transition-opacity duration-1000 ease-in-out`}
           style={{
             backgroundImage: `url(${image})`,
             opacity: index === currentImageIndex ? 1 : 0,
