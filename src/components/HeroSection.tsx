@@ -20,7 +20,7 @@ const HeroSection: React.FC = () => {
       {/* Content */}
       <div className="relative z-10 max-w-2xl mx-auto space-y-6 animate-fade-in-up">
         <h1 className="text-5xl md:text-6xl font-extrabold leading-tight animate-slide-in-left">
-          Soar to New Heights with Icarion Virtual Airline
+          Soar to New Heights with <span className="font-cinzel-decorative">Icarion</span> Virtual Airline
         </h1>
         <p className="text-lg md:text-xl text-gray-200 animate-fade-in delay-200">
           Experience the thrill of virtual aviation with a community dedicated to realism, professionalism, and unforgettable flights.

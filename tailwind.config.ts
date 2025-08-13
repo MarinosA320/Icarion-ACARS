@@ -21,6 +21,7 @@ export default {
       fontFamily: {
         sans: ["Lato", "sans-serif"], // Changed to Lato
         heading: ["Lato", "sans-serif"], // Changed to Lato
+        "cinzel-decorative": ["Cinzel Decorative", "serif"], // Added Cinzel Decorative
       },
       colors: {
         border: "hsl(var(--border))",

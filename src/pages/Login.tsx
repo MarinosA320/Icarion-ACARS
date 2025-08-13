@@ -40,7 +40,7 @@ export default function Login() {
       
       <div className="relative z-10 w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md"> {/* Changed max-w-sm to max-w-md */}
         <h2 className="text-2xl font-bold text-center mb-6 text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT">
-          Welcome to Icarion Virtual Airline
+          Welcome to <span className="font-cinzel-decorative">Icarion</span> Virtual Airline
         </h2>
         <Auth
           supabaseClient={supabase}
