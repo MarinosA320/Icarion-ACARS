@@ -1,0 +1,1 @@
+(bucket_id = 'flight_images') AND (auth.uid() is not null)

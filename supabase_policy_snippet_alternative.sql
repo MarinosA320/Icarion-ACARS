@@ -1,0 +1,1 @@
+bucket_id = 'social-media-posts' AND auth.uid() is not null

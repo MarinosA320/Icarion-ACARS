@@ -1,0 +1,192 @@
+import React, { useState, useEffect } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import UserDetailsDialog from '@/components/UserDetailsDialog';
+import UserManagementTab from '@/components/staff/UserManagementTab';
+import LogbookEntryManagementTab from '@/components/staff/LogbookEntryManagementTab';
+import FlightBookingManagementTab from '@/components/staff/FlightBookingManagementTab';
+import JobOpeningManagementTab from '@/components/staff/JobOpeningManagementTab';
+import CreateJobOpeningForm from '@/components/staff/CreateJobOpeningForm';
+import JobApplicationManagementTab from '@/components/staff/JobApplicationManagementTab';
+import TrainingRequestManagementTab from '@/components/staff/TrainingRequestManagementTab'; // New import
+import { useStaffDashboardData } from '@/hooks/use-staff-dashboard-data';
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+
+const StaffDashboard = () => {
+  const {
+    users,
+    flights,
+    flightBookings,
+    jobOpenings,
+    jobApplications,
+    trainingRequests, // New
+    staffMembers,
+    loading,
+    currentUserIsStaff,
+    fetchUsers,
+    fetchStaffMembers,
+    fetchAllFlights,
+    fetchAllFlightBookings,
+    fetchJobOpenings,
+    fetchJobApplications,
+    fetchAllTrainingRequests, // New
+    handleUserUpdate,
+    handleBookingStatusUpdate,
+    handleDeleteBooking,
+    handleDeleteFlight,
+    handleCreateJobOpening,
+    handleUpdateJobOpening,
+    handleDeleteJobOpening,
+    handleUpdateApplicationStatus,
+    handleDeleteApplication,
+    handleUpdateTrainingRequest, // New
+    handleDeleteTrainingRequest, // New
+  } = useStaffDashboardData();
+
+  const [isUserDetailsDialogOpen, setIsUserDetailsDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<any | null>(null);
+  const [activeTab, setActiveTab] = useState('users');
+
+  // Fetch data based on active tab
+  useEffect(() => {
+    if (!currentUserIsStaff) return;
+
+    switch (activeTab) {
+      case 'users':
+        fetchUsers();
+        fetchStaffMembers();
+        break;
+      case 'logbook-entries':
+        fetchAllFlights();
+        break;
+      case 'flight-bookings':
+        fetchAllFlightBookings();
+        break;
+      case 'announcements':
+        // Announcements are managed on their own page now, no data fetch needed here
+        break;
+      case 'job-openings':
+        fetchJobOpenings();
+        break;
+      case 'job-applications':
+        fetchJobApplications();
+        break;
+      case 'training-requests': // New case
+        fetchAllTrainingRequests();
+        break;
+      default:
+        break;
+    }
+  }, [activeTab, currentUserIsStaff, fetchUsers, fetchStaffMembers, fetchAllFlights, fetchAllFlightBookings, fetchJobOpenings, fetchJobApplications, fetchAllTrainingRequests]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <div className="text-center space-y-4">
+          <Skeleton className="h-10 w-64 mx-auto" />
+          <Skeleton className="h-6 w-96 mx-auto" />
+          <Skeleton className="h-4 w-48 mx-auto" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUserIsStaff) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold mb-4 text-red-600">Access Denied</h1>
+          <p className="text-xl text-gray-600 dark:text-gray-400">You do not have permission to view this page.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto p-4 pt-24">
+      <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Staff Dashboard</h1>
+
+      <Tabs defaultValue="users" className="w-full" onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7"> {/* Adjusted grid-cols */}
+          <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="logbook-entries">Logbook Entries</TabsTrigger>
+          <TabsTrigger value="flight-bookings">Flight Bookings</TabsTrigger>
+          <TabsTrigger value="announcements">Announcements</TabsTrigger>
+          <TabsTrigger value="job-openings">Job Openings</TabsTrigger>
+          <TabsTrigger value="job-applications">Job Applications</TabsTrigger>
+          <TabsTrigger value="training-requests">Training Requests</TabsTrigger> {/* New Tab */}
+        </TabsList>
+
+        <TabsContent value="users" className="mt-6">
+          <UserManagementTab
+            users={users}
+            handleUserUpdate={handleUserUpdate}
+            isUserDetailsDialogOpen={isUserDetailsDialogOpen}
+            selectedUser={selectedUser}
+            setIsUserDetailsDialogOpen={setIsUserDetailsDialogOpen}
+            setSelectedUser={setSelectedUser}
+          />
+        </TabsContent>
+
+        <TabsContent value="logbook-entries" className="mt-6">
+          <LogbookEntryManagementTab
+            flights={flights}
+            handleDeleteFlight={handleDeleteFlight}
+          />
+        </TabsContent>
+
+        <TabsContent value="flight-bookings" className="mt-6">
+          <FlightBookingManagementTab
+            flightBookings={flightBookings}
+            handleBookingStatusUpdate={handleBookingStatusUpdate}
+            handleDeleteBooking={handleDeleteBooking}
+          />
+        </TabsContent>
+
+        <TabsContent value="announcements" className="mt-6">
+          <p className="text-center text-gray-600 dark:text-gray-400">
+            Announcement management has been moved to the <a href="/announcements" className="text-blue-500 hover:underline">Announcements page</a>.
+          </p>
+        </TabsContent>
+
+        <TabsContent value="job-openings" className="mt-6">
+          <CreateJobOpeningForm onJobPosted={fetchJobOpenings} />
+          <JobOpeningManagementTab
+            jobOpenings={jobOpenings}
+            handleUpdateJobOpening={handleUpdateJobOpening}
+            handleDeleteJobOpening={handleDeleteJobOpening}
+            fetchJobOpenings={fetchJobOpenings}
+          />
+        </TabsContent>
+
+        <TabsContent value="job-applications" className="mt-6">
+          <JobApplicationManagementTab
+            jobApplications={jobApplications}
+            handleUpdateApplicationStatus={handleUpdateApplicationStatus}
+            handleDeleteApplication={handleDeleteApplication}
+            fetchJobApplications={fetchJobApplications}
+          />
+        </TabsContent>
+
+        <TabsContent value="training-requests" className="mt-6"> {/* New Tab Content */}
+          <TrainingRequestManagementTab
+            trainingRequests={trainingRequests}
+            staffMembers={staffMembers}
+            handleUpdateTrainingRequest={handleUpdateTrainingRequest}
+            handleDeleteTrainingRequest={handleDeleteTrainingRequest}
+            fetchTrainingRequests={fetchAllTrainingRequests}
+          />
+        </TabsContent>
+      </Tabs>
+
+      {selectedUser && (
+        <UserDetailsDialog
+          isOpen={isUserDetailsDialogOpen}
+          onClose={() => setIsUserDetailsDialogOpen(false)}
+          user={selectedUser}
+        />
+      )}
+    </div>
+  );
+};
+
+export default StaffDashboard;

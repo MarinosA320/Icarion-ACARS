@@ -1,0 +1,1 @@
+(bucket_id = 'avatars') AND (auth.uid() is not null)
