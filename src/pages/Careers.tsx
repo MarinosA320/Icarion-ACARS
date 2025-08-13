@@ -61,7 +61,7 @@ const Careers = () => {
   return (
     <DynamicBackground images={careersBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
       {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="absolute inset-0 bg-black opacity-30"></div>
+      <div className="absolute inset-0 bg-black opacity-15"></div> {/* Adjusted opacity to 15% */}
       
       <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Careers at Icarion VA</h1>
