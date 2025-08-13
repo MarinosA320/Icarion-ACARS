@@ -276,7 +276,7 @@ const Logbook = () => {
   return (
     <DynamicBackground images={logbookBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
       {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="absolute inset-0 bg-black opacity-50"></div>
+      <div className="absolute inset-0 bg-black opacity-30"></div> {/* Adjusted opacity */}
       
       <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Flight Logbook</h1>
@@ -318,13 +318,13 @@ const Logbook = () => {
         {loading ? (
           renderSkeletons()
         ) : flights.length === 0 ? (
-          <div className="relative w-full max-w-3xl mx-auto bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col items-center justify-center text-center">
+          <div className="relative w-full max-w-3xl mx-auto bg-white/50 dark:bg-gray-800/50 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col items-center justify-center text-center"> {/* Adjusted opacity */}
             <h2 className="text-2xl font-bold text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT mb-4">Your Pilot Logbook</h2>
             <p className="text-lg text-gray-600 dark:text-gray-400">No flights logged yet. Start your aviation journey!</p>
             <p className="text-sm text-muted-foreground mt-2">Use the buttons above to log your first flight.</p>
           </div>
         ) : (
-          <div className="relative w-full max-w-3xl mx-auto bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col">
+          <div className="relative w-full max-w-3xl mx-auto bg-white/50 dark:bg-gray-800/50 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col"> {/* Adjusted opacity */}
             <TransitionGroup className="relative flex-grow overflow-hidden">
               <CSSTransition
                 key={currentPage}
