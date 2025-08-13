@@ -16,10 +16,18 @@ const DynamicBackground: React.FC<DynamicBackgroundProps> = ({
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    if (images.length === 0) return;
+    if (images.length === 0) {
+      console.log("DynamicBackground: No images provided.");
+      return;
+    }
+    console.log("DynamicBackground: Images array:", images);
 
     const timer = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
+      setCurrentImageIndex((prevIndex) => {
+        const nextIndex = (prevIndex + 1) % images.length;
+        console.log(`DynamicBackground: Changing image from index ${prevIndex} to ${nextIndex}. Current image: ${images[nextIndex]}`);
+        return nextIndex;
+      });
     }, interval);
 
     return () => clearInterval(timer);
@@ -38,6 +46,10 @@ const DynamicBackground: React.FC<DynamicBackgroundProps> = ({
           style={{
             backgroundImage: `url(${image})`,
             opacity: index === currentImageIndex ? 1 : 0,
+            // Temporary: Add a distinct background color to see if the div is rendered
+            backgroundColor: index === currentImageIndex ? 'rgba(0, 255, 0, 0.2)' : 'transparent', // Green overlay for active image
+            width: '100%', // Explicitly set width
+            height: '100%', // Explicitly set height
           }}
         />
       ))}
