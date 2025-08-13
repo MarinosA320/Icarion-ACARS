@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom';
 import DynamicBackground from './DynamicBackground'; // Import the new component
 
 const backgroundImages = [
-  '/images/backgrounds/placeholder1.jpg', // Replace with your actual image paths
-  '/images/backgrounds/placeholder2.jpg', // Make sure these files exist in public/images/backgrounds
-  '/images/backgrounds/placeholder3.jpg',
+  '/images/backgrounds/hero-bg-1.jpg', // Replace with your actual image paths
+  '/images/backgrounds/hero-bg-2.jpg', // Make sure these files exist in public/images/backgrounds
+  '/images/backgrounds/hero-bg-3.jpg',
 ];
 
 const HeroSection: React.FC = () => {

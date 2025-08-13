@@ -11,10 +11,10 @@ import { useTheme } from 'next-themes';
 import DynamicBackground from '@/components/DynamicBackground'; // New import
 
 const loginBackgroundImages = [
-  '/images/login-backgrounds/Screenshot 2025-05-16 202149.png',
-  '/images/login-backgrounds/Screenshot 2025-08-03 193621.png',
-  '/images/login-backgrounds/pasted-image-2025-08-13T12-35-42-278Z.png',
-  '/images/login-backgrounds/pasted-image-2025-08-13T12-36-43-571Z.png',
+  '/images/login-backgrounds/login-bg-1.png',
+  '/images/login-backgrounds/login-bg-2.png',
+  '/images/login-backgrounds/login-bg-3.png',
+  '/images/login-backgrounds/login-bg-4.png',
 ];
 
 export default function Login() {
