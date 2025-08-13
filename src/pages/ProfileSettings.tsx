@@ -45,9 +45,7 @@ const formatMinutesToHoursAndMinutes = (totalMinutes: number): string => {
 };
 
 const profileSettingsBackgroundImages = [
-  '/images/backgrounds/profile-bg-1.jpg',
-  '/images/backgrounds/profile-bg-2.jpg',
-  '/images/backgrounds/profile-bg-3.jpg',
+  '/images/backgrounds/profile-bg-new.png', // Updated to use the new image
 ];
 
 const ProfileSettings = () => {
