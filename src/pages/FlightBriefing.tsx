@@ -7,12 +7,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { showSuccess, showError } from '@/utils/toast';
 import { fetchNotams } from '@/utils/aviationApi';
-import { useLocation } from 'react-router-dom'; // Import useLocation
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
-import DynamicBackground from '@/components/DynamicBackground'; // New import
+import { useLocation } from 'react-router-dom';
+import { Skeleton } from '@/components/ui/skeleton';
+import DynamicBackground from '@/components/DynamicBackground';
 
 const flightBriefingBackgroundImages = [
-  '/images/backgrounds/briefing.jpg.jpg', // Corrected path to match the actual file name
+  '/images/backgrounds/briefing.jpg', // Corrected path: removed redundant .jpg
 ];
 
 const FlightBriefing = () => {
