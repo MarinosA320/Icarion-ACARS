@@ -12,9 +12,8 @@ import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
 import DynamicBackground from '@/components/DynamicBackground'; // New import
 
 const flightBriefingBackgroundImages = [
-  '/images/backgrounds/hero-bg-1.jpg', // You can replace these with specific flight briefing images
-  '/images/backgrounds/hero-bg-2.jpg',
-  '/images/backgrounds/hero-bg-3.jpg',
+  '/images/backgrounds/flight-briefing-new-bg.jpg', // New placeholder image path
+  // You can add more image paths here if you want a rotating background
 ];
 
 const FlightBriefing = () => {
@@ -222,7 +221,7 @@ const FlightBriefing = () => {
                     Directly embedding real-time significant weather charts is complex due to data formats and licensing.
                     Please refer to official aviation weather sources for these charts:
                   </p>
-                  <ul className="list-disc list-inside text-sm mt-2 space-y-1">
+                  <ul className="list-disc list-inside text-sm mt-2 space-y-1}>
                     <li><a href="https://aviationweather.gov/sigwx/sfc" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Aviation Weather Center (USA)</a></li>
                     <li><a href="https://www.wunderground.com/maps/airports/significant-weather" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Wunderground Significant Weather</a></li>
                     <li>For European SIGWX, check EUMETNET or national meteorological services.</li>
