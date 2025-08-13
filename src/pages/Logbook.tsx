@@ -12,6 +12,7 @@ import { fetchProfilesData } from '@/utils/supabaseDataFetch';
 import { Skeleton } from '@/components/ui/skeleton';
 import LogbookFlightPage from '@/components/LogbookFlightPage';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import DynamicBackground from '@/components/DynamicBackground'; // Import DynamicBackground
 
 interface Flight {
   id: string;
@@ -64,6 +65,12 @@ const formatMinutesToHHMM = (totalMinutes: number | undefined): string => {
   const minutes = totalMinutes % 60;
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
 };
+
+const logbookBackgroundImages = [
+  '/images/backgrounds/hero-bg-1.jpg',
+  '/images/backgrounds/hero-bg-2.jpg',
+  '/images/backgrounds/hero-bg-3.jpg',
+];
 
 const Logbook = () => {
   const navigate = useNavigate();
@@ -267,80 +274,85 @@ const Logbook = () => {
   console.log('Logbook component rendering. Loading state:', loading);
 
   return (
-    <div className="container mx-auto p-4 pt-24">
-      <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Flight Logbook</h1>
+    <DynamicBackground images={logbookBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
+      {/* Darker overlay on top of the image for better text contrast and depth */}
+      <div className="absolute inset-0 bg-black opacity-50"></div>
+      
+      <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
+        <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Flight Logbook</h1>
 
-      <div className="mb-8 text-center space-y-4">
-        <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
-          <Button onClick={handleLogVatsimFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingVatsimFlight}>
-            {isLoggingVatsimFlight ? 'Checking VATSIM...' : 'Log Active VATSIM Flight'}
-          </Button>
-          <Button onClick={() => setShowSimbriefUrlInput(true)} className="px-6 py-3 text-lg w-full md:w-auto" disabled={showSimbriefUrlInput}>
-            Log SimBrief Flight
-          </Button>
-          {hasSavedFlight && (
-            <Button onClick={handleResumeFlight} className="px-6 py-3 text-lg w-full md:w-auto" variant="secondary">
-              Resume Saved Flight
+        <div className="mb-8 text-center space-y-4">
+          <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+            <Button onClick={handleLogVatsimFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingVatsimFlight}>
+              {isLoggingVatsimFlight ? 'Checking VATSIM...' : 'Log Active VATSIM Flight'}
             </Button>
+            <Button onClick={() => setShowSimbriefUrlInput(true)} className="px-6 py-3 text-lg w-full md:w-auto" disabled={showSimbriefUrlInput}>
+              Log SimBrief Flight
+            </Button>
+            {hasSavedFlight && (
+              <Button onClick={handleResumeFlight} className="px-6 py-3 text-lg w-full md:w-auto" variant="secondary">
+                Resume Saved Flight
+              </Button>
+            )}
+          </div>
+          {showSimbriefUrlInput && (
+            <div className="flex flex-col md:flex-row gap-2 items-center mt-4">
+              <Input
+                type="url"
+                placeholder="Paste SimBrief Dispatch URL here..."
+                value={simbriefUrl}
+                onChange={(e) => setSimbriefUrl(e.target.value)}
+                className="flex-grow"
+                disabled={isLoggingSimbriefFlight}
+              />
+              <Button onClick={handleLogSimbriefFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingSimbriefFlight}>
+                {isLoggingSimbriefFlight ? 'Parsing SimBrief...' : 'Log SimBrief Flight'}
+              </Button>
+              <Button onClick={() => { setShowSimbriefUrlInput(false); setSimbriefUrl(''); }} variant="outline" className="px-6 py-3 text-lg w-full md:w-auto">
+                Cancel
+              </Button>
+            </div>
           )}
         </div>
-        {showSimbriefUrlInput && (
-          <div className="flex flex-col md:flex-row gap-2 items-center mt-4">
-            <Input
-              type="url"
-              placeholder="Paste SimBrief Dispatch URL here..."
-              value={simbriefUrl}
-              onChange={(e) => setSimbriefUrl(e.target.value)}
-              className="flex-grow"
-              disabled={isLoggingSimbriefFlight}
-            />
-            <Button onClick={handleLogSimbriefFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingSimbriefFlight}>
-              {isLoggingSimbriefFlight ? 'Parsing SimBrief...' : 'Log SimBrief Flight'}
-            </Button>
-            <Button onClick={() => { setShowSimbriefUrlInput(false); setSimbriefUrl(''); }} variant="outline" className="px-6 py-3 text-lg w-full md:w-auto">
-              Cancel
-            </Button>
+
+        {loading ? (
+          renderSkeletons()
+        ) : flights.length === 0 ? (
+          <div className="relative w-full max-w-3xl mx-auto bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col items-center justify-center text-center">
+            <h2 className="text-2xl font-bold text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT mb-4">Your Pilot Logbook</h2>
+            <p className="text-lg text-gray-600 dark:text-gray-400">No flights logged yet. Start your aviation journey!</p>
+            <p className="text-sm text-muted-foreground mt-2">Use the buttons above to log your first flight.</p>
+          </div>
+        ) : (
+          <div className="relative w-full max-w-3xl mx-auto bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col">
+            <TransitionGroup className="relative flex-grow overflow-hidden">
+              <CSSTransition
+                key={currentPage}
+                timeout={300}
+                classNames="page-slide"
+              >
+                <div className="absolute inset-0">
+                  {flights[currentPage] && (
+                    <LogbookFlightPage flight={flights[currentPage]} isStaff={isStaff} />
+                  )}
+                </div>
+              </CSSTransition>
+            </TransitionGroup>
+            <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <Button onClick={handlePreviousPage} disabled={currentPage === 0}>
+                Previous Flight
+              </Button>
+              <span className="text-sm text-gray-600 dark:text-gray-400">
+                Flight {currentPage + 1} of {flights.length}
+              </span>
+              <Button onClick={handleNextPage} disabled={currentPage === flights.length - 1}>
+                Next Flight
+              </Button>
+            </div>
           </div>
         )}
       </div>
-
-      {loading ? (
-        renderSkeletons()
-      ) : flights.length === 0 ? (
-        <div className="relative w-full max-w-3xl mx-auto bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col items-center justify-center text-center">
-          <h2 className="text-2xl font-bold text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT mb-4">Your Pilot Logbook</h2>
-          <p className="text-lg text-gray-600 dark:text-gray-400">No flights logged yet. Start your aviation journey!</p>
-          <p className="text-sm text-muted-foreground mt-2">Use the buttons above to log your first flight.</p>
-        </div>
-      ) : (
-        <div className="relative w-full max-w-3xl mx-auto bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col">
-          <TransitionGroup className="relative flex-grow overflow-hidden">
-            <CSSTransition
-              key={currentPage}
-              timeout={300}
-              classNames="page-slide"
-            >
-              <div className="absolute inset-0">
-                {flights[currentPage] && (
-                  <LogbookFlightPage flight={flights[currentPage]} isStaff={isStaff} />
-                )}
-              </div>
-            </CSSTransition>
-          </TransitionGroup>
-          <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Button onClick={handlePreviousPage} disabled={currentPage === 0}>
-              Previous Flight
-            </Button>
-            <span className="text-sm text-gray-600 dark:text-gray-400">
-              Flight {currentPage + 1} of {flights.length}
-            </span>
-            <Button onClick={handleNextPage} disabled={currentPage === flights.length - 1}>
-              Next Flight
-            </Button>
-          </div>
-        </div>
-      )}
-    </div>
+    </DynamicBackground>
   );
 };
 
