@@ -67,9 +67,9 @@ const formatMinutesToHHMM = (totalMinutes: number | undefined): string => {
 };
 
 const logbookBackgroundImages = [
-  '/images/backgrounds/hero-bg-1.jpg',
-  '/images/backgrounds/hero-bg-2.jpg',
-  '/images/backgrounds/hero-bg-3.jpg',
+  '/images/backgrounds/1.png',
+  '/images/backgrounds/2.png',
+  '/images/backgrounds/3.png',
 ];
 
 const Logbook = () => {
