@@ -46,10 +46,8 @@ const DynamicBackground: React.FC<DynamicBackgroundProps> = ({
           style={{
             backgroundImage: `url(${image})`,
             opacity: index === currentImageIndex ? 1 : 0,
-            // Temporary: Add a distinct background color to see if the div is rendered
-            backgroundColor: index === currentImageIndex ? 'rgba(0, 255, 0, 0.2)' : 'transparent', // Green overlay for active image
-            width: '100%', // Explicitly set width
-            height: '100%', // Explicitly set height
+            width: '100%',
+            height: '100%',
           }}
         />
       ))}
