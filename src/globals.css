@@ -96,11 +96,11 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans; /* Apply Inter font globally */
+    @apply bg-background text-foreground font-sans font-light; /* Apply Lato font globally and set to light */
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading; /* Apply Plus Jakarta Sans to headings */
+    @apply font-heading font-light; /* Apply Lato font to headings and set to light */
   }
 }
 

@@ -19,8 +19,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Inter", "sans-serif"],
-        heading: ["'Plus Jakarta Sans'", "sans-serif"],
+        sans: ["Lato", "sans-serif"], // Changed to Lato
+        heading: ["Lato", "sans-serif"], // Changed to Lato
       },
       colors: {
         border: "hsl(var(--border))",
