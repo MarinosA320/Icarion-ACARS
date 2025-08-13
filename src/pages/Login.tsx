@@ -2,7 +2,7 @@ import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useEffect, useState }s from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -38,7 +38,7 @@ export default function Login() {
       {/* Darker overlay on top of the image for better text contrast and depth */}
       <div className="absolute inset-0 bg-black opacity-50"></div>
       
-      <div className="relative z-10 w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
+      <div className="relative z-10 w-full max-w-md bg-white/20 dark:bg-gray-800/20 p-8 rounded-lg shadow-md backdrop-blur-sm">
         <h2 className="text-2xl font-bold text-center mb-6 text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT">
           Welcome to Icarion Virtual Airline
         </h2>
