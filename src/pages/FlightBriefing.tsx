@@ -12,7 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import DynamicBackground from '@/components/DynamicBackground';
 
 const flightBriefingBackgroundImages = [
-  '/images/backgrounds/briefing.jpg', // Corrected path: removed redundant .jpg
+  '/images/backgrounds/Briefing.jpg', // Corrected path: changed 'briefing.jpg' to 'Briefing.jpg'
 ];
 
 const FlightBriefing = () => {
