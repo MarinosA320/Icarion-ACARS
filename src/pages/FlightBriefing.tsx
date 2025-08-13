@@ -7,9 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { showSuccess, showError } from '@/utils/toast';
 import { fetchNotams } from '@/utils/aviationApi';
-import { useLocation } from 'react-router-dom'; // Import useLocation
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
-import DynamicBackground from '@/components/DynamicBackground'; // New import
+import { useLocation } from 'react-router-dom';
+import { Skeleton } from '@/components/ui/skeleton';
+import DynamicBackground from '@/components/DynamicBackground';
 
 const flightBriefingBackgroundImages = [
   '/images/backgrounds/flight-briefing-new-bg.jpg', // New placeholder image path
@@ -34,7 +34,7 @@ const FlightBriefing = () => {
     if (initialDepartureIcao || initialArrivalIcao) {
       handleGetBriefing();
     }
-  }, [initialDepartureIcao, initialArrivalIcao]); // Depend on initial ICAOs
+  }, [initialDepartureIcao, initialArrivalIcao]);
 
   const handleGetBriefing = async () => {
     setLoading(true);
@@ -71,7 +71,7 @@ const FlightBriefing = () => {
 
   const renderBriefingSkeletons = () => (
     <div className="space-y-8">
-      <Skeleton className="h-8 w-1/2 mx-auto" /> {/* Title skeleton */}
+      <Skeleton className="h-8 w-1/2 mx-auto" />
       <Card className="shadow-md rounded-lg">
         <CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader>
         <CardContent className="space-y-4">
