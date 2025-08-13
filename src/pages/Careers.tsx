@@ -59,11 +59,11 @@ const Careers = () => {
   );
 
   return (
-    <DynamicBackground images={careersBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
+    <DynamicBackground images={careersBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-start p-4 pt-24">
       {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="absolute inset-0 bg-black opacity-15"></div> {/* Adjusted opacity to 15% */}
+      <div className="absolute inset-0 bg-black opacity-15"></div>
       
-      <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
+      <div className="relative z-10 w-full max-w-5xl mx-auto text-white pt-32">
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Careers at Icarion VA</h1>
         <p className="text-lg text-center text-gray-600 dark:text-gray-400 mb-8">
           Join our team and help us build the future of virtual aviation!
