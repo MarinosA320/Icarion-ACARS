@@ -1,5 +1,5 @@
 import { Auth } from '@supabase/auth-ui-react';
-import { ThemeSupa } from '@supabase/auth-ui-shared';
+import { ThemeMinimal } from '@supabase/auth-ui-shared'; // Changed from ThemeSupa
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import PolicyDialog from '@/components/PolicyDialog';
 import { useTheme } from 'next-themes';
-import DynamicBackground from '@/components/DynamicBackground'; // New import
+import DynamicBackground from '@/components/DynamicBackground';
 
 const loginBackgroundImages = [
   '/images/login-backgrounds/login-bg-1.png',
@@ -46,9 +46,9 @@ export default function Login() {
           supabaseClient={supabase}
           providers={[]}
           appearance={{
-            theme: ThemeSupa,
+            theme: ThemeMinimal, // Changed to ThemeMinimal for more control
             variables: {
-              default: { // These apply to both unless overridden by light/dark
+              default: {
                 colors: {
                   brand: 'hsl(var(--primary))',
                   brandAccent: 'hsl(var(--accent))',
@@ -62,23 +62,70 @@ export default function Login() {
                   text: 'hsl(var(--foreground))',
                 },
               },
-              dark: { // Explicit overrides for dark theme using hex values
+              // Explicitly define dark mode colors using HSL values from globals.css
+              dark: {
                 colors: {
-                  brand: '#E0F2FE', // light blue from --primary in dark
-                  brandAccent: '#1E90FF', // vibrant blue from --accent in dark
-                  buttonText: '#F8FAFC', // off-white from --primary-foreground in dark
-                  inputBackground: '#273142', // dark grey from --input in dark
-                  inputBorder: '#273142', // dark grey from --border in dark
-                  inputBorderHover: '#BEE3F8', // light blue from --ring in dark
-                  inputBorderFocus: '#BEE3F8', // light blue from --ring in dark
-                  inputText: '#F8FAFC', // off-white from --foreground in dark
-                  inputPlaceholder: '#D1D5DB', // light grey from --muted-foreground in dark
-                  text: '#F8FAFC', // off-white from --foreground in dark
+                  brand: 'hsl(var(--primary))', // Icarion Blue Default
+                  brandAccent: 'hsl(var(--accent))', // Icarion Blue Light (Accent)
+                  buttonText: 'hsl(var(--primary-foreground))', // Off-white
+                  inputBackground: 'hsl(var(--input))', // Dark grey
+                  inputBorder: 'hsl(var(--border))', // Dark grey
+                  inputBorderHover: 'hsl(var(--ring))', // Light blue
+                  inputBorderFocus: 'hsl(var(--ring))', // Light blue
+                  inputText: 'hsl(var(--foreground))', // Off-white
+                  inputPlaceholder: 'hsl(var(--muted-foreground))', // Light grey
+                  text: 'hsl(var(--foreground))', // Off-white
                 }
               }
             },
+            // Add custom styles for ThemeMinimal to match shadcn/ui components
+            style: {
+              button: {
+                borderRadius: 'var(--radius)',
+                padding: '0.75rem 1.5rem',
+                fontSize: '1rem',
+                fontWeight: '600',
+                transition: 'all 0.2s ease-in-out',
+                backgroundColor: 'hsl(var(--primary))',
+                color: 'hsl(var(--primary-foreground))',
+                '&:hover': {
+                  backgroundColor: 'hsl(var(--primary) / 0.9)',
+                },
+              },
+              input: {
+                borderRadius: 'var(--radius)',
+                padding: '0.75rem 1rem',
+                fontSize: '1rem',
+                border: '1px solid hsl(var(--border))',
+                backgroundColor: 'hsl(var(--input))',
+                color: 'hsl(var(--foreground))',
+                '&::placeholder': {
+                  color: 'hsl(var(--muted-foreground))',
+                },
+                '&:focus': {
+                  borderColor: 'hsl(var(--ring))',
+                  outline: 'none',
+                },
+              },
+              label: {
+                fontSize: '0.875rem',
+                fontWeight: '500',
+                marginBottom: '0.5rem',
+                color: 'hsl(var(--foreground))',
+              },
+              anchor: {
+                color: 'hsl(var(--primary))',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              },
+              message: { // For error/success messages
+                fontSize: '0.875rem',
+                color: 'hsl(var(--destructive))',
+              },
+            }
           }}
-          theme={theme === 'dark' ? 'dark' : 'light'} // Make theme dynamic
+          theme={theme === 'dark' ? 'dark' : 'light'} // Keep dynamic theme
           redirectTo={window.location.origin + '/'}
           localization={{
             variables: {
@@ -204,7 +251,7 @@ export default function Login() {
           />
           <Label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             I agree to the{' '}
-            <Button variant="link" className="p-0 h-auto text-sm text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT hover:underline">
+            <Button variant="link" className="p-0 h-auto text-sm text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT hover:underline" onClick={() => setIsPolicyDialogOpen(true)}>
               Terms of Service, Privacy Policy, and Rules & Regulations
             </Button>
           </Label>
