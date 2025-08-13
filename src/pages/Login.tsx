@@ -1,5 +1,5 @@
 import { Auth } from '@supabase/auth-ui-react';
-import { ThemeMinimal } from '@supabase/auth-ui-shared'; // Changed from ThemeSupa
+import { ThemeMinimal } from '@supabase/auth-ui-shared';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -38,7 +38,7 @@ export default function Login() {
       {/* Darker overlay on top of the image for better text contrast and depth */}
       <div className="absolute inset-0 bg-black opacity-50"></div>
       
-      <div className="relative z-10 w-full max-w-xs bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md"> {/* Changed background to solid */}
+      <div className="relative z-10 w-full max-w-sm bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md"> {/* Changed max-w-xs to max-w-sm */}
         <h2 className="text-2xl font-bold text-center mb-6 text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT">
           Welcome to Icarion Virtual Airline
         </h2>
@@ -46,7 +46,7 @@ export default function Login() {
           supabaseClient={supabase}
           providers={[]}
           appearance={{
-            theme: ThemeMinimal, // Explicitly using ThemeMinimal
+            theme: ThemeMinimal,
             variables: {
               default: {
                 colors: {
@@ -104,7 +104,7 @@ export default function Login() {
                 '&:focus': {
                   borderColor: 'hsl(var(--ring))',
                   outline: 'none',
-                  boxShadow: '0 0 0 2px hsl(var(--ring))', // Add focus ring
+                  boxShadow: '0 0 0 2px hsl(var(--ring))',
                 },
               },
               label: {
@@ -119,14 +119,14 @@ export default function Login() {
                   textDecoration: 'underline',
                 },
               },
-              message: { // For error/success messages
+              message: {
                 fontSize: '0.875rem',
                 color: 'hsl(var(--destructive))',
                 marginTop: '0.5rem',
               },
             }
           }}
-          theme={theme === 'dark' ? 'dark' : 'light'} // Keep dynamic theme
+          theme={theme === 'dark' ? 'dark' : 'light'}
           redirectTo={window.location.origin + '/'}
           localization={{
             variables: {
