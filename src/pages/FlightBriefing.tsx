@@ -106,7 +106,7 @@ const FlightBriefing = () => {
       <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
         <h1 className="text-3xl font-bold mb-8 text-center">Flight Briefing</h1>
 
-        <Card className="max-w-3xl mx-auto mb-8 shadow-md rounded-lg bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white">
+        <Card className="max-w-5xl mx-auto mb-8 shadow-md rounded-lg bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white">
           <CardHeader>
             <CardTitle>Get Your Briefing</CardTitle>
             <CardDescription>Enter airport ICAO codes and route to get NOTAM information.</CardDescription>
@@ -220,7 +220,7 @@ const FlightBriefing = () => {
                     Directly embedding real-time significant weather charts is complex due to data formats and licensing.
                     Please refer to official aviation weather sources for these charts:
                   </p>
-                  <ul className="list-disc list-inside text-sm mt-2 space-y-1">
+                  <ul className="list-disc list-inside text-sm mt-2 space-y-1}>
                     <li><a href="https://aviationweather.gov/sigwx/sfc" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Aviation Weather Center (USA)</a></li>
                     <li><a href="https://www.wunderground.com/maps/airports/significant-weather" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Wunderground Significant Weather</a></li>
                     <li>For European SIGWX, check EUMETNET or national meteorological services.</li>
