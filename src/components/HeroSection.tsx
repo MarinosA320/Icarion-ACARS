@@ -14,7 +14,7 @@ const HeroSection: React.FC = () => {
     <section className="relative w-full h-[calc(100vh-64px)] flex items-center justify-center text-center overflow-hidden text-white p-4">
       <DynamicBackground images={backgroundImages} interval={8000} className="absolute inset-0 z-0">
         {/* Gradient overlay for brand color integration */}
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-icarion-blue-dark to-icarion-blue-DEFAULT opacity-70"></div>
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-icarion-blue-dark to-icarion-blue-DEFAULT opacity-50"></div>
       </DynamicBackground>
 
       {/* Content */}
