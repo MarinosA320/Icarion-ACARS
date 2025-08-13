@@ -3,17 +3,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea'; // Corrected import
+import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { showSuccess, showError } from '@/utils/toast';
 import { fetchNotams } from '@/utils/aviationApi';
-import { useLocation } from 'react-router-dom';
-import { Skeleton } from '@/components/ui/skeleton';
-import DynamicBackground from '@/components/DynamicBackground'; // Re-imported
+import { useLocation } from 'react-router-dom'; // Import useLocation
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
+import DynamicBackground from '@/components/DynamicBackground'; // New import
 
 const flightBriefingBackgroundImages = [
-  '/images/backgrounds/flight-briefing-new-bg.jpg', // Your new placeholder image path
-  // Add more image paths here if you want a rotating background
+  '/images/backgrounds/hero-bg-1.jpg', // You can replace these with specific flight briefing images
+  '/images/backgrounds/hero-bg-2.jpg',
+  '/images/backgrounds/hero-bg-3.jpg',
 ];
 
 const FlightBriefing = () => {
@@ -34,7 +35,7 @@ const FlightBriefing = () => {
     if (initialDepartureIcao || initialArrivalIcao) {
       handleGetBriefing();
     }
-  }, [initialDepartureIcao, initialArrivalIcao]);
+  }, [initialDepartureIcao, initialArrivalIcao]); // Depend on initial ICAOs
 
   const handleGetBriefing = async () => {
     setLoading(true);
@@ -71,7 +72,7 @@ const FlightBriefing = () => {
 
   const renderBriefingSkeletons = () => (
     <div className="space-y-8">
-      <Skeleton className="h-8 w-1/2 mx-auto" />
+      <Skeleton className="h-8 w-1/2 mx-auto" /> {/* Title skeleton */}
       <Card className="shadow-md rounded-lg">
         <CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader>
         <CardContent className="space-y-4">
@@ -221,7 +222,7 @@ const FlightBriefing = () => {
                     Directly embedding real-time significant weather charts is complex due to data formats and licensing.
                     Please refer to official aviation weather sources for these charts:
                   </p>
-                  <ul className="list-disc list-inside text-sm mt-2 space-y-1}>
+                  <ul className="list-disc list-inside text-sm mt-2 space-y-1">
                     <li><a href="https://aviationweather.gov/sigwx/sfc" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Aviation Weather Center (USA)</a></li>
                     <li><a href="https://www.wunderground.com/maps/airports/significant-weather" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Wunderground Significant Weather</a></li>
                     <li>For European SIGWX, check EUMETNET or national meteorological services.</li>
