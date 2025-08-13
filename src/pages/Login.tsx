@@ -38,7 +38,7 @@ export default function Login() {
       {/* Darker overlay on top of the image for better text contrast and depth */}
       <div className="absolute inset-0 bg-black opacity-50"></div>
       
-      <div className="relative z-10 w-full max-w-sm bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md"> {/* Changed max-w-xs to max-w-sm */}
+      <div className="relative z-10 w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md"> {/* Changed max-w-sm to max-w-md */}
         <h2 className="text-2xl font-bold text-center mb-6 text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT">
           Welcome to Icarion Virtual Airline
         </h2>
