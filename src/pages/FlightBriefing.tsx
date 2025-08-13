@@ -7,12 +7,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { showSuccess, showError } from '@/utils/toast';
 import { fetchNotams } from '@/utils/aviationApi';
-import { useLocation } from 'react-router-dom'; // Import useLocation
-import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton
-import DynamicBackground from '@/components/DynamicBackground'; // New import
+import { useLocation } from 'react-router-dom';
+import { Skeleton } from '@/components/ui/skeleton';
+import DynamicBackground from '@/components/DynamicBackground';
 
 const flightBriefingBackgroundImages = [
-  '/images/backgrounds/briefing.jpg', // Using the new image as requested
+  '/images/backgrounds/briefing.jpg',
 ];
 
 const FlightBriefing = () => {
@@ -28,12 +28,11 @@ const FlightBriefing = () => {
   const [depNotams, setDepNotams] = useState<string[]>([]);
   const [arrNotams, setArrNotams] = useState<string[]>([]);
 
-  // Trigger briefing fetch if initial ICAOs are provided
   useEffect(() => {
     if (initialDepartureIcao || initialArrivalIcao) {
       handleGetBriefing();
     }
-  }, [initialDepartureIcao, initialArrivalIcao]); // Depend on initial ICAOs
+  }, [initialDepartureIcao, initialArrivalIcao]);
 
   const handleGetBriefing = async () => {
     setLoading(true);
@@ -47,13 +46,11 @@ const FlightBriefing = () => {
     }
 
     try {
-      // Fetch Departure Airport Data
       if (departureIcao) {
         const notams = await fetchNotams(departureIcao.toUpperCase());
         setDepNotams(notams);
       }
 
-      // Fetch Arrival Airport Data
       if (arrivalIcao) {
         const notams = await fetchNotams(arrivalIcao.toUpperCase());
         setArrNotams(notams);
@@ -70,7 +67,7 @@ const FlightBriefing = () => {
 
   const renderBriefingSkeletons = () => (
     <div className="space-y-8">
-      <Skeleton className="h-8 w-1/2 mx-auto" /> {/* Title skeleton */}
+      <Skeleton className="h-8 w-1/2 mx-auto" />
       <Card className="shadow-md rounded-lg">
         <CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader>
         <CardContent className="space-y-4">
@@ -100,7 +97,6 @@ const FlightBriefing = () => {
 
   return (
     <DynamicBackground images={flightBriefingBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
-      {/* Darker overlay on top of the image for better text contrast and depth */}
       <div className="absolute inset-0 bg-black opacity-50"></div>
       
       <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
