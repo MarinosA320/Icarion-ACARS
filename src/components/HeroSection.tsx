@@ -7,7 +7,7 @@ const HeroSection: React.FC = () => {
     <section className="relative h-[calc(100vh-64px)] flex items-center justify-center text-center overflow-hidden bg-gradient-to-br from-icarion-blue-dark to-icarion-blue-DEFAULT text-white p-4">
       {/* Background Image with subtle overlay */}
       <div className="absolute inset-0 z-0" style={{
-        backgroundImage: 'url(/images/hero-background.jpg)', // Ensure this image exists in public/images/
+        backgroundImage: 'url(/placeholder.svg)', // Changed to use placeholder.svg
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}>
