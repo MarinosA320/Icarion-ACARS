@@ -9,8 +9,9 @@ import { showSuccess, showError } from '@/utils/toast'; // Import toast for feed
 interface Question {
   id: string;
   questionText: string;
-  options: string[];
-  correctOptionIndex: number; // This will not be displayed to the public
+  type: 'multiple-choice' | 'text'; // New field for question type
+  options?: string[]; // Optional for text questions
+  correctOptionIndex?: number; // This will not be displayed to the public
 }
 
 interface JobOpening {
@@ -22,6 +23,7 @@ interface JobOpening {
   status: string;
   created_at: string;
   updated_at: string;
+  image_url: string | null; // Added image_url field
   questions: Question[] | null; // Added questions field
 }
 
@@ -47,6 +49,11 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex-grow space-y-4">
+        {job.image_url && (
+          <div className="mb-4">
+            <img src={job.image_url} alt={job.title} className="w-full h-48 object-cover rounded-md" />
+          </div>
+        )}
         <div>
           <h3 className="font-semibold mb-1">Description:</h3>
           <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{job.description}</p>
@@ -72,14 +79,21 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
               {job.questions.map((question, qIndex) => (
                 <div key={question.id} className="border p-3 rounded-md bg-gray-50 dark:bg-gray-700">
                   <p className="font-medium text-sm mb-2">{qIndex + 1}. {question.questionText}</p>
-                  <div className="space-y-1">
-                    {question.options.map((option, optIndex) => (
-                      <div key={optIndex} className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
-                        <input type="radio" id={`job-${job.id}-q${qIndex}-opt${optIndex}`} name={`job-${job.id}-q${qIndex}`} className="form-radio h-4 w-4 text-blue-600" disabled />
-                        <label htmlFor={`job-${job.id}-q${qIndex}-opt${optIndex}`}>{option}</label>
-                      </div>
-                    ))}
-                  </div>
+                  {question.type === 'multiple-choice' && question.options && (
+                    <div className="space-y-1">
+                      {question.options.map((option, optIndex) => (
+                        <div key={optIndex} className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
+                          <input type="radio" id={`job-${job.id}-q${qIndex}-opt${optIndex}`} name={`job-${job.id}-q${qIndex}`} className="form-radio h-4 w-4 text-blue-600" disabled />
+                          <label htmlFor={`job-${job.id}-q${qIndex}-opt${optIndex}`}>{option}</label>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {question.type === 'text' && (
+                    <p className="text-sm text-gray-700 dark:text-gray-300 italic">
+                      (Text answer expected)
+                    </p>
+                  )}
                 </div>
               ))}
             </div>

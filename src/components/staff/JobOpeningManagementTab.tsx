@@ -11,12 +11,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { format } from 'date-fns';
 import { showSuccess, showError } from '@/utils/toast';
 import { PlusCircle, XCircle, Plus, Minus } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client'; // Import supabase for image deletion
 
 interface Question {
   id: string;
   questionText: string;
-  options: string[];
-  correctOptionIndex: number;
+  type: 'multiple-choice' | 'text'; // New field for question type
+  options?: string[]; // Optional for text questions
+  correctOptionIndex?: number; // Optional for text questions
 }
 
 interface JobOpening {
@@ -28,6 +30,7 @@ interface JobOpening {
   status: string;
   created_at: string;
   updated_at: string;
+  image_url: string | null; // Added image_url field
   questions: Question[] | null; // Added questions field
 }
 
@@ -51,11 +54,13 @@ const JobOpeningManagementTab: React.FC<JobOpeningManagementTabProps> = ({
   const [editRequirements, setEditRequirements] = useState('');
   const [editResponsibilities, setEditResponsibilities] = useState('');
   const [editStatus, setEditStatus] = useState('');
+  const [editImageFile, setEditImageFile] = useState<File | null>(null); // State for new image file
+  const [editImageUrl, setEditImageUrl] = useState<string | null>(null); // State for current image URL
   const [editQuestions, setEditQuestions] = useState<Question[]>([]); // State for editing questions
   const [loading, setLoading] = useState(false);
 
   const addEditQuestion = () => {
-    setEditQuestions([...editQuestions, { id: Date.now().toString(), questionText: '', options: ['', ''], correctOptionIndex: 0 }]); // Start with 2 options
+    setEditQuestions([...editQuestions, { id: Date.now().toString(), questionText: '', type: 'multiple-choice', options: ['', ''], correctOptionIndex: 0 }]); // Default to multiple-choice
   };
 
   const removeEditQuestion = (id: string) => {
@@ -68,20 +73,34 @@ const JobOpeningManagementTab: React.FC<JobOpeningManagementTabProps> = ({
     ));
   };
 
+  const handleEditQuestionTypeChange = (id: string, type: 'multiple-choice' | 'text') => {
+    setEditQuestions(editQuestions.map(q => {
+      if (q.id === id) {
+        if (type === 'text') {
+          const { options, correctOptionIndex, ...rest } = q;
+          return { ...rest, type };
+        } else {
+          return { ...q, type, options: q.options || ['', ''], correctOptionIndex: q.correctOptionIndex || 0 };
+        }
+      }
+      return q;
+    }));
+  };
+
   const addEditOption = (questionId: string) => {
     setEditQuestions(editQuestions.map(q =>
-      q.id === questionId ? { ...q, options: [...q.options, ''] } : q
+      q.id === questionId ? { ...q, options: [...(q.options || []), ''] } : q
     ));
   };
 
   const removeEditOption = (questionId: string, optionIndex: number) => {
     setEditQuestions(editQuestions.map(q => {
       if (q.id === questionId) {
-        const newOptions = q.options.filter((_, idx) => idx !== optionIndex);
+        const newOptions = (q.options || []).filter((_, idx) => idx !== optionIndex);
         let newCorrectIndex = q.correctOptionIndex;
         if (newCorrectIndex === optionIndex) {
           newCorrectIndex = 0; // Reset if the correct option was removed
-        } else if (newCorrectIndex > optionIndex) {
+        } else if (newCorrectIndex !== undefined && newCorrectIndex > optionIndex) {
           newCorrectIndex--; // Adjust if correct option index shifts
         }
         return { ...q, options: newOptions, correctOptionIndex: newCorrectIndex };
@@ -94,7 +113,7 @@ const JobOpeningManagementTab: React.FC<JobOpeningManagementTabProps> = ({
     setEditQuestions(editQuestions.map(q =>
       q.id === questionId ? {
         ...q,
-        options: q.options.map((opt, idx) => idx === optionIndex ? value : opt)
+        options: (q.options || []).map((opt, idx) => idx === optionIndex ? value : opt)
       } : q
     ));
   };
@@ -106,6 +125,8 @@ const JobOpeningManagementTab: React.FC<JobOpeningManagementTabProps> = ({
     setEditRequirements(job.requirements || '');
     setEditResponsibilities(job.responsibilities || '');
     setEditStatus(job.status);
+    setEditImageFile(null); // Clear any previously selected file
+    setEditImageUrl(job.image_url); // Set current image URL
     setEditQuestions(job.questions || []); // Populate questions for editing
     setIsEditDialogOpen(true);
   };
@@ -121,30 +142,66 @@ const JobOpeningManagementTab: React.FC<JobOpeningManagementTabProps> = ({
         setLoading(false);
         return;
       }
-      if (q.options.length < 2) {
-        showError('Each question must have at least two options.');
-        setLoading(false);
-        return;
-      }
-      if (q.options.some(opt => !opt.trim())) {
-        showError('All options for each question must be filled.');
-        setLoading(false);
-        return;
-      }
-      if (q.correctOptionIndex === undefined || q.correctOptionIndex < 0 || q.correctOptionIndex >= q.options.length) {
-        showError('A correct answer must be selected for each question.');
-        setLoading(false);
-        return;
+      if (q.type === 'multiple-choice') {
+        if (!q.options || q.options.length < 2) {
+          showError('Each multiple-choice question must have at least two options.');
+          setLoading(false);
+          return;
+        }
+        if (q.options.some(opt => !opt.trim())) {
+          showError('All options for each multiple-choice question must be filled.');
+          setLoading(false);
+          return;
+        }
+        if (q.correctOptionIndex === undefined || q.correctOptionIndex < 0 || q.correctOptionIndex >= q.options.length) {
+          showError('A correct answer must be selected for each multiple-choice question.');
+          setLoading(false);
+          return;
+        }
       }
     }
 
     setLoading(true);
+
+    let newImageUrl = editImageUrl;
+    if (editImageFile) {
+      // Delete old image if it exists and is different
+      if (selectedJob.image_url && selectedJob.image_url !== newImageUrl) {
+        const oldUrlParts = selectedJob.image_url.split('/');
+        const oldFilePath = oldUrlParts.slice(oldUrlParts.indexOf('job-opening-images') + 1).join('/');
+        await supabase.storage.from('job-opening-images').remove([oldFilePath]);
+      }
+
+      const fileExt = editImageFile.name.split('.').pop();
+      const fileName = `${Date.now()}-${editImageFile.name}.${fileExt}`;
+      const filePath = `job_opening_images/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('job-opening-images')
+        .upload(filePath, editImageFile);
+
+      if (uploadError) {
+        showError('Error uploading image: ' + uploadError.message);
+        setLoading(false);
+        return;
+      }
+      const { data: publicUrlData } = supabase.storage.from('job-opening-images').getPublicUrl(filePath);
+      newImageUrl = publicUrlData.publicUrl;
+    } else if (editImageUrl === null && selectedJob.image_url) {
+      // If image was present but now explicitly removed (e.g., by clearing input)
+      const oldUrlParts = selectedJob.image_url.split('/');
+      const oldFilePath = oldUrlParts.slice(oldUrlParts.indexOf('job-opening-images') + 1).join('/');
+      await supabase.storage.from('job-opening-images').remove([oldFilePath]);
+    }
+
+
     const updatedFields: Partial<JobOpening> = {
       title: editTitle,
       description: editDescription,
       requirements: editRequirements || null,
       responsibilities: editResponsibilities || null,
       status: editStatus,
+      image_url: newImageUrl, // Save new image URL
       questions: editQuestions.length > 0 ? editQuestions : null, // Save questions
     };
 
@@ -152,6 +209,25 @@ const JobOpeningManagementTab: React.FC<JobOpeningManagementTabProps> = ({
     setLoading(false);
     setIsEditDialogOpen(false);
     fetchJobOpenings(); // Refresh the list
+  };
+
+  const handleDeleteJob = async (jobId: string, imageUrl: string | null) => {
+    setLoading(true);
+    if (imageUrl) {
+      const urlParts = imageUrl.split('/');
+      const filePathInStorage = urlParts.slice(urlParts.indexOf('job-opening-images') + 1).join('/');
+      const { error: storageError } = await supabase.storage
+        .from('job-opening-images')
+        .remove([filePathInStorage]);
+
+      if (storageError) {
+        showError('Error deleting image from storage: ' + storageError.message);
+        setLoading(false);
+        return;
+      }
+    }
+    await handleDeleteJobOpening(jobId);
+    setLoading(false);
   };
 
   return (
@@ -204,7 +280,7 @@ const JobOpeningManagementTab: React.FC<JobOpeningManagementTabProps> = ({
                         </AlertDialogHeader>
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDeleteJobOpening(job.id)}>
+                          <AlertDialogAction onClick={() => handleDeleteJob(job.id, job.image_url)}>
                             Delete
                           </AlertDialogAction>
                         </AlertDialogFooter>
@@ -281,11 +357,28 @@ const JobOpeningManagementTab: React.FC<JobOpeningManagementTabProps> = ({
                   </SelectContent>
                 </Select>
               </div>
+              <div className="grid gap-2">
+                <Label htmlFor="editJobImage">Job Opening Image (Optional)</Label>
+                {editImageUrl && (
+                  <div className="mb-2">
+                    <img src={editImageUrl} alt="Current Job" className="max-h-32 object-contain rounded-md" />
+                    <Button variant="ghost" size="sm" onClick={() => setEditImageUrl(null)} className="text-red-500 hover:text-red-600 mt-1">Remove Image</Button>
+                  </div>
+                )}
+                <Input
+                  id="editJobImage"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setEditImageFile(e.target.files ? e.target.files[0] : null)}
+                  className="w-full"
+                  disabled={loading}
+                />
+              </div>
 
               {/* Multiple Choice Questions Section for Editing */}
               <div className="space-y-4 border p-4 rounded-md">
                 <h3 className="text-lg font-semibold flex items-center justify-between">
-                  Multiple Choice Questions (Optional)
+                  Application Questions (Optional)
                   <Button type="button" variant="outline" size="sm" onClick={addEditQuestion} disabled={loading}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Add Question
                   </Button>
@@ -298,45 +391,65 @@ const JobOpeningManagementTab: React.FC<JobOpeningManagementTabProps> = ({
                         <XCircle className="h-4 w-4 text-red-500" />
                       </Button>
                     </div>
-                    <Input
-                      id={`edit-question-${q.id}`}
-                      value={q.questionText}
-                      onChange={(e) => handleEditQuestionChange(q.id, 'questionText', e.target.value)}
-                      placeholder="Enter question text"
-                      required
-                      disabled={loading}
-                    />
-                    <div className="space-y-2">
-                      <Label>Options:</Label>
-                      {q.options.map((option, optIndex) => (
-                        <div key={optIndex} className="flex items-center space-x-2">
-                          <Input
-                            value={option}
-                            onChange={(e) => handleEditOptionChange(q.id, optIndex, e.target.value)}
-                            placeholder={`Option ${optIndex + 1}`}
-                            required
-                            disabled={loading}
-                          />
-                          <input
-                            type="radio"
-                            name={`edit-correct-option-${q.id}`}
-                            checked={q.correctOptionIndex === optIndex}
-                            onChange={() => handleEditQuestionChange(q.id, 'correctOptionIndex', optIndex)}
-                            className="form-radio h-4 w-4 text-blue-600"
-                            disabled={loading}
-                          />
-                          <Label htmlFor={`edit-correct-option-${q.id}-${optIndex}`}>Correct</Label>
-                          {q.options.length > 2 && ( // Allow removing if more than 2 options
-                            <Button type="button" variant="ghost" size="sm" onClick={() => removeEditOption(q.id, optIndex)} disabled={loading}>
-                              <Minus className="h-4 w-4 text-red-500" />
-                            </Button>
-                          )}
-                        </div>
-                      ))}
-                      <Button type="button" variant="outline" size="sm" onClick={() => addEditOption(q.id)} disabled={loading}>
-                        <Plus className="mr-2 h-4 w-4" /> Add Option
-                      </Button>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="col-span-1">
+                        <Label htmlFor={`edit-question-type-${q.id}`}>Question Type</Label>
+                        <Select value={q.type} onValueChange={(value: 'multiple-choice' | 'text') => handleEditQuestionTypeChange(q.id, value)} disabled={loading}>
+                          <SelectTrigger id={`edit-question-type-${q.id}`}>
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="multiple-choice">Multiple Choice</SelectItem>
+                            <SelectItem value="text">Text Answer</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="col-span-1">
+                        <Label htmlFor={`edit-question-text-${q.id}`}>Question Text</Label>
+                        <Input
+                          id={`edit-question-text-${q.id}`}
+                          value={q.questionText}
+                          onChange={(e) => handleEditQuestionChange(q.id, 'questionText', e.target.value)}
+                          placeholder="Enter question text"
+                          required
+                          disabled={loading}
+                        />
+                      </div>
                     </div>
+
+                    {q.type === 'multiple-choice' && (
+                      <div className="space-y-2">
+                        <Label>Options:</Label>
+                        {(q.options || []).map((option, optIndex) => (
+                          <div key={optIndex} className="flex items-center space-x-2">
+                            <Input
+                              value={option}
+                              onChange={(e) => handleEditOptionChange(q.id, optIndex, e.target.value)}
+                              placeholder={`Option ${optIndex + 1}`}
+                              required
+                              disabled={loading}
+                            />
+                            <input
+                              type="radio"
+                              name={`edit-correct-option-${q.id}`}
+                              checked={q.correctOptionIndex === optIndex}
+                              onChange={() => handleEditQuestionChange(q.id, 'correctOptionIndex', optIndex)}
+                              className="form-radio h-4 w-4 text-blue-600"
+                              disabled={loading}
+                            />
+                            <Label htmlFor={`edit-correct-option-${q.id}-${optIndex}`}>Correct</Label>
+                            {(q.options || []).length > 2 && ( // Allow removing if more than 2 options
+                              <Button type="button" variant="ghost" size="sm" onClick={() => removeEditOption(q.id, optIndex)} disabled={loading}>
+                                <Minus className="h-4 w-4 text-red-500" />
+                              </Button>
+                            )}
+                          </div>
+                        ))}
+                        <Button type="button" variant="outline" size="sm" onClick={() => addEditOption(q.id)} disabled={loading}>
+                          <Plus className="mr-2 h-4 w-4" /> Add Option
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>

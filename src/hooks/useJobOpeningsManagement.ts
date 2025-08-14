@@ -5,8 +5,9 @@ import { showSuccess, showError } from '@/utils/toast';
 interface Question {
   id: string;
   questionText: string;
-  options: string[];
-  correctOptionIndex: number;
+  type: 'multiple-choice' | 'text'; // New field for question type
+  options?: string[]; // Optional for text questions
+  correctOptionIndex?: number; // Optional for text questions
 }
 
 interface JobOpening {
@@ -18,6 +19,7 @@ interface JobOpening {
   status: string;
   created_at: string;
   updated_at: string;
+  image_url: string | null; // Added image_url field
   questions: Question[] | null;
 }
 

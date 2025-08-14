@@ -12,14 +12,15 @@ import UserDetailsDialog from '@/components/UserDetailsDialog'; // To view appli
 interface Question {
   id: string;
   questionText: string;
-  options: string[];
-  correctOptionIndex: number;
+  type: 'multiple-choice' | 'text'; // New field for question type
+  options?: string[]; // Optional for text questions
+  correctOptionIndex?: number; // Optional for text questions
 }
 
 interface Answer {
   questionId: string;
   selectedOptionIndex?: number;
-  textAnswer?: string;
+  textAnswer?: string; // New field for text answers
 }
 
 interface JobApplication {
@@ -70,11 +71,15 @@ const JobApplicationManagementTab: React.FC<JobApplicationManagementTabProps> = 
   const getAnswerDisplay = (question: Question, answers: Answer[] | null) => {
     if (!answers) return 'N/A';
     const answer = answers.find(a => a.questionId === question.id);
-    if (answer && answer.selectedOptionIndex !== undefined && question.options[answer.selectedOptionIndex]) {
-      return question.options[answer.selectedOptionIndex];
-    }
-    if (answer && answer.textAnswer) {
-      return answer.textAnswer;
+
+    if (question.type === 'multiple-choice') {
+      if (answer && answer.selectedOptionIndex !== undefined && question.options && question.options[answer.selectedOptionIndex]) {
+        return question.options[answer.selectedOptionIndex];
+      }
+    } else if (question.type === 'text') {
+      if (answer && answer.textAnswer) {
+        return answer.textAnswer;
+      }
     }
     return 'Not answered';
   };
@@ -82,8 +87,14 @@ const JobApplicationManagementTab: React.FC<JobApplicationManagementTabProps> = 
   const getAnswerColor = (question: Question, answers: Answer[] | null) => {
     if (!answers) return 'text-gray-700 dark:text-gray-300';
     const answer = answers.find(a => a.questionId === question.id);
-    if (answer && answer.selectedOptionIndex !== undefined) {
-      return answer.selectedOptionIndex === question.correctOptionIndex ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+
+    if (question.type === 'multiple-choice') {
+      if (answer && answer.selectedOptionIndex !== undefined && question.correctOptionIndex !== undefined) {
+        return answer.selectedOptionIndex === question.correctOptionIndex ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
+      }
+    } else if (question.type === 'text') {
+      // For text answers, there's no "correct" or "incorrect" in the same way
+      return 'text-gray-700 dark:text-gray-300';
     }
     return 'text-gray-700 dark:text-gray-300';
   };

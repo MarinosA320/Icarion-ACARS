@@ -6,14 +6,15 @@ import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchPr
 interface Question {
   id: string;
   questionText: string;
-  options: string[];
-  correctOptionIndex: number;
+  type: 'multiple-choice' | 'text'; // New field for question type
+  options?: string[]; // Optional for text questions
+  correctOptionIndex?: number; // Optional for text questions
 }
 
 interface Answer {
   questionId: string;
   selectedOptionIndex?: number;
-  textAnswer?: string;
+  textAnswer?: string; // New field for text answers
 }
 
 interface JobApplication {
