@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
 import { fetchProfilesData } from '@/utils/supabaseDataFetch';
+import { sendNotification } from '@/utils/notificationService'; // New import
 
 export interface TrainingRequest {
   id: string;
@@ -14,7 +15,7 @@ export interface TrainingRequest {
   status: string;
   created_at: string;
   instructor_id: string | null;
-  training_category: string; // New field
+  training_category: string;
   user_profile: {
     display_name: string | null;
     email: string | null;
@@ -39,7 +40,7 @@ export const useTrainingRequestsManagement = () => {
   const fetchAllTrainingRequests = useCallback(async () => {
     const { data, error } = await supabase
       .from('training_requests')
-      .select('id,user_id,desired_rank,aircraft_type,preferred_date_time,prior_experience,optional_message,status,created_at,instructor_id,training_category') // Select new field
+      .select('id,user_id,desired_rank,aircraft_type,preferred_date_time,prior_experience,optional_message,status,created_at,instructor_id,training_category')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -73,7 +74,7 @@ export const useTrainingRequestsManagement = () => {
 
     const { data, error } = await supabase
       .from('training_requests')
-      .select('id,user_id,desired_rank,aircraft_type,preferred_date_time,prior_experience,optional_message,status,created_at,instructor_id,training_category') // Select new field
+      .select('id,user_id,desired_rank,aircraft_type,preferred_date_time,prior_experience,optional_message,status,created_at,instructor_id,training_category')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -121,6 +122,23 @@ export const useTrainingRequestsManagement = () => {
   }, [fetchMyTrainingRequests]);
 
   const handleUpdateTrainingRequest = useCallback(async (requestId: string, updatedFields: Partial<TrainingRequest>) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      showError('You must be logged in to update training requests.');
+      return;
+    }
+
+    const { data: existingRequest, error: fetchError } = await supabase
+      .from('training_requests')
+      .select('user_id, training_category, aircraft_type, desired_rank')
+      .eq('id', requestId)
+      .single();
+
+    if (fetchError || !existingRequest) {
+      showError('Error fetching training request details: ' + (fetchError?.message || 'Request not found.'));
+      return;
+    }
+
     const { error } = await supabase
       .from('training_requests')
       .update(updatedFields)
@@ -132,6 +150,22 @@ export const useTrainingRequestsManagement = () => {
       showSuccess('Training request updated successfully!');
       fetchAllTrainingRequests(); // Refresh all requests for staff view
       fetchMyTrainingRequests(); // Refresh user's requests
+
+      // Send notification if status is Approved
+      if (updatedFields.status === 'Approved') {
+        let notificationContent = `Your training request for "${existingRequest.training_category}" has been approved!`;
+        if (existingRequest.training_category === 'Aircraft Type Rating' && existingRequest.aircraft_type) {
+          notificationContent += ` (Aircraft Type: ${existingRequest.aircraft_type})`;
+        }
+        if (updatedFields.instructor_id) {
+          const instructorProfile = await supabase.from('profiles').select('display_name').eq('id', updatedFields.instructor_id).single();
+          if (instructorProfile.data?.display_name) {
+            notificationContent += ` Your instructor is ${instructorProfile.data.display_name}.`;
+          }
+        }
+        notificationContent += ` Please check your email for further details.`;
+        await sendNotification(existingRequest.user_id, 'training_approved', notificationContent, user.id);
+      }
     }
   }, [fetchAllTrainingRequests, fetchMyTrainingRequests]);
 

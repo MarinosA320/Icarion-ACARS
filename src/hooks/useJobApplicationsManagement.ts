@@ -1,20 +1,21 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
-import { fetchProfilesData } from '@/utils/supabaseDataFetch'; // Import fetchProfilesData
+import { fetchProfilesData } from '@/utils/supabaseDataFetch';
+import { sendNotification } from '@/utils/notificationService'; // New import
 
 interface Question {
   id: string;
   questionText: string;
-  type: 'multiple-choice' | 'text'; // New field for question type
-  options?: string[]; // Optional for text questions
-  correctOptionIndex?: number; // Optional for text questions
+  type: 'multiple-choice' | 'text';
+  options?: string[];
+  correctOptionIndex?: number;
 }
 
 interface Answer {
   questionId: string;
   selectedOptionIndex?: number;
-  textAnswer?: string; // New field for text answers
+  textAnswer?: string;
 }
 
 interface JobApplication {
@@ -45,7 +46,6 @@ export const useJobApplicationsManagement = () => {
   const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
 
   const fetchJobApplications = useCallback(async () => {
-    // Fetch job applications without direct profile join
     const { data, error } = await supabase
       .from('job_applications')
       .select('id,job_opening_id,user_id,answers,status,created_at,job_opening:job_openings(title,questions)')
@@ -70,6 +70,23 @@ export const useJobApplicationsManagement = () => {
   }, []);
 
   const handleUpdateApplicationStatus = useCallback(async (applicationId: string, newStatus: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      showError('You must be logged in to update application status.');
+      return;
+    }
+
+    const { data: existingApplication, error: fetchError } = await supabase
+      .from('job_applications')
+      .select('user_id, job_opening_id, job_opening(title)')
+      .eq('id', applicationId)
+      .single();
+
+    if (fetchError || !existingApplication) {
+      showError('Error fetching application details: ' + (fetchError?.message || 'Application not found.'));
+      return;
+    }
+
     const { error } = await supabase
       .from('job_applications')
       .update({ status: newStatus })
@@ -80,6 +97,13 @@ export const useJobApplicationsManagement = () => {
     } else {
       showSuccess('Application status updated!');
       fetchJobApplications();
+
+      // Send notification if status is accepted
+      if (newStatus === 'accepted') {
+        const jobTitle = existingApplication.job_opening?.title || 'a job opening';
+        const notificationContent = `Congratulations! Your application for "${jobTitle}" has been accepted. Please check your email for further instructions.`;
+        await sendNotification(existingApplication.user_id, 'job_accepted', notificationContent, user.id);
+      }
     }
   }, [fetchJobApplications]);
 

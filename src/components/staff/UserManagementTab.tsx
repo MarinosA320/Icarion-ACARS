@@ -11,6 +11,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { X, PlusCircle } from 'lucide-react';
 import { AIRCRAFT_FAMILIES, ALL_AIRLINES } from '@/utils/aircraftData'; // Import ALL_AIRLINES
+import SendMessageDialog from '@/components/staff/SendMessageDialog'; // New import
 
 interface Profile {
   id: string;
@@ -45,10 +46,17 @@ const UserManagementTab: React.FC<UserManagementTabProps> = ({
   setSelectedUser,
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSendMessageDialogOpen, setIsSendMessageDialogOpen] = useState(false);
+  const [messageRecipient, setMessageRecipient] = useState<{ id: string; display_name: string } | null>(null);
 
   const handleViewUserDetails = (user: Profile) => {
     setSelectedUser(user);
     setIsUserDetailsDialogOpen(true);
+  };
+
+  const handleSendMessageClick = (user: Profile) => {
+    setMessageRecipient({ id: user.id, display_name: user.display_name || 'N/A' });
+    setIsSendMessageDialogOpen(true);
   };
 
   const handleTypeRatingChange = (userId: string, currentRatings: string[] | null, family: string, isChecked: boolean) => {
@@ -112,7 +120,7 @@ const UserManagementTab: React.FC<UserManagementTabProps> = ({
               <TableHead>Rank</TableHead>
               <TableHead>Staff</TableHead>
               <TableHead>Type Ratings</TableHead>
-              <TableHead>Authorized Airlines</TableHead> {/* New Table Head */}
+              <TableHead>Authorized Airlines</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -198,7 +206,7 @@ const UserManagementTab: React.FC<UserManagementTabProps> = ({
                       </PopoverContent>
                     </Popover>
                   </TableCell>
-                  <TableCell className="min-w-[250px]"> {/* New Cell for Authorized Airlines */}
+                  <TableCell className="min-w-[250px]">
                     <div className="flex flex-wrap gap-1 mb-2">
                       {user.authorized_airlines?.map((airline, index) => (
                         <Badge key={index} variant="secondary" className="flex items-center gap-1">
@@ -243,9 +251,12 @@ const UserManagementTab: React.FC<UserManagementTabProps> = ({
                       </PopoverContent>
                     </Popover>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={() => handleViewUserDetails(user)}>
                       View Details
+                    </Button>
+                    <Button variant="secondary" size="sm" onClick={() => handleSendMessageClick(user)}>
+                      Message
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -259,6 +270,14 @@ const UserManagementTab: React.FC<UserManagementTabProps> = ({
           isOpen={isUserDetailsDialogOpen}
           onClose={() => setIsUserDetailsDialogOpen(false)}
           user={selectedUser}
+        />
+      )}
+      {messageRecipient && (
+        <SendMessageDialog
+          isOpen={isSendMessageDialogOpen}
+          onClose={() => setIsSendMessageDialogOpen(false)}
+          recipientId={messageRecipient.id}
+          recipientDisplayName={messageRecipient.display_name}
         />
       )}
     </Card>

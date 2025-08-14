@@ -15,6 +15,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { MenuIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import NotificationMenu from '@/components/NotificationMenu'; // New import
 
 interface Profile {
   display_name: string | null;
@@ -95,6 +96,7 @@ const Navbar = () => {
           <SheetContent side="left" className="w-[250px] sm:w-[300px] bg-white dark:bg-gray-800 p-4">
             <div className="flex flex-col space-y-4 mt-6">
               {navLinks}
+              <NotificationMenu /> {/* Added NotificationMenu here for mobile */}
               <Button onClick={handleLogout} variant="outline" className="w-full">Logout</Button>
             </div>
           </SheetContent>
@@ -102,6 +104,7 @@ const Navbar = () => {
       ) : (
         <div className="flex items-center space-x-6">
           {navLinks}
+          <NotificationMenu /> {/* Added NotificationMenu here for desktop */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
