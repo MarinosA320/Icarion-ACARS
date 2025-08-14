@@ -15,6 +15,7 @@ interface Profile {
   rank: string;
   email: string | null;
   type_ratings: string[] | null;
+  authorized_airlines: string[] | null; // New field
 }
 
 export const useUsersManagement = () => {
@@ -24,7 +25,7 @@ export const useUsersManagement = () => {
   const fetchUsers = useCallback(async () => {
     const { data: profilesData, error: profilesError } = await supabase
       .from('profiles')
-      .select("id,first_name,last_name,display_name,discord_username,vatsim_ivao_id,avatar_url,is_staff,rank,type_ratings");
+      .select("id,first_name,last_name,display_name,discord_username,vatsim_ivao_id,avatar_url,is_staff,rank,type_ratings,authorized_airlines"); // Select new field
 
     if (profilesError) {
       showError('Error fetching users: ' + profilesError.message);

@@ -10,7 +10,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { X, PlusCircle } from 'lucide-react';
-import { AIRCRAFT_FAMILIES } from '@/utils/aircraftData'; // Import AIRCRAFT_FAMILIES
+import { AIRCRAFT_FAMILIES, ALL_AIRLINES } from '@/utils/aircraftData'; // Import ALL_AIRLINES
 
 interface Profile {
   id: string;
@@ -24,6 +24,7 @@ interface Profile {
   rank: string;
   email?: string;
   type_ratings: string[] | null;
+  authorized_airlines: string[] | null; // New field
 }
 
 interface UserManagementTabProps {
@@ -62,7 +63,20 @@ const UserManagementTab: React.FC<UserManagementTabProps> = ({
     handleUserUpdate(userId, 'type_ratings', newRatings);
   };
 
+  const handleAuthorizedAirlineChange = (userId: string, currentAirlines: string[] | null, airlineName: string, isChecked: boolean) => {
+    let newAirlines = currentAirlines ? [...currentAirlines] : [];
+    if (isChecked) {
+      if (!newAirlines.includes(airlineName)) {
+        newAirlines.push(airlineName);
+      }
+    } else {
+      newAirlines = newAirlines.filter(a => a !== airlineName);
+    }
+    handleUserUpdate(userId, 'authorized_airlines', newAirlines);
+  };
+
   const allAircraftFamilies = Object.values(AIRCRAFT_FAMILIES).filter((value, index, self) => self.indexOf(value) === index);
+  const allAirlineNames = ALL_AIRLINES.map(airline => airline.name);
 
   const filteredUsers = users.filter(user => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();
@@ -98,13 +112,14 @@ const UserManagementTab: React.FC<UserManagementTabProps> = ({
               <TableHead>Rank</TableHead>
               <TableHead>Staff</TableHead>
               <TableHead>Type Ratings</TableHead>
+              <TableHead>Authorized Airlines</TableHead> {/* New Table Head */}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredUsers.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center text-muted-foreground">
+                <TableCell colSpan={8} className="text-center text-muted-foreground">
                   No users found matching your filter.
                 </TableCell>
               </TableRow>
@@ -176,6 +191,51 @@ const UserManagementTab: React.FC<UserManagementTabProps> = ({
                                   className="mr-2"
                                 />
                                 {family}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </Command>
+                      </PopoverContent>
+                    </Popover>
+                  </TableCell>
+                  <TableCell className="min-w-[250px]"> {/* New Cell for Authorized Airlines */}
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {user.authorized_airlines?.map((airline, index) => (
+                        <Badge key={index} variant="secondary" className="flex items-center gap-1">
+                          {airline}
+                          <X
+                            className="h-3 w-3 cursor-pointer"
+                            onClick={() => handleAuthorizedAirlineChange(user.id, user.authorized_airlines, airline, false)}
+                          />
+                        </Badge>
+                      ))}
+                    </div>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="outline" size="sm" className="h-8">
+                          <PlusCircle className="mr-2 h-4 w-4" /> Manage Airlines
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[200px] p-0">
+                        <Command>
+                          <CommandInput placeholder="Search airline..." />
+                          <CommandEmpty>No airline found.</CommandEmpty>
+                          <CommandGroup>
+                            {allAirlineNames.map((airlineName) => (
+                              <CommandItem
+                                key={airlineName}
+                                onSelect={() => {
+                                  handleAuthorizedAirlineChange(user.id, user.authorized_airlines, airlineName, !user.authorized_airlines?.includes(airlineName));
+                                }}
+                              >
+                                <Checkbox
+                                  checked={user.authorized_airlines?.includes(airlineName)}
+                                  onCheckedChange={(checked) => {
+                                    handleAuthorizedAirlineChange(user.id, user.authorized_airlines, airlineName, !!checked);
+                                  }}
+                                  className="mr-2"
+                                />
+                                {airlineName}
                               </CommandItem>
                             ))}
                           </CommandGroup>

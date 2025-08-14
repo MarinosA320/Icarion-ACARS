@@ -22,7 +22,6 @@ const LogFlight = () => {
   const {
     formState,
     flightImage,
-    // Removed bookingId as it's no longer used
     handleChange,
     handleImageChange,
     clearForm,
@@ -32,6 +31,7 @@ const LogFlight = () => {
     userProfile,
     filteredAircraftTypes,
     aircraftRegistrations,
+    availableAirlines, // Get availableAirlines from the hook
   } = useUserProfileAndAircraftData(
     formState.selectedAirline,
     formState.selectedAircraftType,
@@ -46,6 +46,16 @@ const LogFlight = () => {
       showError('User not logged in.');
       setLoading(false);
       return;
+    }
+
+    // Validate selected airline against user's authorized airlines
+    if (userProfile && availableAirlines.length > 0) {
+      const isAirlineAuthorized = availableAirlines.some(airline => airline.name === formState.selectedAirline);
+      if (!isAirlineAuthorized) {
+        showError(`You are not authorized to fly for ${formState.selectedAirline}. Please select an authorized airline.`);
+        setLoading(false);
+        return;
+      }
     }
 
     // Re-validate rank and type rating before logging
@@ -122,7 +132,6 @@ const LogFlight = () => {
       showError('Error logging flight: ' + error.message);
       console.error('Error logging flight:', error);
     } else {
-      // Removed bookingId update logic
       showSuccess('Flight logged successfully!');
       clearForm();
       navigate('/logbook');
@@ -159,6 +168,7 @@ const LogFlight = () => {
               userRank={userProfile?.rank || ''}
               filteredAircraftTypes={filteredAircraftTypes}
               aircraftRegistrations={aircraftRegistrations}
+              availableAirlines={availableAirlines} // Pass availableAirlines
               handleChange={handleChange}
               handleAircraftTypeChange={(value) => handleChange('selectedAircraftType', value)}
               handleAirlineChange={(value) => handleChange('selectedAirline', value)}

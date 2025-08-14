@@ -2,7 +2,7 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ALL_AIRLINES } from '@/utils/aircraftData';
+import { ALL_AIRLINES, Airline } from '@/utils/aircraftData'; // Import Airline interface
 
 interface FlightDetailsFormProps {
   formState: {
@@ -21,10 +21,18 @@ interface FlightDetailsFormProps {
     departureType: string;
     arrivalType: string;
     volantaTrackingLink: string; // New field
+    flightTime: string; // Added for completeness
+    landingRate: string; // Added for completeness
+    departureRunway: string; // Added for completeness
+    arrivalRunway: string; // Added for completeness
+    taxiwaysUsed: string; // Added for completeness
+    gatesUsedDep: string; // Added for completeness
+    gatesUsedArr: string; // Added for completeness
   };
   userRank: string;
   filteredAircraftTypes: string[];
   aircraftRegistrations: string[];
+  availableAirlines: Airline[]; // New prop
   handleChange: (field: string, value: string) => void;
   handleAircraftTypeChange: (value: string) => void;
   handleAirlineChange: (value: string) => void;
@@ -35,11 +43,13 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
   userRank,
   filteredAircraftTypes,
   aircraftRegistrations,
+  availableAirlines, // Use this prop
   handleChange,
   handleAircraftTypeChange,
   handleAirlineChange,
 }) => {
-  const currentAirline = ALL_AIRLINES.find(a => a.name === formState.selectedAirline) || ALL_AIRLINES[0];
+  // Use availableAirlines directly for rendering options
+  const currentAirline = availableAirlines.find(a => a.name === formState.selectedAirline);
 
   return (
     <>
@@ -50,9 +60,13 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
             <SelectValue placeholder="Select airline" />
           </SelectTrigger>
           <SelectContent className="max-h-60 overflow-y-auto">
-            {ALL_AIRLINES.map(airline => (
-              <SelectItem key={airline.name} value={airline.name}>{airline.name}</SelectItem>
-            ))}
+            {availableAirlines.length > 0 ? (
+              availableAirlines.map(airline => (
+                <SelectItem key={airline.name} value={airline.name}>{airline.name}</SelectItem>
+              ))
+            ) : (
+              <SelectItem value="no-airlines-available" disabled>No authorized airlines available</SelectItem>
+            )}
           </SelectContent>
         </Select>
       </div>
