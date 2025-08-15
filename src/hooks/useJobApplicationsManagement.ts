@@ -48,7 +48,7 @@ export const useJobApplicationsManagement = () => {
   const fetchJobApplications = useCallback(async () => {
     const { data, error } = await supabase
       .from('job_applications')
-      .select('id,job_opening_id,user_id,answers,status,created_at,job_opening(title,questions)') // Simplified join syntax
+      .select('id,job_opening_id,user_id,answers,status,created_at,job_opening!fk_job_opening(title,questions)') // Explicitly specify the foreign key
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -78,7 +78,7 @@ export const useJobApplicationsManagement = () => {
 
     const { data: existingApplication, error: fetchError } = await supabase
       .from('job_applications')
-      .select('user_id, job_opening_id, job_opening(title)') // Simplified join syntax
+      .select('user_id, job_opening_id, job_opening!fk_job_opening(title)') // Explicitly specify the foreign key
       .eq('id', applicationId)
       .single();
 
