@@ -148,7 +148,12 @@ const JobApplicationManagementTab: React.FC<JobApplicationManagementTabProps> = 
                     </Select>
                   </TableCell>
                   <TableCell className="flex gap-2">
-                    <Dialog>
+                    <Dialog onOpenChange={(open) => {
+                      if (open) {
+                        console.log('Job Application Questions:', application.job_opening?.questions);
+                        console.log('Job Application Answers:', application.answers);
+                      }
+                    }}>
                       <DialogTrigger asChild>
                         <Button variant="outline" size="sm">View</Button>
                       </DialogTrigger>
@@ -168,7 +173,7 @@ const JobApplicationManagementTab: React.FC<JobApplicationManagementTabProps> = 
                           <div><span className="font-medium">Application Status:</span> {application.status.charAt(0).toUpperCase() + application.status.slice(1)}</div>
                           <div><span className="font-medium">Applied On:</span> {format(new Date(application.created_at), 'PPP p')}</div>
 
-                          {application.job_opening?.questions && application.job_opening.questions.length > 0 && (
+                          {application.job_opening?.questions && application.job_opening.questions.length > 0 ? (
                             <div className="col-span-full mt-4">
                               <h3 className="font-semibold text-base mb-2">Answers to Questions:</h3>
                               <div className="space-y-3">
@@ -181,6 +186,10 @@ const JobApplicationManagementTab: React.FC<JobApplicationManagementTabProps> = 
                                   </div>
                                 ))}
                               </div>
+                            </div>
+                          ) : (
+                            <div className="col-span-full mt-4 text-center text-muted-foreground">
+                              No questions found for this job opening.
                             </div>
                           )}
                         </div>
