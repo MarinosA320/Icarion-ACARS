@@ -20,6 +20,7 @@ import Navbar from "./components/Navbar";
 import { supabase } from "./integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "next-themes";
+import ErrorBoundary from "./components/ErrorBoundary"; // New import
 
 const queryClient = new QueryClient();
 
@@ -152,7 +153,9 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Navbar />
-                    <LogFlight />
+                    <ErrorBoundary> {/* Wrap LogFlight with ErrorBoundary */}
+                      <LogFlight />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />
