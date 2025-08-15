@@ -18,16 +18,16 @@ interface FlightDetailsFormProps {
     eta: string;
     ata: string;
     flightRules: string;
+    flightTime: string;
+    landingRate: string;
+    departureRunway: string;
+    arrivalRunway: string;
+    taxiwaysUsed: string;
+    gatesUsedDep: string;
+    gatesUsedArr: string;
     departureType: string;
     arrivalType: string;
-    volantaTrackingLink: string; // New field
-    flightTime: string; // Added for completeness
-    landingRate: string; // Added for completeness
-    departureRunway: string; // Added for completeness
-    arrivalRunway: string; // Added for completeness
-    taxiwaysUsed: string; // Added for completeness
-    gatesUsedDep: string; // Added for completeness
-    gatesUsedArr: string; // Added for completeness
+    volantaTrackingLink: string;
   };
   userRank: string;
   filteredAircraftTypes: string[];
@@ -55,7 +55,7 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
     <>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="airlineName">Airline Name</Label>
-        <Select value={formState.selectedAirline} onValueChange={handleAirlineChange}>
+        <Select value={formState.selectedAirline || ''} onValueChange={handleAirlineChange}>
           <SelectTrigger id="airlineName">
             <SelectValue placeholder="Select airline" />
           </SelectTrigger>
@@ -72,21 +72,21 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="flightNumber">Flight Number / Callsign</Label>
-        <Input id="flightNumber" value={formState.flightNumber} onChange={(e) => handleChange('flightNumber', e.target.value)} />
+        <Input id="flightNumber" value={formState.flightNumber || ''} onChange={(e) => handleChange('flightNumber', e.target.value)} />
       </div>
       
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="departureAirport">Departure Airport</Label>
-        <Input id="departureAirport" value={formState.departureAirport} onChange={(e) => handleChange('departureAirport', e.target.value)} />
+        <Input id="departureAirport" value={formState.departureAirport || ''} onChange={(e) => handleChange('departureAirport', e.target.value)} />
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="arrivalAirport">Arrival Airport</Label>
-        <Input id="arrivalAirport" value={formState.arrivalAirport} onChange={(e) => handleChange('arrivalAirport', e.target.value)} />
+        <Input id="arrivalAirport" value={formState.arrivalAirport || ''} onChange={(e) => handleChange('arrivalAirport', e.target.value)} />
       </div>
 
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="aircraftType">Aircraft Type (Your Rank: {userRank || 'Loading...'})</Label>
-        <Select value={formState.selectedAircraftType} onValueChange={handleAircraftTypeChange} disabled={!formState.selectedAirline || !userRank}>
+        <Select value={formState.selectedAircraftType || ''} onValueChange={handleAircraftTypeChange} disabled={!formState.selectedAirline || !userRank}>
           <SelectTrigger id="aircraftType">
             <SelectValue placeholder="Select aircraft type" />
           </SelectTrigger>
@@ -104,7 +104,7 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="aircraftRegistration">Aircraft Registration</Label>
         {formState.selectedAirline === 'Icarion Virtual' ? (
-          <Select value={formState.selectedAircraftRegistration} onValueChange={(value) => handleChange('selectedAircraftRegistration', value)} disabled={!formState.selectedAircraftType}>
+          <Select value={formState.selectedAircraftRegistration || ''} onValueChange={(value) => handleChange('selectedAircraftRegistration', value)} disabled={!formState.selectedAircraftType}>
             <SelectTrigger id="aircraftRegistration">
               <SelectValue placeholder="Select registration" />
             </SelectTrigger>
@@ -121,7 +121,7 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
         ) : (
           <Input
             id="aircraftRegistration"
-            value={formState.selectedAircraftRegistration}
+            value={formState.selectedAircraftRegistration || ''}
             onChange={(e) => handleChange('selectedAircraftRegistration', e.target.value)}
             placeholder="e.g., N123AB"
             required
@@ -132,7 +132,7 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
 
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="pilotRole">Pilot Role</Label>
-        <Select value={formState.pilotRole} onValueChange={(value) => handleChange('pilotRole', value)}>
+        <Select value={formState.pilotRole || ''} onValueChange={(value) => handleChange('pilotRole', value)}>
           <SelectTrigger id="pilotRole">
             <SelectValue placeholder="Select role" />
           </SelectTrigger>
@@ -145,7 +145,7 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="flightRules">Flight Rules</Label>
-        <Select value={formState.flightRules} onValueChange={(value) => handleChange('flightRules', value)}>
+        <Select value={formState.flightRules || ''} onValueChange={(value) => handleChange('flightRules', value)}>
           <SelectTrigger id="flightRules">
             <SelectValue placeholder="Select rules" />
           </SelectTrigger>
@@ -158,55 +158,55 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
 
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="etd">Estimated Time of Departure (ETD)</Label>
-        <Input id="etd" type="datetime-local" value={formState.etd} onChange={(e) => handleChange('etd', e.target.value)} />
+        <Input id="etd" type="datetime-local" value={formState.etd || ''} onChange={(e) => handleChange('etd', e.target.value)} />
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="atd">Actual Time of Departure (ATD)</Label>
-        <Input id="atd" type="datetime-local" value={formState.atd} onChange={(e) => handleChange('atd', e.target.value)} />
+        <Input id="atd" type="datetime-local" value={formState.atd || ''} onChange={(e) => handleChange('atd', e.target.value)} />
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="eta">Estimated Time of Arrival (ETA)</Label>
-        <Input id="eta" type="datetime-local" value={formState.eta} onChange={(e) => handleChange('eta', e.target.value)} />
+        <Input id="eta" type="datetime-local" value={formState.eta || ''} onChange={(e) => handleChange('eta', e.target.value)} />
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="ata">Actual Time of Arrival (ATA)</Label>
-        <Input id="ata" type="datetime-local" value={formState.ata} onChange={(e) => handleChange('ata', e.target.value)} />
+        <Input id="ata" type="datetime-local" value={formState.ata || ''} onChange={(e) => handleChange('ata', e.target.value)} />
       </div>
 
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="flightTime">Flight Time (HH:MM)</Label>
-        <Input id="flightTime" value={formState.flightTime} onChange={(e) => handleChange('flightTime', e.target.value)} placeholder="e.g., 02:30" required />
+        <Input id="flightTime" value={formState.flightTime || ''} onChange={(e) => handleChange('flightTime', e.target.value)} placeholder="e.g., 02:30" required />
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="landingRate">Landing Rate (fpm)</Label>
-        <Input id="landingRate" type="number" value={formState.landingRate} onChange={(e) => handleChange('landingRate', e.target.value)} placeholder="e.g., -250" />
+        <Input id="landingRate" type="number" value={formState.landingRate || ''} onChange={(e) => handleChange('landingRate', e.target.value)} placeholder="e.g., -250" />
       </div>
 
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="departureRunway">Departure Runway</Label>
-        <Input id="departureRunway" value={formState.departureRunway} onChange={(e) => handleChange('departureRunway', e.target.value)} placeholder="e.g., 27L" />
+        <Input id="departureRunway" value={formState.departureRunway || ''} onChange={(e) => handleChange('departureRunway', e.target.value)} placeholder="e.g., 27L" />
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="arrivalRunway">Arrival Runway</Label>
-        <Input id="arrivalRunway" value={formState.arrivalRunway} onChange={(e) => handleChange('arrivalRunway', e.target.value)} placeholder="e.g., 09R" />
+        <Input id="arrivalRunway" value={formState.arrivalRunway || ''} onChange={(e) => handleChange('arrivalRunway', e.target.value)} placeholder="e.g., 09R" />
       </div>
 
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="taxiwaysUsed">Taxiways Used</Label>
-        <Input id="taxiwaysUsed" value={formState.taxiwaysUsed} onChange={(e) => handleChange('taxiwaysUsed', e.target.value)} placeholder="e.g., A, B, C" />
+        <Input id="taxiwaysUsed" value={formState.taxiwaysUsed || ''} onChange={(e) => handleChange('taxiwaysUsed', e.target.value)} placeholder="e.g., A, B, C" />
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="gatesUsedDep">Departure Gate(s)</Label>
-        <Input id="gatesUsedDep" value={formState.gatesUsedDep} onChange={(e) => handleChange('gatesUsedDep', e.target.value)} placeholder="e.g., A12" />
+        <Input id="gatesUsedDep" value={formState.gatesUsedDep || ''} onChange={(e) => handleChange('gatesUsedDep', e.target.value)} placeholder="e.g., A12" />
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="gatesUsedArr">Arrival Gate(s)</Label>
-        <Input id="gatesUsedArr" value={formState.gatesUsedArr} onChange={(e) => handleChange('gatesUsedArr', e.target.value)} placeholder="e.g., B05" />
+        <Input id="gatesUsedArr" value={formState.gatesUsedArr || ''} onChange={(e) => handleChange('gatesUsedArr', e.target.value)} placeholder="e.g., B05" />
       </div>
 
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="departureType">Departure Type</Label>
-        <Select value={formState.departureType} onValueChange={(value) => handleChange('departureType', value)}>
+        <Select value={formState.departureType || ''} onValueChange={(value) => handleChange('departureType', value)}>
           <SelectTrigger id="departureType">
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
@@ -219,7 +219,7 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
       </div>
       <div className="col-span-full md:col-span-1">
         <Label htmlFor="arrivalType">Arrival Type</Label>
-        <Select value={formState.arrivalType} onValueChange={(value) => handleChange('arrivalType', value)}>
+        <Select value={formState.arrivalType || ''} onValueChange={(value) => handleChange('arrivalType', value)}>
           <SelectTrigger id="arrivalType">
             <SelectValue placeholder="Select type" />
           </SelectTrigger>
@@ -233,7 +233,7 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
 
       <div className="col-span-full">
         <Label htmlFor="volantaTrackingLink">Volanta Tracking Link (Optional)</Label>
-        <Input id="volantaTrackingLink" type="url" value={formState.volantaTrackingLink} onChange={(e) => handleChange('volantaTrackingLink', e.target.value)} placeholder="e.g., https://volanta.app/flights/..." />
+        <Input id="volantaTrackingLink" type="url" value={formState.volantaTrackingLink || ''} onChange={(e) => handleChange('volantaTrackingLink', e.target.value)} placeholder="e.g., https://volanta.app/flights/..." />
       </div>
     </>
   );
