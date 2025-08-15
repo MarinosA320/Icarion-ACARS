@@ -214,30 +214,37 @@ const Logbook = () => {
       return;
     }
 
-    console.log('Logbook.tsx: Calling fetchSimbriefData with URL:', simbriefUrl);
-    const simbriefData = await fetchSimbriefData(simbriefUrl);
+    console.log('Logbook.tsx: Attempting to fetch SimBrief data for URL:', simbriefUrl);
+    try {
+      const simbriefData = await fetchSimbriefData(simbriefUrl);
+      console.log('Logbook.tsx: SimBrief data received:', simbriefData);
 
-    if (simbriefData) {
-      console.log('SimBrief data successfully retrieved:', simbriefData);
-      const airline = ALL_AIRLINES.find(a => a.name.toUpperCase().includes(simbriefData.airlineIcao))?.name || 'Icarion Virtual';
+      if (simbriefData) {
+        console.log('Logbook.tsx: SimBrief data successfully retrieved:', simbriefData);
+        const airline = ALL_AIRLINES.find(a => a.name.toUpperCase().includes(simbriefData.airlineIcao))?.name || 'Icarion Virtual';
 
-      const dataToPass = {
-        departureAirport: simbriefData.departureAirport,
-        arrivalAirport: simbriefData.arrivalAirport,
-        aircraftType: simbriefData.aircraftType,
-        flightNumber: simbriefData.flightNumber,
-        flightPlan: simbriefData.flightPlan,
-        etd: simbriefData.etd,
-        eta: simbriefData.eta,
-        aircraftRegistration: simbriefData.aircraftRegistration,
-        airlineName: airline,
-      };
-      console.log('Data prepared for LogFlight page from SimBrief:', dataToPass);
-      navigate('/log-flight', { state: { initialFlightData: dataToPass } });
-    } else {
-      console.log('SimBrief data retrieval failed. Specific error handled by fetchSimbriefData.');
+        const dataToPass = {
+          departureAirport: simbriefData.departureAirport,
+          arrivalAirport: simbriefData.arrivalAirport,
+          aircraftType: simbriefData.aircraftType,
+          flightNumber: simbriefData.flightNumber,
+          flightPlan: simbriefData.flightPlan,
+          etd: simbriefData.etd,
+          eta: simbriefData.eta,
+          aircraftRegistration: simbriefData.aircraftRegistration,
+          airlineName: airline,
+        };
+        console.log('Logbook.tsx: Data prepared for LogFlight page from SimBrief:', dataToPass);
+        navigate('/log-flight', { state: { initialFlightData: dataToPass } });
+      } else {
+        console.log('Logbook.tsx: SimBrief data retrieval failed or was empty. Error handled by fetchSimbriefData.');
+      }
+    } catch (error) {
+      console.error('Logbook.tsx: Error during SimBrief data fetching or processing:', error);
+      showError('An unexpected error occurred while processing SimBrief data.');
+    } finally {
+      setIsLoggingSimbriefFlight(false);
     }
-    setIsLoggingSimbriefFlight(false);
   };
 
   const handleResumeFlight = () => {
