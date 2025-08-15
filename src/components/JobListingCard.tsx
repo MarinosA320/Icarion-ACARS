@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator'; // Corrected this line
+import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import JobApplicationForm from '@/components/JobApplicationForm';
 import { showSuccess, showError } from '@/utils/toast';
@@ -36,6 +36,11 @@ interface JobListingCardProps {
 const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
   const [isApplicationDialogOpen, setIsApplicationDialogOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Add this useEffect to log the state
+  useEffect(() => {
+    console.log(`JobListingCard for "${job.title}" - isExpanded: ${isExpanded}`);
+  }, [isExpanded, job.title]);
 
   const handleApplicationSubmitted = () => {
     setIsApplicationDialogOpen(false);
