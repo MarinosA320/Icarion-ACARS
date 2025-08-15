@@ -68,7 +68,7 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
                 {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 overflow-hidden"> {/* Added overflow-hidden */}
+            <CollapsibleContent className="space-y-4 max-h-[400px] overflow-y-auto"> {/* Added max-h and overflow-y-auto */}
               {job.description && (
                 <div>
                   <h3 className="font-semibold mb-1">Description:</h3>
