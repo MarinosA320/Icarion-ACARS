@@ -2,12 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface InitialFlightData {
-  departureAirport?: string;
-  arrivalAirport?: string;
-  aircraftType?: string;
-  flightNumber?: string;
-  airlineName?: string;
-  aircraftRegistration?: string;
+  departureAirport?: string | null;
+  arrivalAirport?: string | null;
+  aircraftType?: string | null;
+  flightNumber?: string | null;
+  airlineName?: string | null;
+  aircraftRegistration?: string | null;
   etd?: string | null;
   eta?: string | null;
   flightPlan?: string | null;
@@ -72,7 +72,6 @@ export const useFlightForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const initialFlightData = location.state?.initialFlightData as InitialFlightData | undefined;
-  // Removed bookingId from here
 
   const [formState, setFormState] = useState<FlightFormState>(initialFormState);
   const [flightImage, setFlightImage] = useState<File | null>(null);
@@ -95,9 +94,8 @@ export const useFlightForm = () => {
     console.log('useFlightForm: Initial flight data from location state:', initialFlightData);
 
     // Merge with initialFlightData if present, giving initialFlightData precedence
-    // Ensure all values are strings to prevent issues with input components
-    const dataToApply = {
-      ...loadedData,
+    // Ensure all values are explicitly strings to prevent issues with input components
+    const dataToApply: FlightFormState = {
       departureAirport: initialFlightData?.departureAirport || loadedData.departureAirport || '',
       arrivalAirport: initialFlightData?.arrivalAirport || loadedData.arrivalAirport || '',
       selectedAircraftType: initialFlightData?.aircraftType || loadedData.selectedAircraftType || '',
@@ -108,7 +106,8 @@ export const useFlightForm = () => {
       eta: initialFlightData?.eta || loadedData.eta || '',
       flightPlan: initialFlightData?.flightPlan || loadedData.flightPlan || '',
       flightTime: initialFlightData?.flightTime || loadedData.flightTime || '',
-      // Ensure other fields from loadedData are also handled defensively
+      
+      // Ensure all other fields from initialFormState are also explicitly handled
       pilotRole: loadedData.pilotRole || initialFormState.pilotRole,
       atd: loadedData.atd || initialFormState.atd,
       ata: loadedData.ata || initialFormState.ata,
@@ -125,13 +124,13 @@ export const useFlightForm = () => {
       volantaTrackingLink: loadedData.volantaTrackingLink || initialFormState.volantaTrackingLink,
     };
 
-    console.log('useFlightForm: Merged data to apply to formState:', dataToApply);
+    console.log('useFlightForm: Final merged data to apply to formState:', dataToApply);
 
-    setFormState(dataToApply as FlightFormState); // Cast to ensure type compatibility
+    setFormState(dataToApply);
     setFlightImage(null); // Image cannot be persisted via localStorage
 
     // Clear initialFlightData from location state after use to prevent re-applying on subsequent renders
-    if (initialFlightData) { // Removed bookingId from condition
+    if (initialFlightData) {
       console.log('useFlightForm: Clearing initialFlightData from location state.');
       navigate(location.pathname, { replace: true, state: {} });
     }
@@ -159,7 +158,6 @@ export const useFlightForm = () => {
   return {
     formState,
     flightImage,
-    // Removed bookingId from return
     handleChange,
     handleImageChange,
     clearForm,

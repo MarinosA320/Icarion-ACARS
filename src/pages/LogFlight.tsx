@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { showSuccess, showError } from '@/utils/toast';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton component
 
 import { useFlightForm } from '@/hooks/use-flight-form';
 import { useUserProfileAndAircraftData } from '@/hooks/use-user-profile-aircraft-data';
@@ -17,7 +18,7 @@ import FlightActionButtons from '@/components/log-flight/FlightActionButtons';
 
 const LogFlight = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const [loadingSubmission, setLoadingSubmission] = useState(false); // Renamed to avoid conflict with userProfile loading
 
   const {
     formState,
@@ -31,20 +32,32 @@ const LogFlight = () => {
     userProfile,
     filteredAircraftTypes,
     aircraftRegistrations,
-    availableAirlines, // Get availableAirlines from the hook
+    availableAirlines,
   } = useUserProfileAndAircraftData(
     formState.selectedAirline,
     formState.selectedAircraftType,
   );
 
+  // State to manage loading of userProfile data
+  const [loadingProfile, setLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    // userProfile will be null initially, then populated by useUserProfileAndAircraftData
+    // We consider profile loaded once userProfile is not null
+    if (userProfile !== null) {
+      setLoadingProfile(false);
+    }
+  }, [userProfile]);
+
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    setLoadingSubmission(true);
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       showError('User not logged in.');
-      setLoading(false);
+      setLoadingSubmission(false);
       return;
     }
 
@@ -53,7 +66,7 @@ const LogFlight = () => {
       const isAirlineAuthorized = availableAirlines.some(airline => airline.name === formState.selectedAirline);
       if (!isAirlineAuthorized) {
         showError(`You are not authorized to fly for ${formState.selectedAirline}. Please select an authorized airline.`);
-        setLoading(false);
+        setLoadingSubmission(false);
         return;
       }
     }
@@ -66,17 +79,17 @@ const LogFlight = () => {
 
       if (!meetsRank) {
         showError(`Your current rank (${userProfile.rank}) is not sufficient for the ${formState.selectedAircraftType}. Required: ${requiredRank}.`);
-        setLoading(false);
+        setLoadingSubmission(false);
         return;
       }
       if (!meetsTypeRating) {
         showError(`You do not have the required type rating for the ${formState.selectedAircraftType} (${AIRCRAFT_FAMILIES[formState.selectedAircraftType] || 'N/A'} family).`);
-        setLoading(false);
+        setLoadingSubmission(false);
         return;
       }
     } else {
       showError('User profile data not loaded. Cannot validate aircraft selection.');
-      setLoading(false);
+      setLoadingSubmission(false);
       return;
     }
 
@@ -93,7 +106,7 @@ const LogFlight = () => {
 
       if (uploadError) {
         showError('Error uploading flight image: ' + uploadError.message);
-        setLoading(false);
+        setLoadingSubmission(false);
         return;
       }
 
@@ -136,7 +149,7 @@ const LogFlight = () => {
       clearForm();
       navigate('/logbook');
     }
-    setLoading(false);
+    setLoadingSubmission(false);
   };
 
   const fullName = userProfile ? `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() : '';
@@ -153,41 +166,54 @@ const LogFlight = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
-            <div className="col-span-full md:col-span-1">
-              <Label htmlFor="fullName">Full Name</Label>
-              <Input id="fullName" value={fullName} disabled className="bg-gray-100 dark:bg-gray-700" />
+          {loadingProfile ? (
+            <div className="space-y-4 py-4">
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-10 w-full" />
             </div>
-            <div className="col-span-full md:col-span-1">
-              <Label htmlFor="vatsimIvaoId">VATSIM/IVAO ID</Label>
-              <Input id="vatsimIvaoId" value={userProfile?.vatsim_ivao_id || 'N/A'} disabled className="bg-gray-100 dark:bg-gray-700" />
-            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 py-4">
+              <div className="col-span-full md:col-span-1">
+                <Label htmlFor="fullName">Full Name</Label>
+                <Input id="fullName" value={fullName} disabled className="bg-gray-100 dark:bg-gray-700" />
+              </div>
+              <div className="col-span-full md:col-span-1">
+                <Label htmlFor="vatsimIvaoId">VATSIM/IVAO ID</Label>
+                <Input id="vatsimIvaoId" value={userProfile?.vatsim_ivao_id || 'N/A'} disabled className="bg-gray-100 dark:bg-gray-700" />
+              </div>
 
-            <FlightDetailsForm
-              formState={formState}
-              userRank={userProfile?.rank || ''}
-              filteredAircraftTypes={filteredAircraftTypes}
-              aircraftRegistrations={aircraftRegistrations}
-              availableAirlines={availableAirlines} // Pass availableAirlines
-              handleChange={handleChange}
-              handleAircraftTypeChange={(value) => handleChange('selectedAircraftType', value)}
-              handleAirlineChange={(value) => handleChange('selectedAirline', value)}
-            />
+              <FlightDetailsForm
+                formState={formState}
+                userRank={userProfile?.rank || ''}
+                filteredAircraftTypes={filteredAircraftTypes}
+                aircraftRegistrations={aircraftRegistrations}
+                availableAirlines={availableAirlines}
+                handleChange={handleChange}
+                handleAircraftTypeChange={(value) => handleChange('selectedAircraftType', value)}
+                handleAirlineChange={(value) => handleChange('selectedAirline', value)}
+              />
 
-            <FlightPlanAndRemarks
-              flightPlan={formState.flightPlan}
-              remarks={formState.remarks}
-              handleChange={handleChange}
-            />
+              <FlightPlanAndRemarks
+                flightPlan={formState.flightPlan}
+                remarks={formState.remarks}
+                handleChange={handleChange}
+              />
 
-            <FlightImageUpload
-              handleImageChange={handleImageChange}
-            />
+              <FlightImageUpload
+                handleImageChange={handleImageChange}
+              />
 
-            <FlightActionButtons
-              loading={loading}
-            />
-          </form>
+              <FlightActionButtons
+                loading={loadingSubmission}
+              />
+            </form>
+          )}
         </CardContent>
       </Card>
     </div>
