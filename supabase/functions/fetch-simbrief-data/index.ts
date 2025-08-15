@@ -11,7 +11,10 @@ const formatSimbriefDateTime = (simbriefDate: string | undefined): string => {
   try {
     // Example: "06 Aug 2025 - 14:50"
     const parts = simbriefDate.split(' - ');
-    if (parts.length !== 2) return '';
+    if (parts.length !== 2) {
+      console.warn("formatSimbriefDateTime: Invalid date format received:", simbriefDate);
+      return '';
+    }
 
     const datePart = parts[0]; // "06 Aug 2025"
     const timePart = parts[1]; // "14:50"
@@ -23,7 +26,10 @@ const formatSimbriefDateTime = (simbriefDate: string | undefined): string => {
     };
     const month = monthMap[monthStr];
 
-    if (!month) return '';
+    if (!month) {
+      console.warn("formatSimbriefDateTime: Unrecognized month string:", monthStr);
+      return '';
+    }
 
     return `${year}-${month}-${day.padStart(2, '0')}T${timePart}`;
   } catch (e) {
@@ -43,15 +49,27 @@ serve(async (req) => {
     const { simbriefUrl } = await req.json();
 
     if (!simbriefUrl) {
+      console.error('Invalid input: simbriefUrl is required.');
       return new Response(JSON.stringify({ error: 'Invalid input: simbriefUrl is required.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       });
     }
 
-    const url = new URL(simbriefUrl);
+    let url: URL;
+    try {
+      url = new URL(simbriefUrl);
+    } catch (e) {
+      console.error('Invalid SimBrief URL format:', e);
+      return new Response(JSON.stringify({ error: 'Invalid SimBrief URL format.' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
+    
     const params = new URLSearchParams(url.search);
 
+    // Use defensive access with default empty strings
     const departure = params.get('orig')?.toUpperCase() || '';
     const arrival = params.get('dest')?.toUpperCase() || '';
     const aircraftType = params.get('basetype')?.toUpperCase() || '';
@@ -61,9 +79,6 @@ serve(async (req) => {
     const registration = params.get('reg')?.toUpperCase() || '';
     const airlineIcao = params.get('airline')?.toUpperCase() || '';
 
-    // SimBrief URL doesn't directly provide flight time in HH:MM or total minutes easily.
-    // For now, we'll leave it empty or derive it from ETD/ETA if available.
-    // The client-side can calculate it if both ETD and ETA are present.
     const etd = formatSimbriefDateTime(date);
     // ETA is not directly in the URL, so we'll leave it empty for now.
     // In a more advanced integration, you'd fetch the OFP XML for precise times.
