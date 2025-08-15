@@ -43,7 +43,7 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
 
   return (
     <Card className="flex flex-col bg-white dark:bg-gray-800">
-      <CardHeader className="flex-shrink-0"> {/* Removed fixed height h-[100px] */}
+      <CardHeader className="flex-shrink-0">
         <CardTitle className="text-xl">{job.title}</CardTitle>
         <CardDescription className={`font-semibold ${job.status === 'open' ? 'text-green-600' : 'text-red-600'}`}>
           Status: {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
@@ -68,7 +68,7 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
                 {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4">
+            <CollapsibleContent className="space-y-4 overflow-hidden"> {/* Added overflow-hidden */}
               {job.description && (
                 <div>
                   <h3 className="font-semibold mb-1">Description:</h3>
