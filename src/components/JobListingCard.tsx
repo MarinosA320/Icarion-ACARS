@@ -3,15 +3,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
-import JobApplicationForm from '@/components/JobApplicationForm'; // New import
-import { showSuccess, showError } from '@/utils/toast'; // Import toast for feedback
+import JobApplicationForm from '@/components/JobApplicationForm';
+import { showSuccess, showError } from '@/utils/toast';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'; // Import Collapsible components
+import { ChevronDown, ChevronUp } from 'lucide-react'; // Import icons for expand/collapse
 
 interface Question {
   id: string;
   questionText: string;
-  type: 'multiple-choice' | 'text'; // New field for question type
-  options?: string[]; // Optional for text questions
-  correctOptionIndex?: number; // This will not be displayed to the public
+  type: 'multiple-choice' | 'text';
+  options?: string[];
+  correctOptionIndex?: number;
 }
 
 interface JobOpening {
@@ -23,8 +25,8 @@ interface JobOpening {
   status: string;
   created_at: string;
   updated_at: string;
-  image_url: string | null; // Added image_url field
-  questions: Question[] | null; // Added questions field
+  image_url: string | null;
+  questions: Question[] | null;
 }
 
 interface JobListingCardProps {
@@ -33,15 +35,14 @@ interface JobListingCardProps {
 
 const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
   const [isApplicationDialogOpen, setIsApplicationDialogOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false); // State for collapsible content
 
   const handleApplicationSubmitted = () => {
-    // Optionally, you could refresh the job listings or show a different state
-    // For now, the toast message from JobApplicationForm is sufficient.
-    setIsApplicationDialogOpen(false); // Close dialog on successful submission
+    setIsApplicationDialogOpen(false);
   };
 
   return (
-    <Card className="flex flex-col bg-white dark:bg-gray-800"> {/* Changed to solid background */}
+    <Card className="flex flex-col bg-white dark:bg-gray-800">
       <CardHeader>
         <CardTitle className="text-xl">{job.title}</CardTitle>
         <CardDescription className={`font-semibold ${job.status === 'open' ? 'text-green-600' : 'text-red-600'}`}>
@@ -54,51 +55,68 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
             <img src={job.image_url} alt={job.title} className="w-full h-48 object-cover rounded-md" />
           </div>
         )}
-        <div>
-          <h3 className="font-semibold mb-1">Description:</h3>
-          <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{job.description}</p>
-        </div>
-        {job.requirements && (
-          <div>
-            <h3 className="font-semibold mb-1">Requirements:</h3>
-            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{job.requirements}</p>
-          </div>
-        )}
-        {job.responsibilities && (
-          <div>
-            <h3 className="font-semibold mb-1">Responsibilities:</h3>
-            <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{job.responsibilities}</p>
-          </div>
-        )}
 
-        {job.questions && job.questions.length > 0 && (
-          <div>
-            <Separator className="my-4" />
-            <h3 className="font-semibold mb-2">Application Questions Preview:</h3>
-            <div className="space-y-4">
-              {job.questions.map((question, qIndex) => (
-                <div key={question.id} className="border p-3 rounded-md bg-gray-50 dark:bg-gray-700">
-                  <p className="font-medium text-sm mb-2">{qIndex + 1}. {question.questionText}</p>
-                  {question.type === 'multiple-choice' && question.options && (
-                    <div className="space-y-1">
-                      {question.options.map((option, optIndex) => (
-                        <div key={optIndex} className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
-                          <input type="radio" id={`job-${job.id}-q${qIndex}-opt${optIndex}`} name={`job-${job.id}-q${qIndex}`} className="form-radio h-4 w-4 text-blue-600" disabled />
-                          <label htmlFor={`job-${job.id}-q${qIndex}-opt${optIndex}`}>{option}</label>
+        <Collapsible
+          open={isExpanded}
+          onOpenChange={setIsExpanded}
+          className="w-full space-y-2"
+        >
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" className="w-full justify-between px-4 py-2 text-sm font-medium text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT hover:bg-gray-100 dark:hover:bg-gray-700">
+              {isExpanded ? 'Hide Details' : 'Expand Details'}
+              {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-4">
+            {job.description && (
+              <div>
+                <h3 className="font-semibold mb-1">Description:</h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{job.description}</p>
+              </div>
+            )}
+            {job.requirements && (
+              <div>
+                <h3 className="font-semibold mb-1">Requirements:</h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{job.requirements}</p>
+              </div>
+            )}
+            {job.responsibilities && (
+              <div>
+                <h3 className="font-semibold mb-1">Responsibilities:</h3>
+                <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">{job.responsibilities}</p>
+              </div>
+            )}
+
+            {job.questions && job.questions.length > 0 && (
+              <div>
+                <Separator className="my-4" />
+                <h3 className="font-semibold mb-2">Application Questions Preview:</h3>
+                <div className="space-y-4">
+                  {job.questions.map((question, qIndex) => (
+                    <div key={question.id} className="border p-3 rounded-md bg-gray-50 dark:bg-gray-700">
+                      <p className="font-medium text-sm mb-2">{qIndex + 1}. {question.questionText}</p>
+                      {question.type === 'multiple-choice' && question.options && (
+                        <div className="space-y-1">
+                          {question.options.map((option, optIndex) => (
+                            <div key={optIndex} className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
+                              <input type="radio" id={`job-${job.id}-q${qIndex}-opt${optIndex}`} name={`job-${job.id}-q${qIndex}`} className="form-radio h-4 w-4 text-blue-600" disabled />
+                              <label htmlFor={`job-${job.id}-q${qIndex}-opt${optIndex}`}>{option}</label>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
+                      {question.type === 'text' && (
+                        <p className="text-sm text-gray-700 dark:text-gray-300 italic">
+                          (Text answer expected)
+                        </p>
+                      )}
                     </div>
-                  )}
-                  {question.type === 'text' && (
-                    <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-                      (Text answer expected)
-                    </p>
-                  )}
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
+              </div>
+            )}
+          </CollapsibleContent>
+        </Collapsible>
 
         {job.status === 'open' && (
           <>
