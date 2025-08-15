@@ -44,7 +44,7 @@ interface Flight {
     display_name: string | null;
     is_staff: boolean | null;
     vatsim_ivao_id: string | null;
-    rank: string | null; // Updated to allow null
+    rank: string | null;
   } | null;
 }
 
@@ -199,7 +199,7 @@ const Logbook = () => {
         eta: formattedEta,
         flightTime: formattedFlightTime,
       };
-      console.log('Data prepared for LogFlight page:', dataToPass);
+      console.log('Logbook.tsx: Data prepared for LogFlight page (VATSIM):', dataToPass);
       try {
         navigate('/log-flight', { state: { initialFlightData: dataToPass } });
       } catch (navError) {
@@ -227,7 +227,8 @@ const Logbook = () => {
 
       if (simbriefData) {
         console.log('Logbook.tsx: SimBrief data successfully retrieved:', simbriefData);
-        const airline = ALL_AIRLINES.find(a => a.name.toUpperCase().includes(simbriefData.airlineIcao))?.name || 'Icarion Virtual';
+        // Use the new icao_code for a more precise match
+        const airline = ALL_AIRLINES.find(a => a.icao_code === simbriefData.airlineIcao.toUpperCase())?.name || 'Icarion Virtual';
 
         const dataToPass = {
           departureAirport: simbriefData.departureAirport,
@@ -240,7 +241,7 @@ const Logbook = () => {
           aircraftRegistration: simbriefData.aircraftRegistration,
           airlineName: airline,
         };
-        console.log('Logbook.tsx: Data prepared for LogFlight page from SimBrief:', dataToPass);
+        console.log('Logbook.tsx: Data prepared for LogFlight page (SimBrief):', dataToPass);
         try {
           navigate('/log-flight', { state: { initialFlightData: dataToPass } });
         } catch (navError) {

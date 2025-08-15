@@ -79,6 +79,9 @@ export const useFlightForm = () => {
   // Load data from localStorage and initialFlightData on mount
   useEffect(() => {
     console.log('useFlightForm: useEffect triggered.');
+    console.log('useFlightForm: location.state at useEffect start:', location.state);
+    console.log('useFlightForm: initialFlightData at useEffect start:', initialFlightData);
+
     const savedFormData = localStorage.getItem('currentFlightForm');
     let loadedData: Partial<FlightFormState> = {};
     if (savedFormData) {
@@ -90,8 +93,6 @@ export const useFlightForm = () => {
         localStorage.removeItem('currentFlightForm'); // Clear corrupted data
       }
     }
-
-    console.log('useFlightForm: Initial flight data from location state:', initialFlightData);
 
     // Merge with initialFlightData if present, giving initialFlightData precedence
     // Ensure all values are explicitly strings to prevent issues with input components
