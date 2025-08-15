@@ -44,13 +44,13 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
   return (
     <Card className="flex flex-col bg-white dark:bg-gray-800">
       <CardHeader className="h-[100px] flex-shrink-0">
-        <CardTitle className="text-xl line-clamp-2">{job.title}</CardTitle>
+        <CardTitle className="text-xl">{job.title}</CardTitle> {/* Removed line-clamp-2 */}
         <CardDescription className={`font-semibold ${job.status === 'open' ? 'text-green-600' : 'text-red-600'}`}>
           Status: {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-grow flex flex-col justify-between space-y-4"> {/* Added flex-col and justify-between */}
-        <div> {/* Wrapper for image and collapsible content */}
+      <CardContent className="flex-grow flex flex-col justify-between space-y-4">
+        <div>
           {job.image_url && (
             <div className="mb-4">
               <img src={job.image_url} alt={job.title} className="w-full h-48 object-cover rounded-md" />
@@ -121,8 +121,8 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
         </div>
 
         {job.status === 'open' && (
-          <div className="mt-auto"> {/* Use mt-auto to push to bottom */}
-            <Separator className="my-4" />
+          <>
+            <Separator />
             <Dialog open={isApplicationDialogOpen} onOpenChange={setIsApplicationDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="w-full">Apply Now</Button>
@@ -141,13 +141,13 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
                 />
               </DialogContent>
             </Dialog>
-          </div>
+          </>
         )}
         {job.status === 'closed' && (
-          <div className="mt-auto"> {/* Use mt-auto to push to bottom */}
-            <Separator className="my-4" />
+          <>
+            <Separator />
             <Button className="w-full" disabled>Application Closed</Button>
-          </div>
+          </>
         )}
       </CardContent>
     </Card>
