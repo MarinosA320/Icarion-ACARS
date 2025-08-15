@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '@/components/ui/dialog'; // Added DialogFooter
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import JobApplicationForm from '@/components/JobApplicationForm';
 import { showSuccess, showError } from '@/utils/toast';
-import { ScrollArea } from '@/components/ui/scroll-area'; // Import ScrollArea for dialog content
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface Question {
   id: string;
@@ -34,7 +34,7 @@ interface JobListingCardProps {
 
 const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
   const [isApplicationDialogOpen, setIsApplicationDialogOpen] = useState(false);
-  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false); // New state for details dialog
+  const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
 
   const handleApplicationSubmitted = () => {
     setIsApplicationDialogOpen(false);
@@ -63,14 +63,14 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
                 View Details
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col overflow-hidden">
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col"> {/* Removed overflow-hidden */}
               <DialogHeader>
                 <DialogTitle>{job.title} Details</DialogTitle>
                 <DialogDescription>
                   Comprehensive information about this job opening.
                 </DialogDescription>
               </DialogHeader>
-              <ScrollArea className="flex-grow p-4 border rounded-md mt-4"> {/* Added ScrollArea here */}
+              <ScrollArea className="flex-grow p-4 border rounded-md mt-4">
                 <div className="space-y-4">
                   {job.description && (
                     <div>
