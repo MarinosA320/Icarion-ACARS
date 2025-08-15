@@ -73,7 +73,7 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
                 {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 max-h-[400px] overflow-y-auto bg-white dark:bg-gray-800">
+            <CollapsibleContent className="space-y-4 bg-white dark:bg-gray-800"> {/* Removed max-h-[400px] overflow-y-auto */}
               {job.description && (
                 <div>
                   <h3 className="font-semibold mb-1">Description:</h3>
@@ -105,7 +105,7 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
                           <div className="space-y-1">
                             {question.options.map((option, optIndex) => (
                               <div key={optIndex} className="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
-                                <input type="radio" id={`job-${job.id}-q${qIndex}-opt${optIndex}`} name={`job-${job.id}-q${qIndex}`} className="form-radio h-4 w-4 text-blue-600" disabled />
+                                <input type="radio" id={`job-${job.id}-q${qIndex}-opt${optIndex}`} name={`job-${job.id}-q${optIndex}`} className="form-radio h-4 w-4 text-blue-600" disabled />
                                 <label htmlFor={`job-${job.id}-q${qIndex}-opt${optIndex}`}>{option}</label>
                               </div>
                             ))}
