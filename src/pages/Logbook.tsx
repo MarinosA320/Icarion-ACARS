@@ -199,7 +199,12 @@ const Logbook = () => {
         flightTime: formattedFlightTime,
       };
       console.log('Data prepared for LogFlight page:', dataToPass);
-      navigate('/log-flight', { state: { initialFlightData: dataToPass } });
+      try {
+        navigate('/log-flight', { state: { initialFlightData: dataToPass } });
+      } catch (navError) {
+        console.error('Logbook.tsx: Error during navigation after VATSIM data:', navError);
+        showError('An error occurred while preparing the flight form. Please try again.');
+      }
     } else {
       console.log('VATSIM data retrieval failed or no flight plan found. Specific error handled by fetchVatsimPilotData.');
     }
@@ -235,7 +240,12 @@ const Logbook = () => {
           airlineName: airline,
         };
         console.log('Logbook.tsx: Data prepared for LogFlight page from SimBrief:', dataToPass);
-        navigate('/log-flight', { state: { initialFlightData: dataToPass } });
+        try {
+          navigate('/log-flight', { state: { initialFlightData: dataToPass } });
+        } catch (navError) {
+          console.error('Logbook.tsx: Error during navigation after SimBrief data:', navError);
+          showError('An error occurred while preparing the flight form. Please try again.');
+        }
       } else {
         console.log('Logbook.tsx: SimBrief data retrieval failed or was empty. Error handled by fetchSimbriefData.');
       }

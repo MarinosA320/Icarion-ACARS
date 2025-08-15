@@ -79,52 +79,60 @@ export const useFlightForm = () => {
 
   // Load data from localStorage and initialFlightData on mount
   useEffect(() => {
+    console.log('useFlightForm: useEffect triggered.');
     const savedFormData = localStorage.getItem('currentFlightForm');
     let loadedData: Partial<FlightFormState> = {};
     if (savedFormData) {
       try {
         loadedData = JSON.parse(savedFormData);
+        console.log('useFlightForm: Loaded data from localStorage:', loadedData);
       } catch (e) {
-        console.error("Failed to parse saved form data from localStorage", e);
+        console.error("useFlightForm: Failed to parse saved form data from localStorage", e);
         localStorage.removeItem('currentFlightForm'); // Clear corrupted data
       }
     }
 
-    // Merge with initialFlightData if present, giving initialFlightData precedence
-    const dataToApply = { ...loadedData, ...initialFlightData };
+    console.log('useFlightForm: Initial flight data from location state:', initialFlightData);
 
-    setFormState(prevState => ({
-      ...prevState,
-      departureAirport: dataToApply.departureAirport || prevState.departureAirport,
-      arrivalAirport: dataToApply.arrivalAirport || prevState.arrivalAirport,
-      selectedAircraftType: dataToApply.aircraftType || prevState.selectedAircraftType,
-      flightNumber: dataToApply.flightNumber || prevState.flightNumber,
-      selectedAirline: dataToApply.airlineName || prevState.selectedAirline,
-      selectedAircraftRegistration: dataToApply.aircraftRegistration || prevState.selectedAircraftRegistration,
-      etd: dataToApply.etd || prevState.etd,
-      eta: dataToApply.eta || prevState.eta,
-      flightPlan: dataToApply.flightPlan || prevState.flightPlan,
-      flightTime: dataToApply.flightTime || prevState.flightTime,
-      // Other fields from loadedData if they exist
-      pilotRole: loadedData.pilotRole || prevState.pilotRole,
-      atd: loadedData.atd || prevState.atd,
-      ata: loadedData.ata || prevState.ata,
-      flightRules: loadedData.flightRules || prevState.flightRules,
-      departureRunway: loadedData.departureRunway || prevState.departureRunway,
-      arrivalRunway: loadedData.arrivalRunway || prevState.arrivalRunway,
-      taxiwaysUsed: loadedData.taxiwaysUsed || prevState.taxiwaysUsed,
-      gatesUsedDep: loadedData.gatesUsedDep || prevState.gatesUsedDep,
-      gatesUsedArr: loadedData.gatesUsedArr || prevState.gatesUsedArr,
-      departureType: loadedData.departureType || prevState.departureType,
-      arrivalType: loadedData.arrivalType || prevState.arrivalType,
-      landingRate: loadedData.landingRate || prevState.landingRate,
-      remarks: loadedData.remarks || prevState.remarks,
-      volantaTrackingLink: loadedData.volantaTrackingLink || prevState.volantaTrackingLink,
-    }));
+    // Merge with initialFlightData if present, giving initialFlightData precedence
+    // Ensure all values are strings to prevent issues with input components
+    const dataToApply = {
+      ...loadedData,
+      departureAirport: initialFlightData?.departureAirport || loadedData.departureAirport || '',
+      arrivalAirport: initialFlightData?.arrivalAirport || loadedData.arrivalAirport || '',
+      selectedAircraftType: initialFlightData?.aircraftType || loadedData.selectedAircraftType || '',
+      flightNumber: initialFlightData?.flightNumber || loadedData.flightNumber || '',
+      selectedAirline: initialFlightData?.airlineName || loadedData.selectedAirline || 'Icarion Virtual',
+      selectedAircraftRegistration: initialFlightData?.aircraftRegistration || loadedData.selectedAircraftRegistration || '',
+      etd: initialFlightData?.etd || loadedData.etd || '',
+      eta: initialFlightData?.eta || loadedData.eta || '',
+      flightPlan: initialFlightData?.flightPlan || loadedData.flightPlan || '',
+      flightTime: initialFlightData?.flightTime || loadedData.flightTime || '',
+      // Ensure other fields from loadedData are also handled defensively
+      pilotRole: loadedData.pilotRole || initialFormState.pilotRole,
+      atd: loadedData.atd || initialFormState.atd,
+      ata: loadedData.ata || initialFormState.ata,
+      flightRules: loadedData.flightRules || initialFormState.flightRules,
+      departureRunway: loadedData.departureRunway || initialFormState.departureRunway,
+      arrivalRunway: loadedData.arrivalRunway || initialFormState.arrivalRunway,
+      taxiwaysUsed: loadedData.taxiwaysUsed || initialFormState.taxiwaysUsed,
+      gatesUsedDep: loadedData.gatesUsedDep || initialFormState.gatesUsedDep,
+      gatesUsedArr: loadedData.gatesUsedArr || initialFormState.gatesUsedArr,
+      departureType: loadedData.departureType || initialFormState.departureType,
+      arrivalType: loadedData.arrivalType || initialFormState.arrivalType,
+      landingRate: loadedData.landingRate || initialFormState.landingRate,
+      remarks: loadedData.remarks || initialFormState.remarks,
+      volantaTrackingLink: loadedData.volantaTrackingLink || initialFormState.volantaTrackingLink,
+    };
+
+    console.log('useFlightForm: Merged data to apply to formState:', dataToApply);
+
+    setFormState(dataToApply as FlightFormState); // Cast to ensure type compatibility
     setFlightImage(null); // Image cannot be persisted via localStorage
 
     // Clear initialFlightData from location state after use to prevent re-applying on subsequent renders
     if (initialFlightData) { // Removed bookingId from condition
+      console.log('useFlightForm: Clearing initialFlightData from location state.');
       navigate(location.pathname, { replace: true, state: {} });
     }
   }, [navigate, location.pathname, location.state, initialFlightData]);
