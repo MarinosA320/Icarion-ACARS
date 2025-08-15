@@ -214,14 +214,17 @@ const ProfileSettings = () => {
   };
 
   return (
-    <DynamicBackground images={profileSettingsBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
+    <div className="relative min-h-screen flex flex-col">
+      {/* Dynamic Background fixed to viewport */}
+      <DynamicBackground images={profileSettingsBackgroundImages} interval={10000} />
       {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="absolute inset-0 bg-black opacity-30"></div>
+      <div className="fixed inset-0 bg-black opacity-30 z-0"></div>
       
-      <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
+      {/* Content container, scrollable */}
+      <div className="relative z-10 w-full max-w-5xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Profile Settings</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full"> {/* Added w-full here */}
           {/* Profile Information Card */}
           <Card className="col-span-1 shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
             <CardHeader>
@@ -430,7 +433,7 @@ const ProfileSettings = () => {
           </Card>
         </div>
       </div>
-    </DynamicBackground>
+    </div>
   );
 };
 

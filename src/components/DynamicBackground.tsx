@@ -3,14 +3,12 @@ import React, { useState, useEffect } from 'react';
 interface DynamicBackgroundProps {
   images: string[];
   interval?: number; // Interval in milliseconds to change images
-  children: React.ReactNode;
-  className?: string;
+  className?: string; // Additional classes for the background container
 }
 
 const DynamicBackground: React.FC<DynamicBackgroundProps> = ({
   images,
   interval = 8000, // Default to 8 seconds
-  children,
   className,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -34,11 +32,11 @@ const DynamicBackground: React.FC<DynamicBackgroundProps> = ({
   }, [images, interval]);
 
   if (images.length === 0) {
-    return <div className={className}>{children}</div>;
+    return null; // Render nothing if no images are provided
   }
 
   return (
-    <div className={`relative w-full h-full overflow-hidden ${className}`}>
+    <div className={`fixed inset-0 z-0 overflow-hidden ${className}`}>
       {images.map((image, index) => (
         <div
           key={image}
@@ -51,7 +49,6 @@ const DynamicBackground: React.FC<DynamicBackgroundProps> = ({
           }}
         />
       ))}
-      {children}
     </div>
   );
 };

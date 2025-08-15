@@ -9,17 +9,20 @@ const contactBackgroundImages = [
 
 const Contact = () => {
   return (
-    <DynamicBackground images={contactBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
+    <div className="relative min-h-screen flex flex-col">
+      {/* Dynamic Background fixed to viewport */}
+      <DynamicBackground images={contactBackgroundImages} interval={10000} />
       {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="absolute inset-0 bg-black opacity-30"></div>
+      <div className="fixed inset-0 bg-black opacity-30 z-0"></div>
       
-      <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
+      {/* Content container, scrollable */}
+      <div className="relative z-10 w-full max-w-5xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Contact & Support</h1>
         <p className="text-lg text-center text-gray-600 dark:text-gray-400 mb-8">
           Have questions, need support, or want to connect? Reach out to us through the channels below.
         </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full"> {/* Added w-full here */}
           {/* General Inquiries Card */}
           <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50 text-gray-900 dark:text-white">
             <CardHeader>
@@ -72,7 +75,7 @@ const Contact = () => {
           </Card>
         </div>
       </div>
-    </DynamicBackground>
+    </div>
   );
 };
 

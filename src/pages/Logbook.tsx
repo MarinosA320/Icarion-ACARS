@@ -274,14 +274,17 @@ const Logbook = () => {
   console.log('Logbook component rendering. Loading state:', loading);
 
   return (
-    <DynamicBackground images={logbookBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
+    <div className="relative min-h-screen flex flex-col">
+      {/* Dynamic Background fixed to viewport */}
+      <DynamicBackground images={logbookBackgroundImages} interval={10000} />
       {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="absolute inset-0 bg-black opacity-30"></div> {/* Adjusted opacity */}
+      <div className="fixed inset-0 bg-black opacity-30 z-0"></div>
       
-      <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
+      {/* Content container, scrollable */}
+      <div className="relative z-10 w-full max-w-5xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Flight Logbook</h1>
 
-        <div className="mb-8 text-center space-y-4">
+        <div className="mb-8 text-center space-y-4 w-full"> {/* Added w-full here */}
           <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
             <Button onClick={handleLogVatsimFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingVatsimFlight}>
               {isLoggingVatsimFlight ? 'Checking VATSIM...' : 'Log Active VATSIM Flight'}
@@ -352,7 +355,7 @@ const Logbook = () => {
           </div>
         )}
       </div>
-    </DynamicBackground>
+    </div>
   );
 };
 

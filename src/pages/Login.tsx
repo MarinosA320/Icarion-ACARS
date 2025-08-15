@@ -34,11 +34,14 @@ export default function Login() {
   }, [navigate]);
 
   return (
-    <DynamicBackground images={loginBackgroundImages} interval={10000} className="min-h-screen flex items-center justify-center p-4">
+    <div className="relative min-h-screen flex items-center justify-center p-4">
+      {/* Dynamic Background fixed to viewport */}
+      <DynamicBackground images={loginBackgroundImages} interval={10000} />
       {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="absolute inset-0 bg-black opacity-50"></div>
+      <div className="fixed inset-0 bg-black opacity-50 z-0"></div>
       
-      <div className="relative z-10 w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md"> {/* Changed max-w-sm to max-w-md */}
+      {/* Content container, centered and scrollable if needed */}
+      <div className="relative z-10 w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md overflow-y-auto max-h-[95vh]"> {/* Changed max-w-sm to max-w-md */}
         <h2 className="text-2xl font-bold text-center mb-6 text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT">
           Welcome to <span className="font-cinzel-decorative">Icarion</span> Virtual Airline
         </h2>
@@ -259,6 +262,6 @@ export default function Login() {
         </div>
       </div>
       <PolicyDialog isOpen={isPolicyDialogOpen} onClose={() => setIsPolicyDialogOpen(false)} />
-    </DynamicBackground>
+    </div>
   );
 }

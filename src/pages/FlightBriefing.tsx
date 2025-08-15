@@ -99,11 +99,14 @@ const FlightBriefing = () => {
   );
 
   return (
-    <DynamicBackground images={flightBriefingBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-center p-4 pt-24">
+    <div className="relative min-h-screen flex flex-col">
+      {/* Dynamic Background fixed to viewport */}
+      <DynamicBackground images={flightBriefingBackgroundImages} interval={10000} />
       {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="absolute inset-0 bg-black opacity-50"></div>
+      <div className="fixed inset-0 bg-black opacity-50 z-0"></div>
       
-      <div className="relative z-10 w-full max-w-5xl mx-auto text-white">
+      {/* Content container, scrollable */}
+      <div className="relative z-10 w-full max-w-5xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-8 text-center">Flight Briefing</h1>
 
         <Card className="max-w-3xl mx-auto mb-8 shadow-md rounded-lg bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white">
@@ -153,7 +156,7 @@ const FlightBriefing = () => {
         {loading && (departureIcao || arrivalIcao) ? (
           renderBriefingSkeletons()
         ) : (depNotams.length > 0 || arrNotams.length > 0) && (
-          <div className="space-y-8">
+          <div className="space-y-8 w-full"> {/* Added w-full here */}
             <h2 className="text-2xl font-bold text-center">Detailed Briefing</h2>
 
             {/* Departure Airport Briefing */}
@@ -253,7 +256,7 @@ const FlightBriefing = () => {
                   <li>Your flight simulator's built-in chart viewer (if available).</li>
                   <li>Subscription services like Navigraph, Jeppesen, or ForeFlight.</li>
                   <li>Some countries provide free public access to their AIPs (e.g., <a href="https://www.ead.eurocontrol.int/cms/ead-public/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">Eurocontrol EAD (requires registration)</a> for Europe, or national aviation authority websites).</li>
-                </ul>
+                  </ul>
               </CardContent>
             </Card>
 
@@ -288,7 +291,7 @@ const FlightBriefing = () => {
           </div>
         )}
       </div>
-    </DynamicBackground>
+    </div>
   );
 };
 

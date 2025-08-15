@@ -59,31 +59,34 @@ const Careers = () => {
   );
 
   return (
-    <DynamicBackground images={careersBackgroundImages} interval={10000} className="min-h-screen flex flex-col items-center justify-start p-4 pt-24">
+    <div className="relative min-h-screen flex flex-col">
+      {/* Dynamic Background fixed to viewport */}
+      <DynamicBackground images={careersBackgroundImages} interval={10000} />
       {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="absolute inset-0 bg-black opacity-15"></div>
+      <div className="fixed inset-0 bg-black opacity-15 z-0"></div>
       
-      <div className="relative z-10 w-full max-w-5xl mx-auto text-white pt-80">
+      {/* Content container, scrollable */}
+      <div className="relative z-10 w-full max-w-5xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Careers at <span className="font-cinzel-decorative">Icarion</span> VA</h1>
         <p className="text-lg text-center text-gray-600 dark:text-gray-400 mb-8">
           Join our team and help us build the future of virtual aviation!
         </p>
 
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 w-full">
             {renderSkeletons()}
           </div>
         ) : jobOpenings.length === 0 ? (
           <p className="text-center text-gray-600 dark:text-gray-400">No job openings available at the moment. Please check back later!</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 w-full">
             {jobOpenings.map((job) => (
               <JobListingCard key={job.id} job={job} />
             ))}
           </div>
         )}
       </div>
-    </DynamicBackground>
+    </div>
   );
 };
 
