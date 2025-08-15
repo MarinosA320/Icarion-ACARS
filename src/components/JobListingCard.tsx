@@ -43,8 +43,8 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
 
   return (
     <Card className="flex flex-col bg-white dark:bg-gray-800">
-      <CardHeader className="h-[100px] flex-shrink-0">
-        <CardTitle className="text-xl">{job.title}</CardTitle> {/* Removed line-clamp-2 */}
+      <CardHeader className="flex-shrink-0"> {/* Removed fixed height h-[100px] */}
+        <CardTitle className="text-xl">{job.title}</CardTitle>
         <CardDescription className={`font-semibold ${job.status === 'open' ? 'text-green-600' : 'text-red-600'}`}>
           Status: {job.status.charAt(0).toUpperCase() + job.status.slice(1)}
         </CardDescription>
@@ -121,7 +121,7 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
         </div>
 
         {job.status === 'open' && (
-          <>
+          <div className="mt-auto">
             <Separator />
             <Dialog open={isApplicationDialogOpen} onOpenChange={setIsApplicationDialogOpen}>
               <DialogTrigger asChild>
@@ -141,13 +141,13 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
                 />
               </DialogContent>
             </Dialog>
-          </>
+          </div>
         )}
         {job.status === 'closed' && (
-          <>
+          <div className="mt-auto">
             <Separator />
             <Button className="w-full" disabled>Application Closed</Button>
-          </>
+          </div>
         )}
       </CardContent>
     </Card>
