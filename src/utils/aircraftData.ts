@@ -45,6 +45,83 @@ export const AIRCRAFT_MIN_RANKS: { [key: string]: string } = {
   'An-124': 'Captain', 'An-225': 'Captain', 'C-5': 'Captain', 'Il-76': 'Captain',
 };
 
+// Define aircraft families for type ratings
+export const AIRCRAFT_FAMILIES: { [key: string]: string } = {
+  'C172': 'Cessna 172 Series',
+  'DA40': 'Diamond DA40 Series',
+  'DH8D': 'De Havilland Canada Dash 8 Series',
+  'E190': 'Embraer E-Jet Family',
+  'ATR42': 'ATR 42/72 Series',
+  'ATR72': 'ATR 42/72 Series',
+  'CRJ100': 'Bombardier CRJ Series',
+  'CRJ200': 'Bombardier CRJ Series',
+  'ERJ135': 'Embraer ERJ Family',
+  'ERJ140': 'Embraer ERJ Family',
+  'ERJ145': 'Embraer ERJ Family',
+  'Saab340': 'Saab 340/2000 Series',
+  'Saab2000': 'Saab 340/2000 Series',
+  'Fokker50': 'Fokker 50/70/100 Series',
+  'EMB120': 'Embraer EMB 120 Brasilia',
+  'A220': 'Airbus A220 Family',
+  'A220-100': 'Airbus A220 Family',
+  'A220-300': 'Airbus A220 Family',
+  'A318': 'Airbus A320 Family',
+  'A319': 'Airbus A320 Family',
+  'B717': 'Boeing 717',
+  'B737': 'Boeing 737 Series',
+  'B737MAX': 'Boeing 737 MAX Series',
+  'E170': 'Embraer E-Jet Family',
+  'E175': 'Embraer E-Jet Family',
+  'E195': 'Embraer E-Jet Family',
+  'SSJ100': 'Sukhoi Superjet 100',
+  'A20N': 'Airbus A320neo Family',
+  'A21N': 'Airbus A320neo Family',
+  'A320': 'Airbus A320 Family',
+  'A321': 'Airbus A320 Family',
+  'B38M': 'Boeing 737 MAX Series',
+  'B738': 'Boeing 737 Series',
+  'B757': 'Boeing 757 Series',
+  'B752': 'Boeing 757 Series',
+  'CRJ700': 'Bombardier CRJ Series',
+  'CRJ900': 'Bombardier CRJ Series',
+  'CRJ1000': 'Bombardier CRJ Series',
+  'M90': 'McDonnell Douglas MD-90',
+  'A300': 'Airbus A300/A310 Series',
+  'A310': 'Airbus A300/A310 Series',
+  'A330': 'Airbus A330 Family',
+  'A340': 'Airbus A340 Family',
+  'A350': 'Airbus A350 Family',
+  'A380': 'Airbus A380',
+  'B707': 'Boeing 707',
+  'B727': 'Boeing 727',
+  'B747': 'Boeing 747 Series',
+  'B767': 'Boeing 767 Series',
+  'B777': 'Boeing 777 Series',
+  'B787': 'Boeing 787 Dreamliner',
+  'DC-10': 'McDonnell Douglas DC-10/MD-11 Series',
+  'MD-11': 'McDonnell Douglas DC-10/MD-11 Series',
+  'L-1011': 'Lockheed L-1011 TriStar',
+  'C919': 'COMAC C919',
+  'MC-21': 'Irkut MC-21',
+  'A321neo': 'Airbus A320neo Family',
+  'F100': 'Fokker 50/70/100 Series',
+  'B737-300F': 'Boeing 737 Series',
+  'B737-800BCF': 'Boeing 737 Series',
+  'B747-400F': 'Boeing 747 Series',
+  'B747-8F': 'Boeing 747 Series',
+  'B767-300F': 'Boeing 767 Series',
+  'B777F': 'Boeing 777 Series',
+  'A300F': 'Airbus A300/A310 Series',
+  'A310F': 'Airbus A300/A310 Series',
+  'A330F': 'Airbus A330 Family',
+  'DC-10F': 'McDonnell Douglas DC-10/MD-11 Series',
+  'MD-11F': 'McDonnell Douglas DC-10/MD-11 Series',
+  'An-124': 'Antonov An-124 Ruslan',
+  'An-225': 'Antonov An-225 Mriya',
+  'C-5': 'Lockheed C-5 Galaxy',
+  'Il-76': 'Ilyushin Il-76',
+};
+
 // Helper function to check if user's rank meets or exceeds required rank
 export const hasRequiredRank = (userRank: string, requiredRank: string): boolean => {
   return RANK_ORDER[userRank] >= RANK_ORDER[requiredRank];
@@ -57,13 +134,36 @@ export interface Aircraft {
 
 export interface Airline {
   name: string;
-  icao_code: string; // Added ICAO code
+  icao_code: string;
   bases: string[]; // ICAO codes of base airports
   fleet: Aircraft[];
 }
 
 // Helper to create a fleet from a list of types
 const createFleet = (types: string[]): Aircraft[] => types.map(type => ({ type, registrations: [] }));
+
+// Define ICARION_FLEET as it's used in ALL_AIRLINES
+export const ICARION_FLEET: Aircraft[] = [
+  { type: 'A320', registrations: ['G-ICAR', 'G-IONA'] },
+  { type: 'B737', registrations: ['G-ICB1', 'G-ICB2'] },
+  { type: 'A330', registrations: ['G-ICN1', 'G-ICN2'] },
+  { type: 'B787', registrations: ['G-ICD1', 'G-ICD2'] },
+  { type: 'C172', registrations: ['G-CESS'] },
+];
+
+// Helper function to check if user has the required type rating
+export const hasTypeRating = (userTypeRatings: string[] | null, aircraftType: string): boolean => {
+  if (!userTypeRatings || userTypeRatings.length === 0) {
+    // If user has no type ratings, they can only fly aircraft that don't require one (e.g., C172, DA40)
+    // If aircraft has no family defined, assume no type rating needed
+    return !AIRCRAFT_FAMILIES[aircraftType]; 
+  }
+  const requiredFamily = AIRCRAFT_FAMILIES[aircraftType];
+  if (!requiredFamily) {
+    return true; // No specific type rating required for this aircraft
+  }
+  return userTypeRatings.includes(requiredFamily);
+};
 
 export const ALL_AIRLINES: Airline[] = [
   { name: 'Icarion Virtual', icao_code: 'ICN', bases: ['LGIR', 'LGAV', 'LGTS', 'EDLW', 'LMML', 'EDDL', 'EDDH', 'LIPZ'], fleet: ICARION_FLEET },
