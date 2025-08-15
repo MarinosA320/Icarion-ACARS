@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Separator } desirous of
+import { Separator } from '@/components/ui/separator'; // Corrected this line
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import JobApplicationForm from '@/components/JobApplicationForm';
 import { showSuccess, showError } from '@/utils/toast';
@@ -42,7 +42,7 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
   };
 
   return (
-    <Card className="flex flex-col bg-white dark:bg-gray-800 overflow-hidden"> {/* Added overflow-hidden */}
+    <Card className="flex flex-col bg-white dark:bg-gray-800 overflow-hidden">
       <CardHeader className="flex-shrink-0">
         <CardTitle className="text-xl">{job.title}</CardTitle>
         <CardDescription className={`font-semibold ${job.status === 'open' ? 'text-green-600' : 'text-red-600'}`}>
@@ -68,7 +68,7 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
                 {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-4 max-h-[400px] overflow-y-auto bg-white dark:bg-gray-800"> {/* Added max-h, overflow-y-auto, and background */}
+            <CollapsibleContent className="space-y-4 max-h-[400px] overflow-y-auto bg-white dark:bg-gray-800">
               {job.description && (
                 <div>
                   <h3 className="font-semibold mb-1">Description:</h3>
