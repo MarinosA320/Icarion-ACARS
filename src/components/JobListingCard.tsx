@@ -63,14 +63,14 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
                 View Details
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col"> {/* Removed overflow-hidden */}
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col overflow-y-auto"> {/* Added overflow-y-auto here */}
               <DialogHeader>
                 <DialogTitle>{job.title} Details</DialogTitle>
                 <DialogDescription>
                   Comprehensive information about this job opening.
                 </DialogDescription>
               </DialogHeader>
-              <ScrollArea className="flex-grow p-4 border rounded-md mt-4">
+              <ScrollArea className="p-4 border rounded-md mt-4"> {/* Removed flex-grow here */}
                 <div className="space-y-4">
                   {job.description && (
                     <div>
