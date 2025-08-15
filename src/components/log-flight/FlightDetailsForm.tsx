@@ -48,8 +48,8 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
   handleAircraftTypeChange,
   handleAirlineChange,
 }) => {
-  // Ensure availableAirlines is an array before using .find()
-  const currentAirline = (availableAirlines || []).find(a => a.name === formState.selectedAirline);
+  // Use availableAirlines directly for rendering options
+  const currentAirline = availableAirlines.find(a => a.name === formState.selectedAirline);
 
   return (
     <>
@@ -122,7 +122,7 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
           <Input
             id="aircraftRegistration"
             value={formState.selectedAircraftRegistration || ''}
-            onChange={(e) => handleChange('aircraftRegistration', e.target.value)}
+            onChange={(e) => handleChange('selectedAircraftRegistration', e.target.value)}
             placeholder="e.g., N123AB"
             required
             disabled={!formState.selectedAircraftType}
