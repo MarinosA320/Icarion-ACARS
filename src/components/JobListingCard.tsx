@@ -41,7 +41,7 @@ const JobListingCard: React.FC<JobListingCardProps> = ({ job }) => {
   };
 
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col bg-white dark:bg-gray-800"> {/* Changed to solid background */}
       <CardHeader>
         <CardTitle className="text-xl">{job.title}</CardTitle>
         <CardDescription className={`font-semibold ${job.status === 'open' ? 'text-green-600' : 'text-red-600'}`}>

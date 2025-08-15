@@ -63,10 +63,10 @@ const Careers = () => {
       {/* Dynamic Background fixed to viewport */}
       <DynamicBackground images={careersBackgroundImages} interval={10000} />
       {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="fixed inset-0 bg-black opacity-15 z-0"></div>
+      <div className="fixed inset-0 bg-black opacity-50 z-0"></div> {/* Increased opacity */}
       
       {/* Content container, scrollable */}
-      <div className="relative z-10 w-full max-w-5xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
+      <div className="relative z-10 w-full max-w-7xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto"> {/* Increased max-w */}
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Careers at <span className="font-cinzel-decorative">Icarion</span> VA</h1>
         <p className="text-lg text-center text-gray-600 dark:text-gray-400 mb-8">
           Join our team and help us build the future of virtual aviation!
