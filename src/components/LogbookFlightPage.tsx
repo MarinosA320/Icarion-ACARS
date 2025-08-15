@@ -32,6 +32,7 @@ interface Flight {
     display_name: string | null;
     is_staff: boolean | null;
     vatsim_ivao_id: string | null;
+    rank: string | null; // Updated to allow null
   } | null;
 }
 

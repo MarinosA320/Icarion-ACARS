@@ -8,11 +8,11 @@ import { Switch } from '@/components/ui/switch';
 import { useTheme } from 'next-themes';
 import { showSuccess, showError } from '@/utils/toast';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import CreateTrainingRequestForm from '@/components/CreateTrainingRequestForm'; // New import
-import { useTrainingRequestsManagement } from '@/hooks/useTrainingRequestsManagement'; // New import
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'; // New import for table
-import { format } from 'date-fns'; // New import for date formatting
-import DynamicBackground from '@/components/DynamicBackground'; // Import DynamicBackground
+import CreateTrainingRequestForm from '@/components/CreateTrainingRequestForm';
+import { useTrainingRequestsManagement } from '@/hooks/useTrainingRequestsManagement';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { format } from 'date-fns';
+import DynamicBackground from '@/components/DynamicBackground';
 
 interface Profile {
   id: string;
@@ -22,12 +22,12 @@ interface Profile {
   discord_username: string | null;
   vatsim_ivao_id: string | null;
   avatar_url: string | null;
-  type_ratings: string[] | null; // New field
-  rank: string; // Ensure rank is included
+  type_ratings: string[] | null;
+  rank: string | null; // Updated to allow null
 }
 
 interface Flight {
-  flight_time: string; // e.g., "02:30"
+  flight_time: string;
   landing_rate: number | null;
 }
 
@@ -45,7 +45,7 @@ const formatMinutesToHoursAndMinutes = (totalMinutes: number): string => {
 };
 
 const profileSettingsBackgroundImages = [
-  '/images/backgrounds/settingss.png', // Updated to use the new 'settingss.png' image
+  '/images/backgrounds/settingss.png',
 ];
 
 const ProfileSettings = () => {
@@ -65,7 +65,7 @@ const ProfileSettings = () => {
   const [averageLandingRate, setAverageLandingRate] = useState('N/A');
 
   const { theme, setTheme } = useTheme();
-  const { myTrainingRequests, fetchMyTrainingRequests } = useTrainingRequestsManagement(); // Use the new hook
+  const { myTrainingRequests, fetchMyTrainingRequests } = useTrainingRequestsManagement();
 
   const fetchProfileAndFlights = async () => {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -79,7 +79,7 @@ const ProfileSettings = () => {
       // Fetch profile data
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
-        .select('id, first_name, last_name, display_name, discord_username, vatsim_ivao_id, avatar_url, type_ratings, rank') // Added rank
+        .select('id, first_name, last_name, display_name, discord_username, vatsim_ivao_id, avatar_url, type_ratings, rank')
         .eq('id', user.id)
         .single();
 
@@ -132,8 +132,8 @@ const ProfileSettings = () => {
 
   useEffect(() => {
     fetchProfileAndFlights();
-    fetchMyTrainingRequests(); // Fetch user's training requests on mount
-  }, [fetchMyTrainingRequests]); // Add fetchMyTrainingRequests to dependencies
+    fetchMyTrainingRequests();
+  }, [fetchMyTrainingRequests]);
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,7 +151,7 @@ const ProfileSettings = () => {
       const filePath = `avatars/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
-        .from('avatars') // Changed to 'avatars' (with hyphen)
+        .from('avatars')
         .upload(filePath, avatarFile, { upsert: true });
 
       if (uploadError) {
@@ -159,7 +159,7 @@ const ProfileSettings = () => {
         return;
       }
 
-      const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath); // Changed to 'avatars' (with hyphen)
+      const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
       avatarUrl = publicUrlData.publicUrl;
     }
 
@@ -224,7 +224,7 @@ const ProfileSettings = () => {
       <div className="relative z-10 w-full max-w-5xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Profile Settings</h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full"> {/* Added w-full here */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {/* Profile Information Card */}
           <Card className="col-span-1 shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
             <CardHeader>
@@ -292,7 +292,7 @@ const ProfileSettings = () => {
                   <>
                     <div>
                       <Label>Your Current Rank</Label>
-                      <Input value={profile.rank} disabled className="bg-gray-100 dark:bg-gray-700" />
+                      <Input value={profile.rank || 'N/A'} disabled className="bg-gray-100 dark:bg-gray-700" />
                     </div>
                     <div>
                       <Label>Your Type Ratings</Label>

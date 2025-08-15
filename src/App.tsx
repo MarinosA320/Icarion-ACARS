@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "sonner"; // Removed 'toast' from here
-import { toast } from "sonner"; // Added direct import for 'toast' from 'sonner'
+import { Toaster as Sonner } from "sonner";
+import { toast } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
@@ -20,9 +20,13 @@ import Navbar from "./components/Navbar";
 import { supabase } from "./integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "next-themes";
-import ErrorBoundary from "./components/ErrorBoundary"; // New import
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const queryClient = new QueryClient();
+
+interface Profile {
+  rank: string | null; // Updated to allow null
+}
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
@@ -46,14 +50,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
       if (profileError) {
         console.error('Error fetching user profile for rank check:', profileError);
-        // Continue even if profile fetch fails, but don't show toast
       } else if (profileData?.rank === 'Visitor') {
         const hasSeenReminder = localStorage.getItem('hasSeenNewUserRatingReminder');
         if (!hasSeenReminder) {
           toast.info(
             "Welcome to Icarion VA! To begin your pilot career, request your initial type rating. For questions, reach out to staff on Discord!",
             {
-              duration: 10000, // Show for 10 seconds
+              duration: 10000,
               onDismiss: () => localStorage.setItem('hasSeenNewUserRatingReminder', 'true'),
               onAutoClose: () => localStorage.setItem('hasSeenNewUserRatingReminder', 'true'),
             }
@@ -68,7 +71,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!session && event === 'SIGNED_OUT') {
         navigate('/login');
-        // Clear the reminder flag if user signs out
         localStorage.removeItem('hasSeenNewUserRatingReminder');
       }
     });
@@ -138,7 +140,6 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-              {/* Removed /my-bookings route */}
               <Route
                 path="/announcements"
                 element={
@@ -153,7 +154,7 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Navbar />
-                    <ErrorBoundary> {/* Wrap LogFlight with ErrorBoundary */}
+                    <ErrorBoundary>
                       <LogFlight />
                     </ErrorBoundary>
                   </ProtectedRoute>
@@ -186,7 +187,6 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

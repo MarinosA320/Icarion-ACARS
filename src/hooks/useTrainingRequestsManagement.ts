@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
 import { fetchProfilesData } from '@/utils/supabaseDataFetch';
-import { sendNotification } from '@/utils/notificationService'; // New import
+import { sendNotification } from '@/utils/notificationService';
 
 export interface TrainingRequest {
   id: string;
@@ -25,7 +25,7 @@ export interface TrainingRequest {
     vatsim_ivao_id: string | null;
     avatar_url: string | null;
     is_staff: boolean | null;
-    rank: string | null;
+    rank: string | null; // Updated to allow null
   } | null;
   instructor_profile: {
     display_name: string | null;
@@ -110,14 +110,14 @@ export const useTrainingRequestsManagement = () => {
     const { error } = await supabase.from('training_requests').insert({
       ...newRequest,
       user_id: user.id,
-      status: 'Pending', // Default status
+      status: 'Pending',
     });
 
     if (error) {
       showError('Error submitting training request: ' + error.message);
     } else {
       showSuccess('Training request submitted successfully!');
-      fetchMyTrainingRequests(); // Refresh user's requests
+      fetchMyTrainingRequests();
     }
   }, [fetchMyTrainingRequests]);
 
@@ -148,8 +148,8 @@ export const useTrainingRequestsManagement = () => {
       showError('Error updating training request: ' + error.message);
     } else {
       showSuccess('Training request updated successfully!');
-      fetchAllTrainingRequests(); // Refresh all requests for staff view
-      fetchMyTrainingRequests(); // Refresh user's requests
+      fetchAllTrainingRequests();
+      fetchMyTrainingRequests();
 
       // Send notification if status is Approved
       if (updatedFields.status === 'Approved') {
@@ -179,8 +179,8 @@ export const useTrainingRequestsManagement = () => {
       showError('Error deleting training request: ' + error.message);
     } else {
       showSuccess('Training request deleted successfully!');
-      fetchAllTrainingRequests(); // Refresh all requests for staff view
-      fetchMyTrainingRequests(); // Refresh user's requests
+      fetchAllTrainingRequests();
+      fetchMyTrainingRequests();
     }
   }, [fetchAllTrainingRequests, fetchMyTrainingRequests]);
 

@@ -7,20 +7,20 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { format } from 'date-fns';
 import { showSuccess, showError } from '@/utils/toast';
-import UserDetailsDialog from '@/components/UserDetailsDialog'; // To view applicant details
+import UserDetailsDialog from '@/components/UserDetailsDialog';
 
 interface Question {
   id: string;
   questionText: string;
-  type: 'multiple-choice' | 'text'; // New field for question type
-  options?: string[]; // Optional for text questions
-  correctOptionIndex?: number; // Optional for text questions
+  type: 'multiple-choice' | 'text';
+  options?: string[];
+  correctOptionIndex?: number;
 }
 
 interface Answer {
   questionId: string;
   selectedOptionIndex?: number;
-  textAnswer?: string; // New field for text answers
+  textAnswer?: string;
 }
 
 interface JobApplication {
@@ -30,7 +30,7 @@ interface JobApplication {
   answers: Answer[] | null;
   status: string;
   created_at: string;
-  job_opening: { // Embedded job opening details
+  job_opening: {
     title: string;
     questions: Question[] | null;
   } | null;
@@ -43,7 +43,7 @@ interface JobApplication {
     vatsim_ivao_id: string | null;
     avatar_url: string | null;
     is_staff: boolean | null;
-    rank: string | null;
+    rank: string | null; // Updated to allow null
   } | null;
 }
 
@@ -93,7 +93,6 @@ const JobApplicationManagementTab: React.FC<JobApplicationManagementTabProps> = 
         return answer.selectedOptionIndex === question.correctOptionIndex ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold';
       }
     } else if (question.type === 'text') {
-      // For text answers, there's no "correct" or "incorrect" in the same way
       return 'text-gray-700 dark:text-gray-300';
     }
     return 'text-gray-700 dark:text-gray-300';

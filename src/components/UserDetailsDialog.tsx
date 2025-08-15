@@ -14,9 +14,9 @@ interface UserDetailsDialogProps {
     vatsim_ivao_id: string | null;
     avatar_url: string | null;
     is_staff: boolean;
-    rank: string;
+    rank: string | null; // Updated to allow null
     email?: string | null;
-    type_ratings?: string[] | null; // New field
+    type_ratings?: string[] | null;
   } | null;
 }
 
@@ -48,7 +48,7 @@ const UserDetailsDialog: React.FC<UserDetailsDialogProps> = ({ isOpen, onClose, 
           <div><span className="font-medium">Staff Member:</span> {user.is_staff ? 'Yes' : 'No'}</div>
           <div><span className="font-medium">Discord Username:</span> {user.discord_username || 'N/A'}</div>
           <div><span className="font-medium">VATSIM/IVAO ID:</span> {user.vatsim_ivao_id || 'N/A'}</div>
-          <div><span className="font-medium">Type Ratings:</span> {user.type_ratings && user.type_ratings.length > 0 ? user.type_ratings.join(', ') : 'None'}</div> {/* Display type ratings */}
+          <div><span className="font-medium">Type Ratings:</span> {user.type_ratings && user.type_ratings.length > 0 ? user.type_ratings.join(', ') : 'None'}</div>
         </div>
       </DialogContent>
     </Dialog>

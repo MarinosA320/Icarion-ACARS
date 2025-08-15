@@ -10,12 +10,12 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { format } from 'date-fns';
 import UserDetailsDialog from '@/components/UserDetailsDialog';
-import { TrainingRequest } from '@/hooks/useTrainingRequestsManagement'; // Import the interface
-import { Profile } from '@/hooks/useUsersManagement'; // Import Profile interface for staff members
+import { TrainingRequest } from '@/hooks/useTrainingRequestsManagement';
+import { Profile } from '@/hooks/useUsersManagement';
 
 interface TrainingRequestManagementTabProps {
   trainingRequests: TrainingRequest[];
-  staffMembers: Profile[]; // For assigning instructors
+  staffMembers: Profile[];
   handleUpdateTrainingRequest: (requestId: string, updatedFields: Partial<TrainingRequest>) => Promise<void>;
   handleDeleteTrainingRequest: (requestId: string) => Promise<void>;
   fetchTrainingRequests: () => Promise<void>;
@@ -50,13 +50,13 @@ const TrainingRequestManagementTab: React.FC<TrainingRequestManagementTabProps> 
     setLoading(true);
     const updatedFields: Partial<TrainingRequest> = {
       status: editStatus,
-      instructor_id: editInstructorId === '' ? null : editInstructorId, // Convert empty string back to null
+      instructor_id: editInstructorId === '' ? null : editInstructorId,
     };
 
     await handleUpdateTrainingRequest(selectedRequest.id, updatedFields);
     setLoading(false);
     setIsEditDialogOpen(false);
-    fetchTrainingRequests(); // Refresh the list
+    fetchTrainingRequests();
   };
 
   const handleViewUserDetails = (user: any) => {
@@ -75,7 +75,7 @@ const TrainingRequestManagementTab: React.FC<TrainingRequestManagementTabProps> 
           <TableHeader>
             <TableRow>
               <TableHead>Pilot</TableHead>
-              <TableHead>Category</TableHead> {/* New column */}
+              <TableHead>Category</TableHead>
               <TableHead>Desired Rank</TableHead>
               <TableHead>Aircraft Type</TableHead>
               <TableHead>Preferred Date</TableHead>
@@ -95,7 +95,7 @@ const TrainingRequestManagementTab: React.FC<TrainingRequestManagementTabProps> 
               trainingRequests.map((request) => (
                 <TableRow key={request.id}>
                   <TableCell>{request.user_profile?.display_name || 'N/A'}</TableCell>
-                  <TableCell>{request.training_category}</TableCell> {/* Display new field */}
+                  <TableCell>{request.training_category}</TableCell>
                   <TableCell>{request.desired_rank}</TableCell>
                   <TableCell>{request.aircraft_type}</TableCell>
                   <TableCell>{format(new Date(request.preferred_date_time), 'PPP p')}</TableCell>
@@ -123,7 +123,7 @@ const TrainingRequestManagementTab: React.FC<TrainingRequestManagementTabProps> 
                           <div><span className="font-medium">Discord:</span> {request.user_profile?.discord_username || 'N/A'}</div>
                           <div><span className="font-medium">VATSIM/IVAO ID:</span> {request.user_profile?.vatsim_ivao_id || 'N/A'}</div>
                           <div><span className="font-medium">Current Rank:</span> {request.user_profile?.rank || 'N/A'}</div>
-                          <div><span className="font-medium">Training Category:</span> {request.training_category}</div> {/* Display in dialog */}
+                          <div><span className="font-medium">Training Category:</span> {request.training_category}</div>
                           <div><span className="font-medium">Desired Rank:</span> {request.desired_rank}</div>
                           <div><span className="font-medium">Aircraft Type:</span> {request.aircraft_type}</div>
                           <div><span className="font-medium">Preferred Date/Time:</span> {format(new Date(request.preferred_date_time), 'PPP p')}</div>

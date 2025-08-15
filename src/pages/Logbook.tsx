@@ -12,7 +12,7 @@ import { fetchProfilesData } from '@/utils/supabaseDataFetch';
 import { Skeleton } from '@/components/ui/skeleton';
 import LogbookFlightPage from '@/components/LogbookFlightPage';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
-import DynamicBackground from '@/components/DynamicBackground'; // Import DynamicBackground
+import DynamicBackground from '@/components/DynamicBackground';
 
 interface Flight {
   id: string;
@@ -44,6 +44,7 @@ interface Flight {
     display_name: string | null;
     is_staff: boolean | null;
     vatsim_ivao_id: string | null;
+    rank: string | null; // Updated to allow null
   } | null;
 }
 
@@ -301,7 +302,7 @@ const Logbook = () => {
       <div className="relative z-10 w-full max-w-5xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
         <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Flight Logbook</h1>
 
-        <div className="mb-8 text-center space-y-4 w-full"> {/* Added w-full here */}
+        <div className="mb-8 text-center space-y-4 w-full">
           <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
             <Button onClick={handleLogVatsimFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingVatsimFlight}>
               {isLoggingVatsimFlight ? 'Checking VATSIM...' : 'Log Active VATSIM Flight'}
@@ -338,13 +339,13 @@ const Logbook = () => {
         {loading ? (
           renderSkeletons()
         ) : flights.length === 0 ? (
-          <div className="relative w-full max-w-3xl mx-auto bg-white/50 dark:bg-gray-800/50 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col items-center justify-center text-center"> {/* Adjusted opacity */}
+          <div className="relative w-full max-w-3xl mx-auto bg-white/50 dark:bg-gray-800/50 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col items-center justify-center text-center">
             <h2 className="text-2xl font-bold text-icarion-blue-DEFAULT dark:text-icarion-gold-DEFAULT mb-4">Your Pilot Logbook</h2>
             <p className="text-lg text-gray-600 dark:text-gray-400">No flights logged yet. Start your aviation journey!</p>
             <p className="text-sm text-muted-foreground mt-2">Use the buttons above to log your first flight.</p>
           </div>
         ) : (
-          <div className="relative w-full max-w-3xl mx-auto bg-white/50 dark:bg-gray-800/50 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col"> {/* Adjusted opacity */}
+          <div className="relative w-full max-w-3xl mx-auto bg-white/50 dark:bg-gray-800/50 border-l-8 border-icarion-blue-dark shadow-2xl rounded-lg p-8 min-h-[600px] flex flex-col">
             <TransitionGroup className="relative flex-grow overflow-hidden">
               <CSSTransition
                 key={currentPage}
