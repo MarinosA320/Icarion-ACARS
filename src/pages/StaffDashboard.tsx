@@ -9,6 +9,11 @@ import JobApplicationManagementTab from '@/components/staff/JobApplicationManage
 import TrainingRequestManagementTab from '@/components/staff/TrainingRequestManagementTab';
 import { useStaffDashboardData } from '@/hooks/use-staff-dashboard-data';
 import { Skeleton } from '@/components/ui/skeleton';
+import DynamicBackground from '@/components/DynamicBackground'; // Import DynamicBackground
+
+const staffDashboardBackgroundImages = [
+  '/images/backgrounds/crew.avif', // Using an existing image for the background
+];
 
 const StaffDashboard = () => {
   const {
@@ -94,75 +99,85 @@ const StaffDashboard = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 pt-24 bg-background">
-      <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Staff Dashboard</h1>
+    <div className="relative min-h-screen flex flex-col">
+      {/* Dynamic Background fixed to viewport */}
+      <DynamicBackground images={staffDashboardBackgroundImages} interval={10000} />
+      {/* Darker overlay on top of the image for better text contrast and depth */}
+      <div className="fixed inset-0 bg-black opacity-50 z-0"></div>
+      
+      {/* Content container, scrollable */}
+      <div className="relative z-10 w-full max-w-7xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
+        <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Staff Dashboard</h1>
 
-      <Tabs defaultValue="users" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
-          <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="logbook-entries">Logbook Entries</TabsTrigger>
-          {/* Removed Flight Bookings Tab */}
-          <TabsTrigger value="announcements">Announcements</TabsTrigger>
-          <TabsTrigger value="job-openings">Job Openings</TabsTrigger>
-          <TabsTrigger value="job-applications">Job Applications</TabsTrigger>
-          <TabsTrigger value="training-requests">Training Requests</TabsTrigger>
-        </TabsList>
+        <div className="w-full bg-white/80 dark:bg-gray-800/80 p-6 rounded-lg shadow-lg text-gray-900 dark:text-white">
+          <Tabs defaultValue="users" className="w-full" onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+              <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="logbook-entries">Logbook Entries</TabsTrigger>
+              {/* Removed Flight Bookings Tab */}
+              <TabsTrigger value="announcements">Announcements</TabsTrigger>
+              <TabsTrigger value="job-openings">Job Openings</TabsTrigger>
+              <TabsTrigger value="job-applications">Job Applications</TabsTrigger>
+              <TabsTrigger value="training-requests">Training Requests</TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="users" className="mt-6">
-          <UserManagementTab
-            users={users}
-            handleUserUpdate={handleUserUpdate}
-            isUserDetailsDialogOpen={isUserDetailsDialogOpen}
-            selectedUser={selectedUser}
-            setIsUserDetailsDialogOpen={setIsUserDetailsDialogOpen}
-            setSelectedUser={setSelectedUser}
-          />
-        </TabsContent>
+            <TabsContent value="users" className="mt-6">
+              <UserManagementTab
+                users={users}
+                handleUserUpdate={handleUserUpdate}
+                isUserDetailsDialogOpen={isUserDetailsDialogOpen}
+                selectedUser={selectedUser}
+                setIsUserDetailsDialogOpen={setIsUserDetailsDialogOpen}
+                setSelectedUser={setSelectedUser}
+              />
+            </TabsContent>
 
-        <TabsContent value="logbook-entries" className="mt-6">
-          <LogbookEntryManagementTab
-            flights={flights}
-            handleDeleteFlight={handleDeleteFlight}
-          />
-        </TabsContent>
+            <TabsContent value="logbook-entries" className="mt-6">
+              <LogbookEntryManagementTab
+                flights={flights}
+                handleDeleteFlight={handleDeleteFlight}
+              />
+            </TabsContent>
 
-        {/* Removed Flight Bookings Content */}
+            {/* Removed Flight Bookings Content */}
 
-        <TabsContent value="announcements" className="mt-6">
-          <p className="text-center text-gray-600 dark:text-gray-400">
-            Announcement management has been moved to the <a href="/announcements" className="text-blue-500 hover:underline">Announcements page</a>.
-          </p>
-        </TabsContent>
+            <TabsContent value="announcements" className="mt-6">
+              <p className="text-center text-gray-600 dark:text-gray-400">
+                Announcement management has been moved to the <a href="/announcements" className="text-blue-500 hover:underline">Announcements page</a>.
+              </p>
+            </TabsContent>
 
-        <TabsContent value="job-openings" className="mt-6">
-          <CreateJobOpeningForm onJobPosted={fetchJobOpenings} />
-          <JobOpeningManagementTab
-            jobOpenings={jobOpenings}
-            handleUpdateJobOpening={handleUpdateJobOpening}
-            handleDeleteJobOpening={handleDeleteJobOpening}
-            fetchJobOpenings={fetchJobOpenings}
-          />
-        </TabsContent>
+            <TabsContent value="job-openings" className="mt-6">
+              <CreateJobOpeningForm onJobPosted={fetchJobOpenings} />
+              <JobOpeningManagementTab
+                jobOpenings={jobOpenings}
+                handleUpdateJobOpening={handleUpdateJobOpening}
+                handleDeleteJobOpening={handleDeleteJobOpening}
+                fetchJobOpenings={fetchJobOpenings}
+              />
+            </TabsContent>
 
-        <TabsContent value="job-applications" className="mt-6">
-          <JobApplicationManagementTab
-            jobApplications={jobApplications}
-            handleUpdateApplicationStatus={handleUpdateApplicationStatus}
-            handleDeleteApplication={handleDeleteApplication}
-            fetchJobApplications={fetchJobApplications}
-          />
-        </TabsContent>
+            <TabsContent value="job-applications" className="mt-6">
+              <JobApplicationManagementTab
+                jobApplications={jobApplications}
+                handleUpdateApplicationStatus={handleUpdateApplicationStatus}
+                handleDeleteApplication={handleDeleteApplication}
+                fetchJobApplications={fetchJobApplications}
+              />
+            </TabsContent>
 
-        <TabsContent value="training-requests" className="mt-6">
-          <TrainingRequestManagementTab
-            trainingRequests={trainingRequests}
-            staffMembers={staffMembers}
-            handleUpdateTrainingRequest={handleUpdateTrainingRequest}
-            handleDeleteTrainingRequest={handleDeleteTrainingRequest}
-            fetchTrainingRequests={fetchAllTrainingRequests}
-          />
-        </TabsContent>
-      </Tabs>
+            <TabsContent value="training-requests" className="mt-6">
+              <TrainingRequestManagementTab
+                trainingRequests={trainingRequests}
+                staffMembers={staffMembers}
+                handleUpdateTrainingRequest={handleUpdateTrainingRequest}
+                handleDeleteTrainingRequest={handleDeleteTrainingRequest}
+                fetchTrainingRequests={fetchAllTrainingRequests}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
 
       {selectedUser && (
         <UserDetailsDialog
