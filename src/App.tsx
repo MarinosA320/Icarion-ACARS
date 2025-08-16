@@ -136,7 +136,9 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Navbar />
-                    <StaffDashboard />
+                    <ErrorBoundary> {/* Added ErrorBoundary here */}
+                      <StaffDashboard />
+                    </ErrorBoundary>
                   </ProtectedRoute>
                 }
               />
