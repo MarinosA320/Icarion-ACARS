@@ -9,11 +9,7 @@ import JobApplicationManagementTab from '@/components/staff/JobApplicationManage
 import TrainingRequestManagementTab from '@/components/staff/TrainingRequestManagementTab';
 import { useStaffDashboardData } from '@/hooks/use-staff-dashboard-data';
 import { Skeleton } from '@/components/ui/skeleton';
-import DynamicBackground from '@/components/DynamicBackground'; // Import DynamicBackground
-
-const staffDashboardBackgroundImages = [
-  '/images/backgrounds/crew.avif', // Using an existing image for the background
-];
+// Removed DynamicBackground import
 
 const StaffDashboard = () => {
   const {
@@ -77,7 +73,7 @@ const StaffDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <div className="text-center space-y-4">
           <Skeleton className="h-10 w-64 mx-auto" />
           <Skeleton className="h-6 w-96 mx-auto" />
@@ -89,7 +85,7 @@ const StaffDashboard = () => {
 
   if (!currentUserIsStaff) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4 text-red-600">Access Denied</h1>
           <p className="text-xl text-gray-600 dark:text-gray-400">You do not have permission to view this page.</p>
@@ -99,17 +95,11 @@ const StaffDashboard = () => {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col">
-      {/* Dynamic Background fixed to viewport */}
-      <DynamicBackground images={staffDashboardBackgroundImages} interval={10000} />
-      {/* Darker overlay on top of the image for better text contrast and depth */}
-      <div className="fixed inset-0 bg-black opacity-50 z-0"></div>
-      
-      {/* Content container, scrollable */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Staff Dashboard</h1>
+    <div className="min-h-screen flex flex-col bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+      <div className="w-full max-w-7xl mx-auto flex-grow flex flex-col items-center justify-start p-4 pt-24">
+        <h1 className="text-3xl font-bold mb-8 text-center">Staff Dashboard</h1>
 
-        <div className="w-full bg-white/80 dark:bg-gray-800/80 p-6 rounded-lg shadow-lg text-gray-900 dark:text-white">
+        <div className="w-full bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
           <Tabs defaultValue="users" className="w-full" onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
               <TabsTrigger value="users">Users</TabsTrigger>
