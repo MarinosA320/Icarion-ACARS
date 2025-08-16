@@ -74,6 +74,7 @@ export const useUsersManagement = () => {
     users,
     staffMembers,
     fetchUsers,
+    fetchStaffMembers, // Added this line
     handleUserUpdate,
   };
 };
