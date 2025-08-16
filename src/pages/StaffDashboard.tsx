@@ -72,7 +72,7 @@ const StaffDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
           <Skeleton className="h-10 w-64 mx-auto" />
           <Skeleton className="h-6 w-96 mx-auto" />
@@ -84,7 +84,7 @@ const StaffDashboard = () => {
 
   if (!currentUserIsStaff) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4 text-red-600">Access Denied</h1>
           <p className="text-xl text-gray-600 dark:text-gray-400">You do not have permission to view this page.</p>
@@ -94,7 +94,7 @@ const StaffDashboard = () => {
   }
 
   return (
-    <div className="container mx-auto p-4 pt-24">
+    <div className="container mx-auto p-4 pt-24 bg-background">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Staff Dashboard</h1>
 
       <Tabs defaultValue="users" className="w-full" onValueChange={setActiveTab}>
