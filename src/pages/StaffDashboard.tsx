@@ -73,7 +73,7 @@ const StaffDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-900">
         <div className="text-center space-y-4">
           <Skeleton className="h-10 w-64 mx-auto" />
           <Skeleton className="h-6 w-96 mx-auto" />
@@ -85,21 +85,21 @@ const StaffDashboard = () => {
 
   if (!currentUserIsStaff) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 text-gray-900">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4 text-red-600">Access Denied</h1>
-          <p className="text-xl text-foreground">You do not have permission to view this page.</p>
+          <p className="text-xl text-gray-900">You do not have permission to view this page.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-gray-50 text-gray-900">
       <div className="w-full max-w-7xl mx-auto flex-grow flex flex-col items-center justify-start p-4 pt-24">
         <h1 className="text-3xl font-bold mb-8 text-center">Staff Dashboard</h1>
 
-        <div className="w-full bg-card text-card-foreground p-6 rounded-lg shadow-lg">
+        <div className="w-full bg-white p-6 rounded-lg shadow-lg">
           <Tabs defaultValue="users" className="w-full" onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
               <TabsTrigger value="users">Users</TabsTrigger>
@@ -132,7 +132,7 @@ const StaffDashboard = () => {
             {/* Removed Flight Bookings Content */}
 
             <TabsContent value="announcements" className="mt-6">
-              <p className="text-center text-muted-foreground">
+              <p className="text-center text-gray-600">
                 Announcement management has been moved to the <a href="/announcements" className="text-blue-500 hover:underline">Announcements page</a>.
               </p>
             </TabsContent>
