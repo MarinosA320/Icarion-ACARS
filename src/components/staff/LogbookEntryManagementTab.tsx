@@ -37,6 +37,7 @@ interface Flight {
     is_staff: boolean | null; // Changed to allow null
     email: string | null;
   } | null;
+  volanta_tracking_link: string | null; // Added volanta_tracking_link
 }
 
 interface LogbookEntryManagementTabProps {
@@ -118,6 +119,15 @@ const LogbookEntryManagementTab: React.FC<LogbookEntryManagementTabProps> = ({
                         <div><span className="font-medium">Arrival Gate:</span> {flight.gates_used_arr || 'N/A'}</div>
                         <div><span className="font-medium">Departure Type:</span> {flight.departure_type || 'N/A'}</div>
                         <div><span className="font-medium">Arrival Type:</span> {flight.arrival_type || 'N/A'}</div>
+
+                        {flight.volanta_tracking_link && (
+                          <div className="col-span-2 mt-4">
+                            <span className="font-medium">Volanta Tracking:</span>
+                            <a href={flight.volanta_tracking_link} target="_blank" rel="noopener noreferrer" className="block mt-2 text-blue-500 hover:underline truncate">
+                              {flight.volanta_tracking_link}
+                            </a>
+                          </div>
+                        )}
 
                         {flight.flight_image_url && (
                           <div className="col-span-2 mt-4">

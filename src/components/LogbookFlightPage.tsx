@@ -34,6 +34,7 @@ interface Flight {
     vatsim_ivao_id: string | null;
     rank: string | null; // Updated to allow null
   } | null;
+  volanta_tracking_link: string | null; // Added volanta_tracking_link
 }
 
 interface LogbookFlightPageProps {
@@ -90,6 +91,15 @@ const LogbookFlightPage: React.FC<LogbookFlightPageProps> = ({ flight, isStaff }
           <div><span className="font-medium">Departure Type:</span> {flight.departure_type || 'N/A'}</div>
           <div><span className="font-medium">Arrival Type:</span> {flight.arrival_type || 'N/A'}</div>
         </div>
+
+        {flight.volanta_tracking_link && (
+          <div className="mt-6">
+            <span className="font-medium">Volanta Tracking:</span>
+            <a href={flight.volanta_tracking_link} target="_blank" rel="noopener noreferrer" className="block mt-2 text-blue-500 hover:underline truncate">
+              {flight.volanta_tracking_link}
+            </a>
+          </div>
+        )}
 
         {flight.flight_image_url && (
           <div className="mt-6">
