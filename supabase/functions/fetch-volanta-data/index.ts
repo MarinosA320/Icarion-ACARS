@@ -41,7 +41,7 @@ serve(async (req) => {
     const { volantaUrl } = await req.json();
 
     if (!volantaUrl) {
-      console.error('Edge Function Error: Invalid input: volantaUrl is required.');
+      console.error('Invalid input: volantaUrl is required.');
       return new Response(JSON.stringify({ error: 'Invalid input: Volanta URL is required.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
@@ -52,14 +52,13 @@ serve(async (req) => {
     try {
       url = new URL(volantaUrl);
       if (!url.hostname.includes('volanta.app')) {
-        console.error('Edge Function Error: Invalid Volanta URL format provided:', volantaUrl);
         return new Response(JSON.stringify({ error: 'Invalid Volanta URL. Please provide a URL from fly.volanta.app.' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400,
         });
       }
     } catch (e) {
-      console.error('Edge Function Error: Invalid Volanta URL format:', e);
+      console.error('Invalid Volanta URL format:', e);
       return new Response(JSON.stringify({ error: 'Invalid Volanta URL format.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
@@ -71,11 +70,10 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Edge Function Error: Volanta page fetch failed with status: ${response.status}, statusText: ${response.statusText}, response: ${errorText}`);
-      // Return a more specific error message including the status from Volanta
-      return new Response(JSON.stringify({ error: `Failed to fetch Volanta flight data: ${response.status} ${response.statusText || ''}. This flight might be private or not exist.` }), {
+      console.error(`Edge Function: Volanta page fetch failed with status: ${response.status}, response: ${errorText}`);
+      return new Response(JSON.stringify({ error: `Failed to fetch Volanta flight data: ${response.status}` }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: response.status, // Pass through the original status code
+        status: response.status,
       });
     }
 
@@ -86,8 +84,8 @@ serve(async (req) => {
     const match = html.match(scriptTagRegex);
 
     if (!match || !match[1]) {
-      console.error('Edge Function Error: Could not find __NEXT_DATA__ script tag in Volanta page.');
-      return new Response(JSON.stringify({ error: 'Could not parse Volanta flight data. Page structure might have changed or it is not a public flight page.' }), {
+      console.error('Could not find __NEXT_DATA__ script tag in Volanta page.');
+      return new Response(JSON.stringify({ error: 'Could not parse Volanta flight data. Page structure might have changed.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       });
@@ -97,10 +95,10 @@ serve(async (req) => {
     const flightData = nextData?.props?.pageProps?.flight;
 
     if (!flightData) {
-      console.error('Edge Function Error: Flight data not found in __NEXT_DATA__:', nextData);
-      return new Response(JSON.stringify({ error: 'Flight data not found on the Volanta page. This flight might be private or not exist.' }), {
+      console.error('Flight data not found in __NEXT_DATA__:', nextData);
+      return new Response(JSON.stringify({ error: 'Flight data not found on the Volanta page.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 404, // Use 404 if data is specifically not found
+        status: 404,
       });
     }
 
@@ -135,15 +133,15 @@ serve(async (req) => {
       airlineIcao: airlineIcao || '', // Pass ICAO to map to full name on client
     };
 
-    console.log('Edge Function: Successfully parsed Volanta data:', responseData);
+    console.log('Edge Function: Parsed Volanta data:', responseData);
     return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
 
   } catch (error) {
-    console.error('Edge Function General Error:', error);
-    return new Response(JSON.stringify({ error: `An unexpected error occurred in the Edge Function: ${error.message}` }), {
+    console.error('Edge Function error:', error);
+    return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });
