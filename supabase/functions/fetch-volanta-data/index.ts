@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'; // Added to force redeployment
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -36,7 +36,7 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log('DYAD_LOG: Edge Function: fetch-volanta-data invoked.'); // Added for debugging
+  console.log('DYAD_LOG: Edge Function: fetch-volanta-data invoked.');
 
   try {
     const { volantaUrl } = await req.json();
@@ -68,7 +68,11 @@ serve(async (req) => {
     }
 
     console.log(`DYAD_LOG: Fetching Volanta page from: ${volantaUrl}`);
-    const response = await fetch(volantaUrl);
+    const response = await fetch(volantaUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -80,7 +84,7 @@ serve(async (req) => {
     }
 
     const html = await response.text();
-    console.log(`DYAD_LOG: Fetched HTML length: ${html.length}`); // Log HTML length, not full content
+    console.log(`DYAD_LOG: Fetched HTML length: ${html.length}`);
     
     // Extract the __NEXT_DATA__ JSON
     const scriptTagRegex = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/;
