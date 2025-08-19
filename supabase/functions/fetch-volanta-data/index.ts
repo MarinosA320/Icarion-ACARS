@@ -87,7 +87,6 @@ serve(async (req) => {
 
     const html = await response.text();
     console.log(`DYAD_LOG: Fetched HTML length: ${html.length}`);
-    console.log(`DYAD_LOG: First 500 chars of HTML: ${html.substring(0, 500)}`); // New log line
     
     // Extract the __NEXT_DATA__ JSON
     const scriptTagRegex = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/;
