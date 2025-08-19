@@ -46,6 +46,8 @@ interface Flight {
     vatsim_ivao_id: string | null;
     rank: string | null;
   } | null;
+  volanta_tracking_link: string | null;
+  flight_path_geojson: any | null; // Added for GeoJSON
 }
 
 // Helper to convert YYYYMMDDHHMM to YYYY-MM-DDTHH:MM for datetime-local input
@@ -120,7 +122,7 @@ const Logbook = () => {
 
     const { data, error } = await supabase
       .from('flights')
-      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at')
+      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at,volanta_tracking_link,flight_path_geojson') // Added flight_path_geojson
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -198,6 +200,7 @@ const Logbook = () => {
         etd: formattedEtd,
         eta: formattedEta,
         flightTime: formattedFlightTime,
+        // No flightPathGeoJSON from VATSIM data directly
       };
       console.log('Logbook.tsx: Data prepared for LogFlight page (VATSIM):', dataToPass);
       try {
@@ -240,6 +243,7 @@ const Logbook = () => {
           eta: simbriefData.eta,
           aircraftRegistration: simbriefData.aircraftRegistration,
           airlineName: airline,
+          // No flightPathGeoJSON from SimBrief data directly
         };
         console.log('Logbook.tsx: Data prepared for LogFlight page (SimBrief):', dataToPass);
         try {

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { format } from 'date-fns';
+import FlightPathMap from './FlightPathMap'; // Import the new map component
 
 interface Flight {
   id: string;
@@ -34,7 +35,8 @@ interface Flight {
     vatsim_ivao_id: string | null;
     rank: string | null; // Updated to allow null
   } | null;
-  volanta_tracking_link: string | null; // Added volanta_tracking_link
+  volanta_tracking_link: string | null;
+  flight_path_geojson: any | null; // Added for GeoJSON
 }
 
 interface LogbookFlightPageProps {
@@ -98,6 +100,13 @@ const LogbookFlightPage: React.FC<LogbookFlightPageProps> = ({ flight, isStaff }
             <a href={flight.volanta_tracking_link} target="_blank" rel="noopener noreferrer" className="block mt-2 text-blue-500 hover:underline truncate">
               {flight.volanta_tracking_link}
             </a>
+          </div>
+        )}
+
+        {flight.flight_path_geojson && (
+          <div className="mt-6">
+            <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">Flight Path</h3>
+            <FlightPathMap geoJsonData={flight.flight_path_geojson} />
           </div>
         )}
 

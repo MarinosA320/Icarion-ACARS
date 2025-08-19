@@ -6,6 +6,7 @@ import { showSuccess, showError } from '@/utils/toast';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton'; // Import Skeleton component
+import { Textarea } from '@/components/ui/textarea'; // Import Textarea
 
 import { useFlightForm } from '@/hooks/use-flight-form';
 import { useUserProfileAndAircraftData } from '@/hooks/use-user-profile-aircraft-data';
@@ -74,11 +75,11 @@ const LogFlight = () => {
     // Re-validate rank and type rating before logging
     if (userProfile) {
       const requiredRank = AIRCRAFT_MIN_RANKS[formState.selectedAircraftType];
-      const meetsRank = requiredRank ? hasRequiredRank(userProfile.rank, requiredRank) : true;
+      const meetsRank = requiredRank ? hasRequiredRank(userProfile.rank || 'Visitor', requiredRank) : true; // Default to 'Visitor' for rank check
       const meetsTypeRating = hasTypeRating(userProfile.type_ratings, formState.selectedAircraftType);
 
       if (!meetsRank) {
-        showError(`Your current rank (${userProfile.rank}) is not sufficient for the ${formState.selectedAircraftType}. Required: ${requiredRank}.`);
+        showError(`Your current rank (${userProfile.rank || 'N/A'}) is not sufficient for the ${formState.selectedAircraftType}. Required: ${requiredRank}.`);
         setLoadingSubmission(false);
         return;
       }
@@ -93,6 +94,22 @@ const LogFlight = () => {
       return;
     }
 
+    let parsedGeoJSON = null;
+    if (formState.flightPathGeoJSON) {
+      try {
+        parsedGeoJSON = JSON.parse(formState.flightPathGeoJSON);
+        // Basic validation for GeoJSON LineString structure
+        if (parsedGeoJSON.type !== 'LineString' || !Array.isArray(parsedGeoJSON.coordinates)) {
+          showError('Invalid GeoJSON format. Please provide a LineString object.');
+          setLoadingSubmission(false);
+          return;
+        }
+      } catch (e) {
+        showError('Invalid GeoJSON data. Please ensure it is valid JSON.');
+        setLoadingSubmission(false);
+        return;
+      }
+    }
 
     let flightImageUrl: string | null = null;
     if (flightImage) {
@@ -139,6 +156,7 @@ const LogFlight = () => {
       arrival_type: formState.arrivalType,
       remarks: formState.remarks || null,
       volanta_tracking_link: formState.volantaTrackingLink || null,
+      flight_path_geojson: parsedGeoJSON, // Save GeoJSON data
     });
 
     if (error) {
@@ -204,6 +222,21 @@ const LogFlight = () => {
                 remarks={formState.remarks}
                 handleChange={handleChange}
               />
+
+              <div className="col-span-full">
+                <Label htmlFor="flightPathGeoJSON">Flight Path (GeoJSON LineString - Optional)</Label>
+                <Textarea
+                  id="flightPathGeoJSON"
+                  value={formState.flightPathGeoJSON || ''}
+                  onChange={(e) => handleChange('flightPathGeoJSON', e.target.value)}
+                  placeholder='Paste GeoJSON LineString here, e.g., {"type":"LineString","coordinates":[[lng,lat],[lng,lat]]}'
+                  rows={6}
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  You can often export flight paths from tracking software (like Volanta) or flight planners in GeoJSON format.
+                  Ensure it's a LineString with coordinates in `[longitude, latitude]` format.
+                </p>
+              </div>
 
               <FlightImageUpload
                 handleImageChange={handleImageChange}

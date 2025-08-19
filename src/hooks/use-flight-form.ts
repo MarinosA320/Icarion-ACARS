@@ -12,6 +12,7 @@ interface InitialFlightData {
   eta?: string | null;
   flightPlan?: string | null;
   flightTime?: string | null;
+  flightPathGeoJSON?: any | null; // Added for GeoJSON
 }
 
 interface FlightFormState {
@@ -39,6 +40,7 @@ interface FlightFormState {
   landingRate: string;
   remarks: string;
   volantaTrackingLink: string;
+  flightPathGeoJSON: any | null; // Added for GeoJSON
 }
 
 const initialFormState: FlightFormState = {
@@ -66,6 +68,7 @@ const initialFormState: FlightFormState = {
   landingRate: '',
   remarks: '',
   volantaTrackingLink: '',
+  flightPathGeoJSON: null, // Initialize as null
 };
 
 export const useFlightForm = () => {
@@ -103,7 +106,8 @@ export const useFlightForm = () => {
           eta: currentInitialFlightData.eta || '',
           flightPlan: currentInitialFlightData.flightPlan || '',
           flightTime: currentInitialFlightData.flightTime || '',
-          
+          flightPathGeoJSON: currentInitialFlightData.flightPathGeoJSON || null, // Apply GeoJSON
+
           // Ensure all other fields from initialFormState are also explicitly handled
           pilotRole: initialFormState.pilotRole,
           atd: initialFormState.atd,

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { format } from 'date-fns';
+import FlightPathMap from '@/components/FlightPathMap'; // Import the new map component
 
 interface Flight {
   id: string;
@@ -37,7 +38,8 @@ interface Flight {
     is_staff: boolean | null; // Changed to allow null
     email: string | null;
   } | null;
-  volanta_tracking_link: string | null; // Added volanta_tracking_link
+  volanta_tracking_link: string | null;
+  flight_path_geojson: any | null; // Added for GeoJSON
 }
 
 interface LogbookEntryManagementTabProps {
@@ -126,6 +128,13 @@ const LogbookEntryManagementTab: React.FC<LogbookEntryManagementTabProps> = ({
                             <a href={flight.volanta_tracking_link} target="_blank" rel="noopener noreferrer" className="block mt-2 text-blue-500 hover:underline truncate">
                               {flight.volanta_tracking_link}
                             </a>
+                          </div>
+                        )}
+
+                        {flight.flight_path_geojson && (
+                          <div className="col-span-2 mt-6">
+                            <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">Flight Path</h3>
+                            <FlightPathMap geoJsonData={flight.flight_path_geojson} />
                           </div>
                         )}
 
