@@ -27,6 +27,22 @@ interface SimbriefFlightData {
   airlineIcao: string;
 }
 
+interface VolantaFlightData {
+  departureAirport: string;
+  arrivalAirport: string;
+  aircraftType: string;
+  flightNumber: string;
+  flightPlan: string;
+  etd: string;
+  eta: string;
+  flightTime: string;
+  landingRate: string;
+  remarks: string;
+  volantaTrackingLink: string;
+  flightPathGeoJSON: any | null;
+  airlineIcao: string;
+}
+
 /**
  * Helper to extract specific error message from Supabase Edge Function error response.
  * Supabase `invoke` error.message often contains the raw JSON response from the Edge Function.
@@ -78,6 +94,7 @@ export async function fetchVatsimPilotData(cid: string): Promise<VatsimPilotData
     if (error) {
       console.error('Error invoking fetch-vatsim-data Edge Function:', error);
       const userFacingMessage = getEdgeFunctionErrorMessage(error, 'Failed to fetch VATSIM data.');
+      showError(userFacingMessage);
       return null;
     }
 
@@ -102,7 +119,7 @@ export async function fetchVatsimPilotData(cid: string): Promise<VatsimPilotData
 export async function fetchSimbriefData(simbriefUrl: string): Promise<SimbriefFlightData | null> {
   console.log(`Attempting to fetch SimBrief data from URL: ${simbriefUrl} via Edge Function.`);
   try {
-    const { data, error } = await supabase.functions.invoke('fetch-simbrief-data', { // Corrected function name
+    const { data, error } = await supabase.functions.invoke('fetch-simbrief-data', {
       body: { simbriefUrl },
     });
 
@@ -122,6 +139,38 @@ export async function fetchSimbriefData(simbriefUrl: string): Promise<SimbriefFl
   } catch (error: any) {
     console.error('Network or unexpected error invoking SimBrief Edge Function:', error);
     showError('Failed to fetch SimBrief data. Please check your internet connection or try again later.');
+    return null;
+  }
+}
+
+/**
+ * Fetches Volanta flight data by parsing a Volanta share URL using a Supabase Edge Function.
+ * @param volantaUrl The full Volanta flight share URL.
+ * @returns VolantaFlightData if data is successfully parsed, otherwise null.
+ */
+export async function fetchVolantaData(volantaUrl: string): Promise<VolantaFlightData | null> {
+  console.log(`Attempting to fetch Volanta data from URL: ${volantaUrl} via Edge Function.`);
+  try {
+    const { data, error } = await supabase.functions.invoke('fetch-volanta-data', {
+      body: { volantaUrl },
+    });
+
+    if (error) {
+      console.error('Error invoking fetch-volanta-data Edge Function:', error);
+      const userFacingMessage = getEdgeFunctionErrorMessage(error, 'Failed to fetch Volanta data.');
+      showError(userFacingMessage);
+      return null;
+    }
+
+    if (data) {
+      console.log('Successfully received Volanta data from Edge Function:', data);
+      return data as VolantaFlightData;
+    }
+
+    return null;
+  } catch (error: any) {
+    console.error('Network or unexpected error invoking Volanta Edge Function:', error);
+    showError('Failed to fetch Volanta data. Please check your internet connection or try again later.');
     return null;
   }
 }
