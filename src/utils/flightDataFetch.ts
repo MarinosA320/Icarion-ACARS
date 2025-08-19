@@ -51,20 +51,37 @@ export const getEdgeFunctionErrorMessage = (error: any, defaultMessage: string):
   let errorMessage = defaultMessage;
 
   if (error) {
-    // Prioritize error.details as it often contains the actual response body from the edge function
+    // First, try to parse error.context.body (most likely place for raw Edge Function response)
+    if (error.context && typeof error.context.body === 'string') {
+      try {
+        const parsedBody = JSON.parse(error.context.body);
+        if (parsedBody && typeof parsedBody === 'object' && 'error' in parsedBody) {
+          return parsedBody.error;
+        }
+      } catch (parseError) {
+        // If parsing fails, or 'error' field not found, fall through
+        console.warn('Failed to parse error.context.body as JSON:', error.context.body);
+      }
+    }
+
+    // Next, try error.details (sometimes contains the raw response)
     if (error.details) {
       try {
         const parsedDetails = JSON.parse(error.details);
         if (parsedDetails && typeof parsedDetails === 'object' && 'error' in parsedDetails) {
-          return parsedDetails.error; // Found specific error from Edge Function
+          return parsedDetails.error;
         }
       } catch (parseError) {
-        // If details is not JSON, or doesn't contain an 'error' field, fall through
-        errorMessage = error.details; // Use raw details as message
+        console.warn('Failed to parse error.details as JSON:', error.details);
+        // If not JSON, use raw details as message, but only if no better message found yet
+        if (errorMessage === defaultMessage) {
+          errorMessage = error.details;
+        }
       }
     }
-    // Fallback to error.message if details didn't yield a specific error
-    if (error.message && errorMessage === defaultMessage) { // Only use error.message if details didn't provide a better one
+
+    // Finally, if no specific error message found, use error.message if it's not the generic one
+    if (error.message && error.message !== "Edge Function returned a non-2xx status code" && errorMessage === defaultMessage) {
       try {
         const parsedMessage = JSON.parse(error.message);
         if (parsedMessage && typeof parsedMessage === 'object' && 'error' in parsedMessage) {
