@@ -4,12 +4,21 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 // Fix for default marker icon not showing up
-delete (L.Icon.Default.prototype as any)._get='_getIconUrl';
+// Instead of deleting, explicitly set the _getIconUrl method
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
+
+// Define the _getIconUrl method on the prototype
+// This is a common workaround for Leaflet icons not appearing in some environments
+if (typeof L.Icon.Default.prototype._getIconUrl === 'undefined') {
+  L.Icon.Default.prototype._getIconUrl = function (name: string) {
+    return L.Icon.Default.prototype.options[name];
+  };
+}
+
 
 interface FlightPathMapProps {
   geoJsonData: any; // Expecting GeoJSON LineString or FeatureCollection with LineString
