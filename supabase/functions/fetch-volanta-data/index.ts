@@ -85,18 +85,28 @@ serve(async (req) => {
 
     if (!match || !match[1]) {
       console.error('Could not find __NEXT_DATA__ script tag in Volanta page.');
-      return new Response(JSON.stringify({ error: 'Could not parse Volanta flight data. Page structure might have changed.' }), {
+      return new Response(JSON.stringify({ error: 'Could not parse Volanta flight data: Missing NEXT_DATA.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
       });
     }
 
-    const nextData = JSON.parse(match[1]);
+    let nextData;
+    try {
+      nextData = JSON.parse(match[1]);
+    } catch (parseError) {
+      console.error('Error parsing __NEXT_DATA__ JSON:', parseError);
+      return new Response(JSON.stringify({ error: 'Could not parse Volanta flight data: Invalid JSON in NEXT_DATA.' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 500,
+      });
+    }
+
     const flightData = nextData?.props?.pageProps?.flight;
 
     if (!flightData) {
       console.error('Flight data not found in __NEXT_DATA__:', nextData);
-      return new Response(JSON.stringify({ error: 'Flight data not found on the Volanta page.' }), {
+      return new Response(JSON.stringify({ error: 'Flight data not found on the Volanta page. Ensure it is a valid flight share URL.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 404,
       });
@@ -140,8 +150,8 @@ serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('Edge Function error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    console.error('Edge Function: Unhandled error during Volanta data processing:', error);
+    return new Response(JSON.stringify({ error: `An unexpected error occurred in the Volanta data function: ${error.message || 'Unknown error'}` }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });
