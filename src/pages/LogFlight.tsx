@@ -16,6 +16,7 @@ import FlightDetailsForm from '@/components/log-flight/FlightDetailsForm';
 import FlightPlanAndRemarks from '@/components/log-flight/FlightPlanAndRemarks';
 import FlightImageUpload from '@/components/log-flight/FlightImageUpload';
 import FlightActionButtons from '@/components/log-flight/FlightActionButtons';
+import FlightPathMap from '@/components/FlightPathMap'; // Import FlightPathMap
 
 const LogFlight = () => {
   const navigate = useNavigate();
@@ -97,18 +98,24 @@ const LogFlight = () => {
 
     let parsedGeoJSON = null;
     if (formState.flightPathGeoJSON) {
-      try {
-        parsedGeoJSON = JSON.parse(formState.flightPathGeoJSON);
-        // Basic validation for GeoJSON LineString structure
-        if (parsedGeoJSON.type !== 'LineString' || !Array.isArray(parsedGeoJSON.coordinates)) {
-          showError('Invalid GeoJSON format. Please provide a LineString object.');
+      // If flightPathGeoJSON is already an object (from Volanta link or parsed file), use it directly
+      // Otherwise, if it's a string (e.g., pasted text), try to parse it
+      if (typeof formState.flightPathGeoJSON === 'string') {
+        try {
+          parsedGeoJSON = JSON.parse(formState.flightPathGeoJSON);
+          // Basic validation for GeoJSON LineString structure
+          if (parsedGeoJSON.type !== 'LineString' || !Array.isArray(parsedGeoJSON.coordinates)) {
+            showError('Invalid GeoJSON format. Please provide a LineString object.');
+            setLoadingSubmission(false);
+            return;
+          }
+        } catch (e) {
+          showError('Invalid GeoJSON data. Please ensure it is valid JSON.');
           setLoadingSubmission(false);
           return;
         }
-      } catch (e) {
-        showError('Invalid GeoJSON data. Please ensure it is valid JSON.');
-        setLoadingSubmission(false);
-        return;
+      } else {
+        parsedGeoJSON = formState.flightPathGeoJSON; // It's already an object
       }
     }
 
@@ -149,7 +156,7 @@ const LogFlight = () => {
       flight_rules: formState.flightRules,
       flight_plan: formState.flightPlan || null,
       departure_runway: formState.departureRunway || null,
-      arrival_runway: formState.arrivalRunway || null,
+      arrival_runway: formState.arrival_runway || null,
       taxiways_used: formState.taxiwaysUsed || null,
       gates_used_dep: formState.gatesUsedDep || null,
       gates_used_arr: formState.gatesUsedArr || null,
@@ -241,8 +248,15 @@ const LogFlight = () => {
                 <Label htmlFor="flightPathGeoJSONText">Or Paste Flight Path (GeoJSON LineString - Optional)</Label>
                 <Textarea
                   id="flightPathGeoJSONText"
-                  value={formState.flightPathGeoJSON || ''}
-                  onChange={(e) => handleChange('flightPathGeoJSON', e.target.value)}
+                  value={typeof formState.flightPathGeoJSON === 'object' && formState.flightPathGeoJSON !== null ? JSON.stringify(formState.flightPathGeoJSON, null, 2) : formState.flightPathGeoJSON || ''}
+                  onChange={(e) => {
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      handleChange('flightPathGeoJSON', parsed); // Store as object
+                    } catch {
+                      handleChange('flightPathGeoJSON', e.target.value); // Store as string if invalid JSON
+                    }
+                  }}
                   placeholder='Paste GeoJSON LineString here, e.g., {"type":"LineString","coordinates":[[lng,lat],[lng,lat]]}'
                   rows={6}
                 />
@@ -250,6 +264,13 @@ const LogFlight = () => {
                   Ensure it's a LineString with coordinates in `[longitude, latitude]` format.
                 </p>
               </div>
+
+              {formState.flightPathGeoJSON && (
+                <div className="col-span-full mt-4">
+                  <h3 className="font-semibold text-lg mb-2 text-gray-900 dark:text-white">Flight Path Preview</h3>
+                  <FlightPathMap geoJsonData={formState.flightPathGeoJSON} />
+                </div>
+              )}
 
               <FlightImageUpload
                 handleImageChange={handleImageChange}

@@ -166,9 +166,14 @@ export const useFlightForm = () => {
       reader.onload = (e) => {
         try {
           const content = e.target?.result as string;
-          // Validate if it's valid JSON before setting
-          JSON.parse(content); // This will throw if invalid
-          setFormState(prevState => ({ ...prevState, flightPathGeoJSON: content }));
+          const parsedContent = JSON.parse(content); // Parse the string content into an object
+          // Basic validation for GeoJSON LineString structure
+          if (parsedContent.type !== 'LineString' || !Array.isArray(parsedContent.coordinates)) {
+            showError('Invalid GeoJSON format. Please provide a LineString object.');
+            setFormState(prevState => ({ ...prevState, flightPathGeoJSON: null })); // Clear invalid data
+            return;
+          }
+          setFormState(prevState => ({ ...prevState, flightPathGeoJSON: parsedContent })); // Store the parsed object
           showSuccess('GeoJSON file loaded successfully!');
         } catch (error) {
           showError('Invalid GeoJSON file. Please upload a valid JSON file.');
