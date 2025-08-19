@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
 import { format } from 'date-fns';
-import { fetchVatsimPilotData, fetchSimbriefData, fetchVolantaData } from '@/utils/flightDataFetch';
+import { fetchVatsimPilotData, fetchSimbriefData } from '@/utils/flightDataFetch'; // Removed fetchVolantaData
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { ALL_AIRLINES } from '@/utils/aircraftData';
@@ -81,13 +81,11 @@ const Logbook = () => {
   const [isStaff, setIsStaff] = useState(false);
   const [isLoggingVatsimFlight, setIsLoggingVatsimFlight] = useState(false);
   const [isLoggingSimbriefFlight, setIsLoggingSimbriefFlight] = useState(false);
-  const [isLoggingVolantaFlight, setIsLoggingVolantaFlight] = useState(false);
   const [simbriefUrl, setSimbriefUrl] = useState('');
-  const [volantaUrl, setVolantaUrl] = useState('');
   const [hasSavedFlight, setHasSavedFlight] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
-  const [showImportUrlSection, setShowImportUrlSection] = useState(false); // New state for combined import section
+  const [showImportUrlSection, setShowImportUrlSection] = useState(false);
 
   useEffect(() => {
     fetchFlights();
@@ -263,56 +261,6 @@ const Logbook = () => {
     }
   };
 
-  const handleLogVolantaFlight = async () => {
-    setIsLoggingVolantaFlight(true);
-    if (!volantaUrl) {
-      showError('Please enter a Volanta URL.');
-      setIsLoggingVolantaFlight(false);
-      return;
-    }
-
-    console.log('Logbook.tsx: Attempting to fetch Volanta data for URL:', volantaUrl);
-    try {
-      const volantaData = await fetchVolantaData(volantaUrl);
-      console.log('Logbook.tsx: Volanta data received:', volantaData);
-
-      if (volantaData) {
-        console.log('Logbook.tsx: Volanta data successfully retrieved:', volantaData);
-        const airline = ALL_AIRLINES.find(a => a.icao_code === volantaData.airlineIcao.toUpperCase())?.name || 'Icarion Virtual';
-
-        const dataToPass = {
-          departureAirport: volantaData.departureAirport,
-          arrivalAirport: volantaData.arrivalAirport,
-          aircraftType: volantaData.aircraftType,
-          flightNumber: volantaData.flightNumber,
-          flightPlan: volantaData.flightPlan,
-          etd: volantaData.etd,
-          eta: volantaData.eta,
-          flightTime: volantaData.flightTime,
-          landingRate: volantaData.landingRate,
-          remarks: volantaData.remarks,
-          volantaTrackingLink: volantaData.volantaTrackingLink,
-          flightPathGeoJSON: volantaData.flightPathGeoJSON,
-          airlineName: airline,
-        };
-        console.log('Logbook.tsx: Data prepared for LogFlight page (Volanta):', dataToPass);
-        try {
-          navigate('/log-flight', { state: { initialFlightData: dataToPass } });
-        } catch (navError) {
-          console.error('Logbook.tsx: Error during navigation after Volanta data:', navError);
-          showError('An error occurred while preparing the flight form. Please try again.');
-        }
-      } else {
-        console.log('Logbook.tsx: Volanta data retrieval failed or was empty. Error handled by fetchVolantaData.');
-      }
-    } catch (error) {
-      console.error('Logbook.tsx: Error during Volanta data fetching or processing:', error);
-      showError('An unexpected error occurred while processing Volanta data.');
-    } finally {
-      setIsLoggingVolantaFlight(false);
-    }
-  };
-
   const handleResumeFlight = () => {
     navigate('/log-flight');
   };
@@ -389,23 +337,8 @@ const Logbook = () => {
                   </Button>
                 </div>
               </div>
-              <div className="w-full space-y-2 mt-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Import from Volanta</h3>
-                <div className="flex flex-col md:flex-row gap-2 items-center">
-                  <Input
-                    type="url"
-                    placeholder="Paste Volanta Flight Share URL here..."
-                    value={volantaUrl}
-                    onChange={(e) => setVolantaUrl(e.target.value)}
-                    className="flex-grow"
-                    disabled={isLoggingVolantaFlight}
-                  />
-                  <Button onClick={handleLogVolantaFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingVolantaFlight}>
-                    {isLoggingVolantaFlight ? 'Fetching Volanta...' : 'Import Volanta'}
-                  </Button>
-                </div>
-              </div>
-              <Button onClick={() => { setShowImportUrlSection(false); setSimbriefUrl(''); setVolantaUrl(''); }} variant="outline" className="px-6 py-3 text-lg w-full md:w-auto mt-4">
+              {/* Removed Volanta import section */}
+              <Button onClick={() => { setShowImportUrlSection(false); setSimbriefUrl(''); }} variant="outline" className="px-6 py-3 text-lg w-full md:w-auto mt-4">
                 Cancel
               </Button>
             </div>
