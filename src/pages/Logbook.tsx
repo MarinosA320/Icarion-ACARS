@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { showSuccess, showError } from '@/utils/toast';
 import { format } from 'date-fns';
-import { fetchVatsimPilotData, fetchSimbriefData, fetchVolantaData } from '@/utils/flightDataFetch'; // Added fetchVolantaData
+import { fetchVatsimPilotData, fetchSimbriefData, fetchVolantaData } from '@/utils/flightDataFetch';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { ALL_AIRLINES } from '@/utils/aircraftData';
@@ -47,7 +47,7 @@ interface Flight {
     rank: string | null;
   } | null;
   volanta_tracking_link: string | null;
-  flight_path_geojson: any | null; // Added for GeoJSON
+  flight_path_geojson: any | null;
 }
 
 // Helper to convert YYYYMMDDHHMM to YYYY-MM-DDTHH:MM for datetime-local input
@@ -81,14 +81,13 @@ const Logbook = () => {
   const [isStaff, setIsStaff] = useState(false);
   const [isLoggingVatsimFlight, setIsLoggingVatsimFlight] = useState(false);
   const [isLoggingSimbriefFlight, setIsLoggingSimbriefFlight] = useState(false);
-  const [isLoggingVolantaFlight, setIsLoggingVolantaFlight] = useState(false); // New state for Volanta
+  const [isLoggingVolantaFlight, setIsLoggingVolantaFlight] = useState(false);
   const [simbriefUrl, setSimbriefUrl] = useState('');
-  const [volantaUrl, setVolantaUrl] = useState(''); // New state for Volanta URL
+  const [volantaUrl, setVolantaUrl] = useState('');
   const [hasSavedFlight, setHasSavedFlight] = useState(false);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
-  const [showSimbriefUrlInput, setShowSimbriefUrlInput] = useState(false);
-  const [showVolantaUrlInput, setShowVolantaUrlInput] = useState(false); // New state for Volanta URL input visibility
+  const [showImportUrlSection, setShowImportUrlSection] = useState(false); // New state for combined import section
 
   useEffect(() => {
     fetchFlights();
@@ -125,7 +124,7 @@ const Logbook = () => {
 
     const { data, error } = await supabase
       .from('flights')
-      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at,volanta_tracking_link,flight_path_geojson') // Added flight_path_geojson
+      .select('id,user_id,departure_airport,arrival_airport,aircraft_type,flight_time,landing_rate,flight_image_url,flight_number,pilot_role,etd,atd,eta,ata,flight_rules,flight_plan,departure_runway,arrival_runway,taxiways_used,gates_used_dep,gates_used_arr,departure_type,arrival_type,remarks,created_at,volanta_tracking_link,flight_path_geojson')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -203,7 +202,6 @@ const Logbook = () => {
         etd: formattedEtd,
         eta: formattedEta,
         flightTime: formattedFlightTime,
-        // No flightPathGeoJSON from VATSIM data directly
       };
       console.log('Logbook.tsx: Data prepared for LogFlight page (VATSIM):', dataToPass);
       try {
@@ -233,7 +231,6 @@ const Logbook = () => {
 
       if (simbriefData) {
         console.log('Logbook.tsx: SimBrief data successfully retrieved:', simbriefData);
-        // Use the new icao_code for a more precise match
         const airline = ALL_AIRLINES.find(a => a.icao_code === simbriefData.airlineIcao.toUpperCase())?.name || 'Icarion Virtual';
 
         const dataToPass = {
@@ -246,7 +243,6 @@ const Logbook = () => {
           eta: simbriefData.eta,
           aircraftRegistration: simbriefData.aircraftRegistration,
           airlineName: airline,
-          // No flightPathGeoJSON from SimBrief data directly
         };
         console.log('Logbook.tsx: Data prepared for LogFlight page (SimBrief):', dataToPass);
         try {
@@ -365,11 +361,8 @@ const Logbook = () => {
             <Button onClick={handleLogVatsimFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingVatsimFlight}>
               {isLoggingVatsimFlight ? 'Checking VATSIM...' : 'Log Active VATSIM Flight'}
             </Button>
-            <Button onClick={() => setShowSimbriefUrlInput(true)} className="px-6 py-3 text-lg w-full md:w-auto" disabled={showSimbriefUrlInput}>
-              Log SimBrief Flight
-            </Button>
-            <Button onClick={() => setShowVolantaUrlInput(true)} className="px-6 py-3 text-lg w-full md:w-auto" disabled={showVolantaUrlInput}>
-              Log Volanta Flight
+            <Button onClick={() => setShowImportUrlSection(true)} className="px-6 py-3 text-lg w-full md:w-auto" disabled={showImportUrlSection}>
+              Import Flight from URL
             </Button>
             {hasSavedFlight && (
               <Button onClick={handleResumeFlight} className="px-6 py-3 text-lg w-full md:w-auto" variant="secondary">
@@ -377,38 +370,41 @@ const Logbook = () => {
               </Button>
             )}
           </div>
-          {showSimbriefUrlInput && (
-            <div className="flex flex-col md:flex-row gap-2 items-center mt-4">
-              <Input
-                type="url"
-                placeholder="Paste SimBrief Dispatch URL here..."
-                value={simbriefUrl}
-                onChange={(e) => setSimbriefUrl(e.target.value)}
-                className="flex-grow"
-                disabled={isLoggingSimbriefFlight}
-              />
-              <Button onClick={handleLogSimbriefFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingSimbriefFlight}>
-                {isLoggingSimbriefFlight ? 'Parsing SimBrief...' : 'Log SimBrief Flight'}
-              </Button>
-              <Button onClick={() => { setShowSimbriefUrlInput(false); setSimbriefUrl(''); }} variant="outline" className="px-6 py-3 text-lg w-full md:w-auto">
-                Cancel
-              </Button>
-            </div>
-          )}
-          {showVolantaUrlInput && (
-            <div className="flex flex-col md:flex-row gap-2 items-center mt-4">
-              <Input
-                type="url"
-                placeholder="Paste Volanta Flight Share URL here..."
-                value={volantaUrl}
-                onChange={(e) => setVolantaUrl(e.target.value)}
-                className="flex-grow"
-                disabled={isLoggingVolantaFlight}
-              />
-              <Button onClick={handleLogVolantaFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingVolantaFlight}>
-                {isLoggingVolantaFlight ? 'Fetching Volanta...' : 'Log Volanta Flight'}
-              </Button>
-              <Button onClick={() => { setShowVolantaUrlInput(false); setVolantaUrl(''); }} variant="outline" className="px-6 py-3 text-lg w-full md:w-auto">
+          {showImportUrlSection && (
+            <div className="flex flex-col gap-4 items-center mt-4 p-4 border rounded-md bg-white/10 dark:bg-gray-700/50">
+              <div className="w-full space-y-2">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Import from SimBrief</h3>
+                <div className="flex flex-col md:flex-row gap-2 items-center">
+                  <Input
+                    type="url"
+                    placeholder="Paste SimBrief Dispatch URL here..."
+                    value={simbriefUrl}
+                    onChange={(e) => setSimbriefUrl(e.target.value)}
+                    className="flex-grow"
+                    disabled={isLoggingSimbriefFlight}
+                  />
+                  <Button onClick={handleLogSimbriefFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingSimbriefFlight}>
+                    {isLoggingSimbriefFlight ? 'Parsing SimBrief...' : 'Import SimBrief'}
+                  </Button>
+                </div>
+              </div>
+              <div className="w-full space-y-2 mt-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Import from Volanta</h3>
+                <div className="flex flex-col md:flex-row gap-2 items-center">
+                  <Input
+                    type="url"
+                    placeholder="Paste Volanta Flight Share URL here..."
+                    value={volantaUrl}
+                    onChange={(e) => setVolantaUrl(e.target.value)}
+                    className="flex-grow"
+                    disabled={isLoggingVolantaFlight}
+                  />
+                  <Button onClick={handleLogVolantaFlight} className="px-6 py-3 text-lg w-full md:w-auto" disabled={isLoggingVolantaFlight}>
+                    {isLoggingVolantaFlight ? 'Fetching Volanta...' : 'Import Volanta'}
+                  </Button>
+                </div>
+              </div>
+              <Button onClick={() => { setShowImportUrlSection(false); setSimbriefUrl(''); setVolantaUrl(''); }} variant="outline" className="px-6 py-3 text-lg w-full md:w-auto mt-4">
                 Cancel
               </Button>
             </div>
