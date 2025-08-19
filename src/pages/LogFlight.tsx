@@ -26,6 +26,7 @@ const LogFlight = () => {
     flightImage,
     handleChange,
     handleImageChange,
+    handleGeoJsonFileChange, // New handler
     clearForm,
   } = useFlightForm();
 
@@ -224,16 +225,28 @@ const LogFlight = () => {
               />
 
               <div className="col-span-full">
-                <Label htmlFor="flightPathGeoJSON">Flight Path (GeoJSON LineString - Optional)</Label>
+                <Label htmlFor="flightPathGeoJSONFile">Upload Flight Path (GeoJSON File - Optional)</Label>
+                <Input
+                  id="flightPathGeoJSONFile"
+                  type="file"
+                  accept=".geojson,application/json"
+                  onChange={(e) => handleGeoJsonFileChange(e.target.files ? e.target.files[0] : null)}
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Upload a .geojson file exported from your flight tracking software.
+                </p>
+              </div>
+              <div className="col-span-full">
+                <Label htmlFor="flightPathGeoJSONText">Or Paste Flight Path (GeoJSON LineString - Optional)</Label>
                 <Textarea
-                  id="flightPathGeoJSON"
+                  id="flightPathGeoJSONText"
                   value={formState.flightPathGeoJSON || ''}
                   onChange={(e) => handleChange('flightPathGeoJSON', e.target.value)}
                   placeholder='Paste GeoJSON LineString here, e.g., {"type":"LineString","coordinates":[[lng,lat],[lng,lat]]}'
                   rows={6}
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  You can often export flight paths from tracking software (like Volanta) or flight planners in GeoJSON format.
                   Ensure it's a LineString with coordinates in `[longitude, latitude]` format.
                 </p>
               </div>

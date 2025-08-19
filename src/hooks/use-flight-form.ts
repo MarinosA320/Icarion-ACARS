@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { showSuccess, showError } from '@/utils/toast'; // Import toast utilities
 
 interface InitialFlightData {
   departureAirport?: string | null;
@@ -159,6 +160,28 @@ export const useFlightForm = () => {
     setFlightImage(file);
   }, []);
 
+  const handleGeoJsonFileChange = useCallback((file: File | null) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = e.target?.result as string;
+          // Validate if it's valid JSON before setting
+          JSON.parse(content); // This will throw if invalid
+          setFormState(prevState => ({ ...prevState, flightPathGeoJSON: content }));
+          showSuccess('GeoJSON file loaded successfully!');
+        } catch (error) {
+          showError('Invalid GeoJSON file. Please upload a valid JSON file.');
+          setFormState(prevState => ({ ...prevState, flightPathGeoJSON: null })); // Clear invalid data
+          console.error('Error reading or parsing GeoJSON file:', error);
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      setFormState(prevState => ({ ...prevState, flightPathGeoJSON: null }));
+    }
+  }, []);
+
   const clearForm = useCallback(() => {
     setFormState(initialFormState);
     setFlightImage(null);
@@ -174,6 +197,7 @@ export const useFlightForm = () => {
     flightImage,
     handleChange,
     handleImageChange,
+    handleGeoJsonFileChange,
     clearForm,
   };
 };
