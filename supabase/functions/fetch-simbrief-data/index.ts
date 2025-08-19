@@ -50,7 +50,7 @@ serve(async (req) => {
 
     if (!simbriefUrl) {
       console.error('Invalid input: simbriefUrl is required.');
-      return new Response(JSON.stringify({ error: 'Invalid input: simbriefUrl is required.' }), {
+      return new Response(JSON.stringify({ error: 'Invalid input: SimBrief URL is required.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       });
@@ -103,7 +103,8 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Edge Function error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    // Include the specific error message in the response for better client-side debugging
+    return new Response(JSON.stringify({ error: `An unexpected error occurred in the SimBrief data function: ${error.message || 'Unknown error'}` }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     });
