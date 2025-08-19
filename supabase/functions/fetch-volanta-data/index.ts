@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.45.0'; // Added to force redeployment
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -35,13 +36,13 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log('Edge Function: fetch-volanta-data invoked.');
+  console.log('DYAD_LOG: Edge Function: fetch-volanta-data invoked.'); // Added for debugging
 
   try {
     const { volantaUrl } = await req.json();
 
     if (!volantaUrl) {
-      console.error('Invalid input: volantaUrl is required.');
+      console.error('DYAD_LOG: Invalid input: volantaUrl is required.');
       return new Response(JSON.stringify({ error: 'Invalid input: Volanta URL is required.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
@@ -52,39 +53,42 @@ serve(async (req) => {
     try {
       url = new URL(volantaUrl);
       if (!url.hostname.includes('volanta.app')) {
+        console.error('DYAD_LOG: Invalid Volanta URL hostname.');
         return new Response(JSON.stringify({ error: 'Invalid Volanta URL. Please provide a URL from fly.volanta.app.' }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400,
         });
       }
     } catch (e) {
-      console.error('Invalid Volanta URL format:', e);
+      console.error('DYAD_LOG: Invalid Volanta URL format caught:', e);
       return new Response(JSON.stringify({ error: 'Invalid Volanta URL format.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       });
     }
 
-    console.log(`Edge Function: Fetching Volanta page from: ${volantaUrl}`);
+    console.log(`DYAD_LOG: Fetching Volanta page from: ${volantaUrl}`);
     const response = await fetch(volantaUrl);
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Edge Function: Volanta page fetch failed with status: ${response.status}, response: ${errorText}`);
-      return new Response(JSON.stringify({ error: `Failed to fetch Volanta flight data: ${response.status}` }), {
+      console.error(`DYAD_LOG: Volanta page fetch failed with status: ${response.status}, response: ${errorText}`);
+      return new Response(JSON.stringify({ error: `Failed to fetch Volanta data from external API: ${response.status}` }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: response.status,
       });
     }
 
     const html = await response.text();
+    console.log(`DYAD_LOG: Fetched HTML length: ${html.length}`); // Log HTML length, not full content
     
     // Extract the __NEXT_DATA__ JSON
     const scriptTagRegex = /<script id="__NEXT_DATA__" type="application\/json">([\s\S]*?)<\/script>/;
     const match = html.match(scriptTagRegex);
+    console.log(`DYAD_LOG: Regex match result: ${match ? 'Found' : 'Not Found'}`);
 
     if (!match || !match[1]) {
-      console.error('Could not find __NEXT_DATA__ script tag in Volanta page.');
+      console.error('DYAD_LOG: Could not find __NEXT_DATA__ script tag in Volanta page or content empty.');
       return new Response(JSON.stringify({ error: 'Could not parse Volanta flight data: Missing NEXT_DATA.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
@@ -94,8 +98,9 @@ serve(async (req) => {
     let nextData;
     try {
       nextData = JSON.parse(match[1]);
+      console.log('DYAD_LOG: Successfully parsed __NEXT_DATA__ JSON.');
     } catch (parseError) {
-      console.error('Error parsing __NEXT_DATA__ JSON:', parseError);
+      console.error('DYAD_LOG: Error parsing __NEXT_DATA__ JSON:', parseError);
       return new Response(JSON.stringify({ error: 'Could not parse Volanta flight data: Invalid JSON in NEXT_DATA.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500,
@@ -103,9 +108,10 @@ serve(async (req) => {
     }
 
     const flightData = nextData?.props?.pageProps?.flight;
+    console.log(`DYAD_LOG: Flight data found: ${flightData ? 'Yes' : 'No'}`);
 
     if (!flightData) {
-      console.error('Flight data not found in __NEXT_DATA__:', nextData);
+      console.error('DYAD_LOG: Flight data not found in __NEXT_DATA__ props.');
       return new Response(JSON.stringify({ error: 'Flight data not found on the Volanta page. Ensure it is a valid flight share URL.' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 404,
@@ -143,14 +149,14 @@ serve(async (req) => {
       airlineIcao: airlineIcao || '', // Pass ICAO to map to full name on client
     };
 
-    console.log('Edge Function: Parsed Volanta data:', responseData);
+    console.log('DYAD_LOG: Successfully extracted Volanta data.');
     return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
 
   } catch (error) {
-    console.error('Edge Function: Unhandled error during Volanta data processing:', error);
+    console.error('DYAD_LOG: Edge Function: Unhandled error during Volanta data processing:', error);
     return new Response(JSON.stringify({ error: `An unexpected error occurred in the Volanta data function: ${error.message || 'Unknown error'}` }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
