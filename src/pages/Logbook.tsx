@@ -218,8 +218,9 @@ const Logbook = () => {
 
   const handleLogSimbriefFlight = async () => {
     setIsLoggingSimbriefFlight(true);
-    if (!simbriefUrl) {
-      showError('Please enter a SimBrief URL.');
+    const expectedSimbriefUrlPrefix = 'https://dispatch.simbrief.com/options/dispatch.php';
+    if (!simbriefUrl.startsWith(expectedSimbriefUrlPrefix)) {
+      showError('Invalid SimBrief URL format. Please provide a SimBrief Dispatch URL (e.g., starting with "https://dispatch.simbrief.com/options/dispatch.php").');
       setIsLoggingSimbriefFlight(false);
       return;
     }
