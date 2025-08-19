@@ -48,52 +48,56 @@ interface VolantaFlightData {
  * Supabase `invoke` error.message often contains the raw JSON response from the Edge Function.
  */
 export const getEdgeFunctionErrorMessage = (error: any, defaultMessage: string): string => {
-  let errorMessage = defaultMessage;
+  if (!error) {
+    return defaultMessage;
+  }
 
-  if (error) {
-    // First, try to parse error.context.body (most likely place for raw Edge Function response)
-    if (error.context && typeof error.context.body === 'string') {
-      try {
-        const parsedBody = JSON.parse(error.context.body);
-        if (parsedBody && typeof parsedBody === 'object' && 'error' in parsedBody) {
-          return parsedBody.error;
-        }
-      } catch (parseError) {
-        // If parsing fails, or 'error' field not found, fall through
-        console.warn('Failed to parse error.context.body as JSON:', error.context.body);
+  // 1. Check for a direct 'error' property on the error object itself (common for some Supabase errors)
+  if (typeof error.error === 'string' && error.error.trim() !== '') {
+    return error.error;
+  }
+  if (typeof error.data === 'string' && error.data.trim() !== '') {
+    return error.data;
+  }
+  if (error.data && typeof error.data === 'object' && 'error' in error.data && typeof error.data.error === 'string') {
+    return error.data.error;
+  }
+
+  // 2. Try to parse error.context.body (most likely place for custom Edge Function response)
+  if (error.context && typeof error.context.body === 'string') {
+    try {
+      const parsedBody = JSON.parse(error.context.body);
+      if (parsedBody && typeof parsedBody === 'object' && 'error' in parsedBody && typeof parsedBody.error === 'string') {
+        return parsedBody.error;
       }
+    } catch (parseError) {
+      // console.warn('Failed to parse error.context.body as JSON:', error.context.body, parseError);
     }
+  }
 
-    // Next, try error.details (sometimes contains the raw response)
-    if (error.details) {
-      try {
-        const parsedDetails = JSON.parse(error.details);
-        if (parsedDetails && typeof parsedDetails === 'object' && 'error' in parsedDetails) {
-          return parsedDetails.error;
-        }
-      } catch (parseError) {
-        console.warn('Failed to parse error.details as JSON:', error.details);
-        // If not JSON, use raw details as message, but only if no better message found yet
-        if (errorMessage === defaultMessage) {
-          errorMessage = error.details;
-        }
+  // 3. Try to parse error.details (sometimes contains the raw response)
+  if (typeof error.details === 'string') {
+    try {
+      const parsedDetails = JSON.parse(error.details);
+      if (parsedDetails && typeof parsedDetails === 'object' && 'error' in parsedDetails && typeof parsedDetails.error === 'string') {
+        return parsedDetails.error;
       }
-    }
-
-    // Finally, if no specific error message found, use error.message if it's not the generic one
-    if (error.message && error.message !== "Edge Function returned a non-2xx status code" && errorMessage === defaultMessage) {
-      try {
-        const parsedMessage = JSON.parse(error.message);
-        if (parsedMessage && typeof parsedMessage === 'object' && 'error' in parsedMessage) {
-          return parsedMessage.error;
-        }
-      } catch (parseError) {
-        // If message is not JSON, use it as is
-        errorMessage = error.message;
+    } catch (parseError) {
+      // console.warn('Failed to parse error.details as JSON:', error.details, parseError);
+      // If it's not JSON, but it's a string, and not the generic message, use it
+      if (error.details.trim() !== '' && error.details !== "Edge Function returned a non-2xx status code") {
+        return error.details;
       }
     }
   }
-  return errorMessage;
+
+  // 4. Check error.message, but avoid the generic Supabase one if possible
+  if (typeof error.message === 'string' && error.message.trim() !== '' && error.message !== "Edge Function returned a non-2xx status code") {
+    return error.message;
+  }
+
+  // Fallback to the default message if nothing more specific is found
+  return defaultMessage;
 };
 
 /**
