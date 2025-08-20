@@ -25,7 +25,7 @@ interface Answer {
 
 interface JobApplication {
   id: string;
-  job_opening_id: string;
+  job_opening_id: string; // Added this field
   user_id: string;
   answers: Answer[] | null;
   status: string;

@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
 import { fetchProfilesData } from '@/utils/supabaseDataFetch';
-import { sendNotification } from '@/utils/notificationService'; // New import
+import { sendNotification } from '@/utils/notificationService';
 
 interface Question {
   id: string;
@@ -20,7 +20,7 @@ interface Answer {
 
 interface JobApplication {
   id: string;
-  job_opening_id: string;
+  job_opening_id: string; // Added this field for explicit fetching
   user_id: string;
   answers: Answer[] | null;
   status: string;
@@ -46,9 +46,10 @@ export const useJobApplicationsManagement = () => {
   const [jobApplications, setJobApplications] = useState<JobApplication[]>([]);
 
   const fetchJobApplications = useCallback(async () => {
+    // Select job_opening_id directly instead of implicitly joining
     const { data, error } = await supabase
       .from('job_applications')
-      .select('id,user_id,answers,status,created_at,job_opening_id(title,questions)') // Changed to use job_opening_id directly
+      .select('id,user_id,answers,status,created_at,job_opening_id')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -58,16 +59,42 @@ export const useJobApplicationsManagement = () => {
     }
 
     const allApplicantUserIds = new Set<string>();
-    data.forEach(app => allApplicantUserIds.add(app.user_id));
+    const allJobOpeningIds = new Set<string>();
+
+    data.forEach(app => {
+      allApplicantUserIds.add(app.user_id);
+      if (app.job_opening_id) {
+        allJobOpeningIds.add(app.job_opening_id);
+      }
+    });
 
     // Fetch profiles including email
     const profilesMap = await fetchProfilesData(Array.from(allApplicantUserIds), true);
 
-    const applicationsWithProfiles = data.map(app => ({
+    // Fetch job openings separately
+    let jobOpeningsMap: { [key: string]: { title: string; questions: Question[] | null; } } = {};
+    if (allJobOpeningIds.size > 0) {
+      const { data: jobData, error: jobError } = await supabase
+        .from('job_openings')
+        .select('id,title,questions')
+        .in('id', Array.from(allJobOpeningIds));
+
+      if (jobError) {
+        console.error('Error fetching associated job openings:', jobError);
+        showError('Error fetching job opening details.');
+      } else {
+        jobData.forEach(job => {
+          jobOpeningsMap[job.id] = { title: job.title, questions: job.questions };
+        });
+      }
+    }
+
+    const applicationsWithProfilesAndJobs = data.map(app => ({
       ...app,
       user_profile: profilesMap[app.user_id] || null,
+      job_opening: app.job_opening_id ? jobOpeningsMap[app.job_opening_id] || null : null, // Manually assign job_opening
     }));
-    setJobApplications(applicationsWithProfiles as JobApplication[]);
+    setJobApplications(applicationsWithProfilesAndJobs as JobApplication[]);
   }, []);
 
   const handleUpdateApplicationStatus = useCallback(async (applicationId: string, newStatus: string) => {
@@ -79,13 +106,26 @@ export const useJobApplicationsManagement = () => {
 
     const { data: existingApplication, error: fetchError } = await supabase
       .from('job_applications')
-      .select('user_id, job_opening_id(title)') // Changed to use job_opening_id directly
+      .select('user_id, job_opening_id') // Select job_opening_id directly
       .eq('id', applicationId)
       .single();
 
     if (fetchError || !existingApplication) {
       showError('Error fetching application details: ' + (fetchError?.message || 'Application not found.'));
       return;
+    }
+
+    // Fetch job title for notification if needed
+    let jobTitle = 'a job opening';
+    if (existingApplication.job_opening_id) {
+      const { data: jobData, error: jobTitleError } = await supabase
+        .from('job_openings')
+        .select('title')
+        .eq('id', existingApplication.job_opening_id)
+        .single();
+      if (jobData && !jobTitleError) {
+        jobTitle = jobData.title;
+      }
     }
 
     const { error } = await supabase
@@ -101,7 +141,6 @@ export const useJobApplicationsManagement = () => {
 
       // Send notification if status is accepted
       if (newStatus === 'accepted') {
-        const jobTitle = existingApplication.job_opening?.title || 'a job opening';
         const notificationContent = `Congratulations! Your application for "${jobTitle}" has been accepted. Please check your email for further instructions.`;
         await sendNotification(existingApplication.user_id, 'job_accepted', notificationContent, user.id);
       }
