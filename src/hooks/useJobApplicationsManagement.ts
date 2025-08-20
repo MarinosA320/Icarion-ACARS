@@ -60,7 +60,8 @@ export const useJobApplicationsManagement = () => {
     const allApplicantUserIds = new Set<string>();
     data.forEach(app => allApplicantUserIds.add(app.user_id));
 
-    const profilesMap = await fetchProfilesData(Array.from(allApplicantUserIds));
+    // Fetch profiles including email
+    const profilesMap = await fetchProfilesData(Array.from(allApplicantUserIds), true);
 
     const applicationsWithProfiles = data.map(app => ({
       ...app,

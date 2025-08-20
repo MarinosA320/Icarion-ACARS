@@ -55,7 +55,8 @@ export const useTrainingRequestsManagement = () => {
       if (req.instructor_id) allUserIds.add(req.instructor_id);
     });
 
-    const profilesMap = await fetchProfilesData(Array.from(allUserIds));
+    // Fetch profiles including email
+    const profilesMap = await fetchProfilesData(Array.from(allUserIds), true);
 
     const requestsWithProfiles = data.map(req => ({
       ...req,
@@ -90,7 +91,8 @@ export const useTrainingRequestsManagement = () => {
       if (req.instructor_id) allUserIds.add(req.instructor_id);
     });
 
-    const profilesMap = await fetchProfilesData(Array.from(allUserIds));
+    // Fetch profiles including email
+    const profilesMap = await fetchProfilesData(Array.from(allUserIds), true);
 
     const requestsWithProfiles = data.map(req => ({
       ...req,

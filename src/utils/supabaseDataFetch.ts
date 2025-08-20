@@ -10,8 +10,9 @@ interface ProfileData {
   vatsim_ivao_id: string | null;
   avatar_url: string | null;
   is_staff: boolean;
-  rank: string;
+  rank: string | null;
   type_ratings: string[] | null;
+  email?: string | null; // Added email to ProfileData interface
 }
 
 /**
@@ -46,9 +47,10 @@ export const fetchEmailsForUserIds = async (userIds: string[]): Promise<{ [key: 
 /**
  * Fetches detailed profile data for a given list of user IDs.
  * @param userIds An array of user UUIDs.
+ * @param includeEmail Optional: if true, also fetches and includes user email addresses.
  * @returns A map of user ID to their profile data.
  */
-export const fetchProfilesData = async (userIds: string[]): Promise<{ [key: string]: ProfileData }> => {
+export const fetchProfilesData = async (userIds: string[], includeEmail: boolean = false): Promise<{ [key: string]: ProfileData }> => {
   if (userIds.length === 0) {
     return {};
   }
@@ -61,9 +63,20 @@ export const fetchProfilesData = async (userIds: string[]): Promise<{ [key: stri
     showError('Error fetching user profiles data.');
     return {};
   }
+
   const profilesMap: { [key: string]: ProfileData } = {};
   data.forEach(profile => {
     profilesMap[profile.id] = profile as ProfileData;
   });
+
+  if (includeEmail) {
+    const userEmails = await fetchEmailsForUserIds(userIds);
+    for (const userId of userIds) {
+      if (profilesMap[userId]) {
+        profilesMap[userId].email = userEmails[userId] || null;
+      }
+    }
+  }
+
   return profilesMap;
 };
