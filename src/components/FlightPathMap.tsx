@@ -1,15 +1,24 @@
 import React from 'react';
-import { MapContainer, TileLayer, Polyline, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
-import L from 'leaflet'; // Import Leaflet library for custom icon
+import { MapContainer, TileLayer, Polyline, Marker } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
 
-// Fix for default Leaflet icon issue with Webpack/Vite
-delete L.Icon.Default.prototype._getIconUrl;
+// Fix for default marker icon not showing up
+// Instead of deleting, explicitly set the _getIconUrl method
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
+
+// Define the _getIconUrl method on the prototype
+// This is a common workaround for Leaflet icons not appearing in some environments
+if (typeof L.Icon.Default.prototype._getIconUrl === 'undefined') {
+  L.Icon.Default.prototype._getIconUrl = function (name: string) {
+    return L.Icon.Default.prototype.options[name];
+  };
+}
+
 
 interface FlightPathMapProps {
   geoJsonData: any; // Expecting GeoJSON LineString or FeatureCollection with LineString
@@ -20,8 +29,8 @@ const FlightPathMap: React.FC<FlightPathMapProps> = ({ geoJsonData }) => {
     return <div className="text-center text-muted-foreground p-4">No flight path data available.</div>;
   }
 
-  // Leaflet expects [latitude, longitude] for coordinates, GeoJSON is [longitude, latitude]
-  const pathCoordinates = geoJsonData.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]);
+  // Extract coordinates from GeoJSON LineString
+  const pathCoordinates = geoJsonData.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]); // Leaflet expects [lat, lng]
 
   if (pathCoordinates.length === 0) {
     return <div className="text-center text-muted-foreground p-4">Invalid flight path data.</div>;
@@ -30,29 +39,20 @@ const FlightPathMap: React.FC<FlightPathMapProps> = ({ geoJsonData }) => {
   const startPoint = pathCoordinates[0];
   const endPoint = pathCoordinates[pathCoordinates.length - 1];
 
-  // Calculate bounds for fitting the map
-  const bounds = L.latLngBounds(pathCoordinates);
-
   return (
     <MapContainer
-      key={Date.now()} // Add a dynamic key to force re-mount on re-render (common fix for Leaflet HMR issues)
-      bounds={bounds}
-      zoom={6} // Default zoom, will be adjusted by fitBounds
-      scrollWheelZoom={false} // Make it non-interactive for display purposes
-      style={{ width: '100%', height: '384px' }} // h-96 is 384px
-      className="rounded-md"
+      center={startPoint}
+      zoom={6}
+      scrollWheelZoom={false}
+      className="h-96 w-full rounded-md shadow-md"
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <Polyline positions={pathCoordinates} color="#007bff" weight={3} />
-      <Marker position={startPoint}>
-        <Popup>Departure</Popup>
-      </Marker>
-      <Marker position={endPoint}>
-        <Popup>Arrival</Popup>
-      </Marker>
+      <Marker position={startPoint} title="Departure" />
+      <Marker position={endPoint} title="Arrival" />
     </MapContainer>
   );
 };

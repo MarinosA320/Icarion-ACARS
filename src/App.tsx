@@ -1,4 +1,3 @@
-import React from "react"; // Added React import
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "sonner";
 import { toast } from "sonner";
@@ -17,9 +16,7 @@ import LogFlight from "./pages/LogFlight";
 import FlightBriefing from "./pages/FlightBriefing";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
-import IcarionPilotDashboard from "./pages/IcarionPilotDashboard";
-import IcarionPilotResources from "./pages/IcarionPilotResources";
-import FlightPlanning from "./pages/FlightPlanning"; // New import
+import IcarionPilotDashboard from "./pages/IcarionPilotDashboard"; // New import
 import Navbar from "./components/Navbar";
 import { supabase } from "./integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -194,29 +191,11 @@ const App = () => {
                 }
               />
               <Route
-                path="/icarion-pilot-dashboard"
+                path="/icarion-pilot-dashboard" // New route
                 element={
                   <ProtectedRoute>
                     <Navbar />
                     <IcarionPilotDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/icarion-pilot-dashboard/resources"
-                element={
-                  <ProtectedRoute>
-                    <Navbar />
-                    <IcarionPilotResources />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/flight-planning" // New route for basic flight planning
-                element={
-                  <ProtectedRoute>
-                    <Navbar />
-                    <FlightPlanning />
                   </ProtectedRoute>
                 }
               />

@@ -4,7 +4,6 @@ import { showError } from '@/utils/toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import DynamicBackground from '@/components/DynamicBackground';
-import { Link } from 'react-router-dom'; // Import Link
 
 const icarionPilotBackgroundImages = [
   '/images/backgrounds/profile-bg-new.png', // Example background image
@@ -100,20 +99,17 @@ const IcarionPilotDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Pilot Resources Card - now a link */}
-          <Link to="/icarion-pilot-dashboard/resources" className="block">
-            <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50 h-full hover:bg-white/60 dark:hover:bg-gray-700/60 transition-colors cursor-pointer">
-              <CardHeader>
-                <CardTitle>Pilot Resources</CardTitle>
-                <CardDescription>Essential tools and links for your flights.</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-800 dark:text-gray-200">
-                  Access a comprehensive list of external flight planning, weather, and ATC resources.
-                </p>
-              </CardContent>
-            </Card>
-          </Link>
+          <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
+            <CardHeader>
+              <CardTitle>Pilot Resources</CardTitle>
+              <CardDescription>Download custom liveries, flight planning tools, and more.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-800 dark:text-gray-200">
+                Links to essential tools and documents for your Icarion flights.
+              </p>
+            </CardContent>
+          </Card>
 
           <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
             <CardHeader>
