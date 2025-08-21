@@ -1,6 +1,6 @@
 import React from 'react';
 import Map, { Source, Layer, Marker } from 'react-map-gl';
-import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox GL CSS
+// Removed: import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox GL CSS
 
 // IMPORTANT: Replace 'YOUR_MAPBOX_ACCESS_TOKEN' with your actual Mapbox Public Access Token.
 // You can get one from https://account.mapbox.com/access-tokens/
