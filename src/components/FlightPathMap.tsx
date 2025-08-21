@@ -1,18 +1,11 @@
 import React from 'react';
-import { MapContainer, TileLayer, Polyline, Marker } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import Map, { Source, Layer, Marker } from 'react-map-gl';
+import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox GL CSS
 
-// Fix for default marker icon not showing up in React-Leaflet
-// This ensures Leaflet's default icon paths are correctly set for Webpack/Vite
-// and explicitly defines the _getIconUrl method if it's missing or problematic.
-// This is a common workaround for Leaflet in React applications.
-// Removed: delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-});
+// IMPORTANT: Replace 'YOUR_MAPBOX_ACCESS_TOKEN' with your actual Mapbox Public Access Token.
+// You can get one from https://account.mapbox.com/access-tokens/
+// For production, consider loading this from an environment variable.
+const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || 'YOUR_MAPBOX_ACCESS_TOKEN';
 
 interface FlightPathMapProps {
   geoJsonData: any; // Expecting GeoJSON LineString or FeatureCollection with LineString
@@ -23,8 +16,8 @@ const FlightPathMap: React.FC<FlightPathMapProps> = ({ geoJsonData }) => {
     return <div className="text-center text-muted-foreground p-4">No flight path data available.</div>;
   }
 
-  // Extract coordinates from GeoJSON LineString
-  const pathCoordinates = geoJsonData.coordinates.map((coord: [number, number]) => [coord[1], coord[0]]); // Leaflet expects [lat, lng]
+  // Mapbox GL JS expects [longitude, latitude] for coordinates
+  const pathCoordinates = geoJsonData.coordinates;
 
   if (pathCoordinates.length === 0) {
     return <div className="text-center text-muted-foreground p-4">Invalid flight path data.</div>;
@@ -33,22 +26,40 @@ const FlightPathMap: React.FC<FlightPathMapProps> = ({ geoJsonData }) => {
   const startPoint = pathCoordinates[0];
   const endPoint = pathCoordinates[pathCoordinates.length - 1];
 
+  const lineGeoJson = {
+    type: 'Feature',
+    geometry: {
+      type: 'LineString',
+      coordinates: pathCoordinates,
+    },
+  };
+
   return (
-    <MapContainer
-      key={JSON.stringify(geoJsonData)} // Added key to force re-render on data change
-      center={startPoint}
-      zoom={6}
-      scrollWheelZoom={false}
-      className="h-96 w-full rounded-md shadow-md"
+    <Map
+      mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
+      initialViewState={{
+        longitude: startPoint[0],
+        latitude: startPoint[1],
+        zoom: 6,
+      }}
+      style={{ width: '100%', height: '384px' }} // h-96 is 384px
+      mapStyle="mapbox://styles/mapbox/streets-v11" // You can change this style
+      interactive={false} // Make it non-interactive for display purposes
+      key={JSON.stringify(geoJsonData)} // Force re-render on data change
     >
-      <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
-      <Polyline positions={pathCoordinates} color="#007bff" weight={3} />
-      <Marker position={startPoint} title="Departure" />
-      <Marker position={endPoint} title="Arrival" />
-    </MapContainer>
+      <Source id="route-line" type="geojson" data={lineGeoJson}>
+        <Layer
+          id="line-layer"
+          type="line"
+          paint={{
+            'line-color': '#007bff',
+            'line-width': 3,
+          }}
+        />
+      </Source>
+      <Marker longitude={startPoint[0]} latitude={startPoint[1]} anchor="bottom" />
+      <Marker longitude={endPoint[0]} latitude={endPoint[1]} anchor="bottom" />
+    </Map>
   );
 };
 

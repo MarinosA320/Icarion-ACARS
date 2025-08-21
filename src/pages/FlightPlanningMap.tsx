@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, useMapEvents } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
+import Map, { Marker, Source, Layer } from 'react-map-gl';
+import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox GL CSS
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,18 +9,12 @@ import { Separator } from '@/components/ui/separator';
 import { showSuccess, showError } from '@/utils/toast';
 import { mockAirports, mockNavaids } from '@/utils/mockAviationData';
 import DynamicBackground from '@/components/DynamicBackground';
-import { Plane, MapPin, Plus, Trash2, Download } from 'lucide-react';
+import { Plus, Trash2, Download } from 'lucide-react';
 
-// Fix for default marker icon not showing up in React-Leaflet
-// This ensures Leaflet's default icon paths are correctly set for Webpack/Vite
-// and explicitly defines the _getIconUrl method if it's missing or problematic.
-// This is a common workaround for Leaflet in React applications.
-// Removed: delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-});
+// IMPORTANT: Replace 'YOUR_MAPBOX_ACCESS_TOKEN' with your actual Mapbox Public Access Token.
+// You can get one from https://account.mapbox.com/access-tokens/
+// For production, consider loading this from an environment variable.
+const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || 'YOUR_MAPBOX_ACCESS_TOKEN';
 
 interface Waypoint {
   id: string;
@@ -39,7 +32,13 @@ const flightPlanningBackgroundImages = [
 const FlightPlanningMap: React.FC = () => {
   const [routeWaypoints, setRouteWaypoints] = useState<Waypoint[]>([]);
   const [newWaypointInput, setNewWaypointInput] = useState('');
-  const mapRef = useRef<L.Map | null>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+
+  const [viewState, setViewState] = useState({
+    longitude: 23.0,
+    latitude: 38.0,
+    zoom: 5,
+  });
 
   const addWaypoint = useCallback((waypoint: Waypoint) => {
     setRouteWaypoints((prev) => {
@@ -88,8 +87,8 @@ const FlightPlanningMap: React.FC = () => {
     setNewWaypointInput('');
   };
 
-  const handleMapClick = useCallback((e: L.LeafletMouseEvent) => {
-    const { lat, lng } = e.latlng;
+  const handleMapClick = useCallback((e: mapboxgl.MapMouseEvent) => {
+    const { lng, lat } = e.lngLat;
     addWaypoint({
       id: `custom-${Date.now()}`,
       type: 'custom',
@@ -99,18 +98,12 @@ const FlightPlanningMap: React.FC = () => {
     });
   }, [addWaypoint]);
 
-  const MapClickHandler = () => {
-    useMapEvents({
-      click: handleMapClick,
-    });
-    return null;
-  };
-
   // Fit map to bounds of waypoints
   useEffect(() => {
     if (mapRef.current && routeWaypoints.length > 0) {
-      const bounds = L.latLngBounds(routeWaypoints.map(wp => [wp.lat, wp.lng]));
-      mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+      const bounds = new mapboxgl.LngLatBounds();
+      routeWaypoints.forEach(wp => bounds.extend([wp.lng, wp.lat]));
+      mapRef.current.fitBounds(bounds, { padding: 50, duration: 1000 });
     }
   }, [routeWaypoints]);
 
@@ -137,6 +130,14 @@ const FlightPlanningMap: React.FC = () => {
     showSuccess('GeoJSON file downloaded!');
   };
 
+  const lineGeoJson = {
+    type: 'Feature',
+    geometry: {
+      type: 'LineString',
+      coordinates: routeWaypoints.map(wp => [wp.lng, wp.lat]),
+    },
+  };
+
   return (
     <div className="relative min-h-screen flex flex-col">
       <DynamicBackground images={flightPlanningBackgroundImages} interval={10000} />
@@ -158,43 +159,67 @@ const FlightPlanningMap: React.FC = () => {
               <CardDescription>Click to add waypoints or drag to pan.</CardDescription>
             </CardHeader>
             <CardContent className="p-0 h-[500px]">
-              <MapContainer
-                key="flight-planning-map" // Added key
-                center={[38.0, 23.0]}
-                zoom={5}
-                scrollWheelZoom={true}
-                className="h-full w-full"
-                whenCreated={mapInstance => { mapRef.current = mapInstance; }}
+              <Map
+                mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
+                {...viewState}
+                onMove={evt => setViewState(evt.viewState)}
+                style={{ width: '100%', height: '100%' }}
+                mapStyle="mapbox://styles/mapbox/streets-v11" // You can change this style
+                onClick={handleMapClick}
+                ref={mapRef}
               >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <MapClickHandler />
                 {routeWaypoints.map((wp) => (
                   <Marker
                     key={wp.id}
-                    position={[wp.lat, wp.lng]}
+                    longitude={wp.lng}
+                    latitude={wp.lat}
+                    anchor="bottom"
                   >
-                    <L.Popup>
-                      <strong>{wp.name}</strong><br />
-                      Lat: {wp.lat.toFixed(4)}, Lng: {wp.lng.toFixed(4)}
-                      <br />
-                      <Button variant="destructive" size="sm" className="mt-2" onClick={() => removeWaypoint(wp.id)}>
+                    <div className="relative">
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
+                        {wp.name}
+                      </div>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="lucide lucide-map-pin text-red-500"
+                      >
+                        <path d="M12 17.5L12 17.5" />
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
+                        <circle cx="12" cy="9" r="3" />
+                      </svg>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs h-6 px-2 py-0"
+                        onClick={() => removeWaypoint(wp.id)}
+                      >
                         Remove
                       </Button>
-                    </L.Popup>
+                    </div>
                   </Marker>
                 ))}
                 {routeWaypoints.length > 1 && (
-                  <Polyline
-                    positions={routeWaypoints.map(wp => [wp.lat, wp.lng])}
-                    color="#007bff"
-                    weight={3}
-                    dashArray="5, 10"
-                  />
+                  <Source id="route-line" type="geojson" data={lineGeoJson}>
+                    <Layer
+                      id="line-layer"
+                      type="line"
+                      paint={{
+                        'line-color': '#007bff',
+                        'line-width': 3,
+                        'line-dasharray': [2, 2],
+                      }}
+                    />
+                  </Source>
                 )}
-              </MapContainer>
+              </Map>
             </CardContent>
           </Card>
 
