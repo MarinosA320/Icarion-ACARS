@@ -19,7 +19,6 @@ import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
 import IcarionPilotDashboard from "./pages/IcarionPilotDashboard";
 import IcarionPilotResources from "./pages/IcarionPilotResources";
-import FlightPlanningMap from "./pages/FlightPlanningMap"; // Re-added import
 import Navbar from "./components/Navbar";
 import { supabase } from "./integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -211,15 +210,7 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/icarion-pilot-dashboard/flight-planning" // New route for flight planning map
-                element={
-                  <ProtectedRoute>
-                    <Navbar />
-                    <FlightPlanningMap />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Removed the FlightPlanningMap route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

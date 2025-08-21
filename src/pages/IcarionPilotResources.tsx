@@ -87,20 +87,22 @@ const IcarionPilotResources: React.FC = () => {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
-          {/* Flight Planning Map Card - now a link */}
-          <Link to="/icarion-pilot-dashboard/flight-planning" className="block">
+          {/* Flight Planning Map Card - now an external link to SkyVector */}
+          <a href="https://skyvector.com/?ll=38.0,23.0&zoom=5&fpl=LGAV%20ATH%20LGTS&ifr=true" target="_blank" rel="noopener noreferrer" className="block">
             <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50 h-full hover:bg-white/60 dark:hover:bg-gray-700/60 transition-colors cursor-pointer">
               <CardHeader>
-                <CardTitle>Flight Planning Map</CardTitle>
-                <CardDescription>Visually plan your routes with interactive map tools.</CardDescription>
+                <CardTitle className="flex items-center">
+                  SkyVector IFR Map <ExternalLink className="inline-block h-4 w-4 ml-2" />
+                </CardTitle>
+                <CardDescription>Access a comprehensive IFR flight planning map.</CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-800 dark:text-gray-200">
-                  Create and visualize your flight plans by clicking on airports and waypoints.
+                  Plan your routes, view charts, and check weather with this external resource.
                 </p>
               </CardContent>
             </Card>
-          </Link>
+          </a>
 
           <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
             <CardHeader>
