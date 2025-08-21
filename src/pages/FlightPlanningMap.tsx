@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { showSuccess, showError } from '@/utils/toast';
-import { mockAirports, mockNavaids } from '@/utils/mockAviationData'; // Import mock data
+import { mockAirports, mockNavaids } from '@/utils/mockAviationData';
 import DynamicBackground from '@/components/DynamicBackground';
 import { Plane, MapPin, Plus, Trash2, Download } from 'lucide-react';
 
@@ -16,34 +16,12 @@ import { Plane, MapPin, Plus, Trash2, Download } from 'lucide-react';
 // This ensures Leaflet's default icon paths are correctly set for Webpack/Vite
 // and explicitly defines the _getIconUrl method if it's missing or problematic.
 // This is a common workaround for Leaflet in React applications.
-delete L.Icon.Default.prototype._getIconUrl; // Remove existing problematic definition if any
+// Removed: delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
 });
-
-// Custom icon for airports - TEMPORARILY COMMENTED OUT FOR DEBUGGING
-/*
-const airportIcon = new L.Icon({
-  iconUrl: 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plane"><path d="M17.8 19.2 16 11.4l4.8 1.5c.9.3 1.5.9 1.5 1.7v.2c0 1-.7 1.5-1.5 1.7L17.8 19.2Z"/><path d="M13.6 19.8c-.6.8-1.5 1.2-2.4 1.2H9.5c-.9 0-1.8-.4-2.4-1.2L3.6 14.4c-.9-1.2-.6-2.9.7-3.8l1.5-1c.9-.6 2.2-.6 3.1 0L12 12l3.1-2.4c.9-.6 2.2-.6 3.1 0l1.5 1c1.3.9 1.6 2.6.7 3.8l-3.6 5.4Z"/><path d="M17.8 4.8 16 12.6l4.8-1.5c.9-.3 1.5-.9 1.5-1.7v-.2c0-1-.7-1.5-1.5-1.7L17.8 4.8Z"/></svg>'),
-  iconSize: [25, 25],
-  iconAnchor: [12, 12],
-  popupAnchor: [0, -10],
-  className: 'text-blue-600 dark:text-blue-400'
-});
-*/
-
-// Custom icon for navaids - TEMPORARILY COMMENTED OUT FOR DEBUGGING
-/*
-const navaidIcon = new L.Icon({
-  iconUrl: 'data:image/svg+xml;base64,' + btoa('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin"><path d="M12 12.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"/><path d="M12 22.5V12"/><path d="M12 12H4.2C3.7 12 3 11.3 3 10.8V6.2C3 5.7 3.7 5 4.2 5h15.6c.5 0 1.2.7 1.2 1.2v4.7c0 .5-.7 1.2-1.2 1.2H12Z"/></svg>'),
-  iconSize: [20, 20],
-  iconAnchor: [10, 10],
-  popupAnchor: [0, -10],
-  className: 'text-green-600 dark:text-green-400'
-});
-*/
 
 interface Waypoint {
   id: string;
@@ -55,7 +33,7 @@ interface Waypoint {
 }
 
 const flightPlanningBackgroundImages = [
-  '/images/backgrounds/flight-planning-bg.jpg', // Placeholder, replace with actual image
+  '/images/backgrounds/flight-planning-bg.jpg',
 ];
 
 const FlightPlanningMap: React.FC = () => {
@@ -181,7 +159,8 @@ const FlightPlanningMap: React.FC = () => {
             </CardHeader>
             <CardContent className="p-0 h-[500px]">
               <MapContainer
-                center={[38.0, 23.0]} // Centered near Athens for initial view
+                key="flight-planning-map" // Added key
+                center={[38.0, 23.0]}
                 zoom={5}
                 scrollWheelZoom={true}
                 className="h-full w-full"
@@ -196,7 +175,6 @@ const FlightPlanningMap: React.FC = () => {
                   <Marker
                     key={wp.id}
                     position={[wp.lat, wp.lng]}
-                    // icon={wp.type === 'airport' ? airportIcon : navaidIcon} // Temporarily removed icon prop
                   >
                     <L.Popup>
                       <strong>{wp.name}</strong><br />

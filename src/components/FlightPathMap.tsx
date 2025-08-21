@@ -7,7 +7,7 @@ import L from 'leaflet';
 // This ensures Leaflet's default icon paths are correctly set for Webpack/Vite
 // and explicitly defines the _getIconUrl method if it's missing or problematic.
 // This is a common workaround for Leaflet in React applications.
-delete L.Icon.Default.prototype._getIconUrl; // Remove existing problematic definition if any
+// Removed: delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -35,6 +35,7 @@ const FlightPathMap: React.FC<FlightPathMapProps> = ({ geoJsonData }) => {
 
   return (
     <MapContainer
+      key={JSON.stringify(geoJsonData)} // Added key to force re-render on data change
       center={startPoint}
       zoom={6}
       scrollWheelZoom={false}
