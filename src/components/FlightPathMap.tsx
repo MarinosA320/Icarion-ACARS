@@ -35,6 +35,7 @@ const FlightPathMap: React.FC<FlightPathMapProps> = ({ geoJsonData }) => {
 
   return (
     <MapContainer
+      key={Date.now()} // Add a dynamic key to force re-mount on re-render (common fix for Leaflet HMR issues)
       bounds={bounds}
       zoom={6} // Default zoom, will be adjusted by fitBounds
       scrollWheelZoom={false} // Make it non-interactive for display purposes

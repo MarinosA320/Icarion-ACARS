@@ -225,7 +225,7 @@ const FlightPlanning: React.FC = () => {
           </CardHeader>
           <CardContent className="p-0 h-[500px]">
             <MapContainer
-              key="flight-planning-map"
+              key={Date.now()} // Add a dynamic key to force re-mount on re-render (common fix for Leaflet HMR issues)
               center={[38.0, 23.0]}
               zoom={3}
               scrollWheelZoom={true}
