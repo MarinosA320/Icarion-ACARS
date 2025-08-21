@@ -16,6 +16,7 @@ import LogFlight from "./pages/LogFlight";
 import FlightBriefing from "./pages/FlightBriefing";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
+import IcarionPilotDashboard from "./pages/IcarionPilotDashboard"; // New import
 import Navbar from "./components/Navbar";
 import { supabase } from "./integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -25,7 +26,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 const queryClient = new QueryClient();
 
 interface Profile {
-  rank: string | null; // Updated to allow null
+  rank: string | null;
 }
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -136,7 +137,7 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <Navbar />
-                    <ErrorBoundary> {/* Added ErrorBoundary here */}
+                    <ErrorBoundary>
                       <StaffDashboard />
                     </ErrorBoundary>
                   </ProtectedRoute>
@@ -186,6 +187,15 @@ const App = () => {
                   <ProtectedRoute>
                     <Navbar />
                     <Contact />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/icarion-pilot-dashboard" // New route
+                element={
+                  <ProtectedRoute>
+                    <Navbar />
+                    <IcarionPilotDashboard />
                   </ProtectedRoute>
                 }
               />
