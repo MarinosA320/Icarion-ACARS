@@ -1,7 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,16 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { showSuccess, showError } from '@/utils/toast';
 import { mockAirports, mockNavaids } from '@/utils/mockAviationData';
 import DynamicBackground from '@/components/DynamicBackground';
-import { Plus, Trash2, ExternalLink } from 'lucide-react';
-import { ALL_AIRLINES } from '@/utils/aircraftData'; // Import ALL_AIRLINES for SimBrief
-
-// Fix for default Leaflet icon issue with Webpack/Vite
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-});
+import { ExternalLink } from 'lucide-react';
+import MapWrapper from '@/components/MapWrapper'; // Import the new MapWrapper
 
 interface Waypoint {
   id: string;
@@ -46,18 +35,6 @@ const FlightPlanning: React.FC = () => {
   const [payloadLbs, setPayloadLbs] = useState('');
 
   const [routeWaypoints, setRouteWaypoints] = useState<Waypoint[]>([]);
-  const mapRef = useRef<L.Map | null>(null);
-
-  // Effect to explicitly clean up the Leaflet map instance
-  useEffect(() => {
-    return () => {
-      if (mapRef.current) {
-        console.log('FlightPlanning: Cleaning up Leaflet map instance.');
-        mapRef.current.remove(); // Remove the map from the DOM and destroy its internal state
-        mapRef.current = null; // Clear the ref
-      }
-    };
-  }, []); // Empty dependency array ensures this runs once on mount and cleanup on unmount
 
   // Function to parse route string and add waypoints
   const parseAndPlotRoute = useCallback(() => {
@@ -95,14 +72,6 @@ const FlightPlanning: React.FC = () => {
       showError('No recognizable waypoints found in route string.');
     }
   }, [routeString, departureIcao, arrivalIcao]);
-
-  // Effect to fit map to bounds of waypoints
-  useEffect(() => {
-    if (mapRef.current && routeWaypoints.length > 0) {
-      const bounds = L.latLngBounds(routeWaypoints.map(wp => [wp.lat, wp.lng]));
-      mapRef.current.fitBounds(bounds, { padding: 50, duration: 0.5 });
-    }
-  }, [routeWaypoints]);
 
   const handleMapClick = useCallback((e: L.LeafletMouseEvent) => {
     const { lat, lng } = e.latlng;
@@ -159,8 +128,6 @@ const FlightPlanning: React.FC = () => {
     setRouteWaypoints([]);
     showSuccess('All fields cleared!');
   };
-
-  const lineGeoJsonPositions = routeWaypoints.map(wp => [wp.lat, wp.lng]);
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -235,43 +202,11 @@ const FlightPlanning: React.FC = () => {
             <CardDescription>Click on the map to add custom waypoints.</CardDescription>
           </CardHeader>
           <CardContent className="p-0 h-[500px]">
-            <MapContainer
-              key={Date.now()} // Keep this to force re-mount on re-render (common fix for Leaflet HMR issues)
-              center={[38.0, 23.0]}
-              zoom={3}
-              scrollWheelZoom={true}
-              style={{ width: '100%', height: '100%' }}
-              onClick={handleMapClick}
-              whenCreated={mapInstance => { mapRef.current = mapInstance; }}
-              className="rounded-md"
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              {routeWaypoints.map((wp) => (
-                <Marker
-                  key={wp.id}
-                  position={[wp.lat, wp.lng]}
-                >
-                  <Popup>
-                    <div className="font-semibold">{wp.name}</div>
-                    <div className="text-xs text-muted-foreground">Lat: {wp.lat.toFixed(2)}, Lng: {wp.lng.toFixed(2)}</div>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      className="mt-2 text-xs h-6 px-2 py-0"
-                      onClick={() => removeWaypoint(wp.id)}
-                    >
-                      <Trash2 className="h-4 w-4" /> Remove
-                    </Button>
-                  </Popup>
-                </Marker>
-              ))}
-              {routeWaypoints.length > 1 && (
-                <Polyline positions={lineGeoJsonPositions} color="#007bff" weight={3} dashArray="5, 5" />
-              )}
-            </MapContainer>
+            <MapWrapper
+              routeWaypoints={routeWaypoints}
+              handleMapClick={handleMapClick}
+              removeWaypoint={removeWaypoint}
+            />
           </CardContent>
         </Card>
 
