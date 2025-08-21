@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import DynamicBackground from '@/components/DynamicBackground';
 import { ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom'; // Import Link
 
 const icarionPilotResourcesBackgroundImages = [
   '/images/backgrounds/profile-bg-new.png', // Using the same background as the dashboard for consistency
@@ -86,9 +87,24 @@ const IcarionPilotResources: React.FC = () => {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+          {/* Flight Planning Map Card - now a link */}
+          <Link to="/icarion-pilot-dashboard/flight-planning" className="block">
+            <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50 h-full hover:bg-white/60 dark:hover:bg-gray-700/60 transition-colors cursor-pointer">
+              <CardHeader>
+                <CardTitle>Flight Planning Map</CardTitle>
+                <CardDescription>Visually plan your routes with interactive map tools.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-800 dark:text-gray-200">
+                  Create and visualize your flight plans by clicking on airports and waypoints.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
+
           <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
             <CardHeader>
-              <CardTitle>Flight Planning & Charts</CardTitle>
+              <CardTitle>Flight Planning & Charts (External)</CardTitle>
               <CardDescription>Tools to plan your routes and access aeronautical charts.</CardDescription>
             </CardHeader>
             <CardContent>
