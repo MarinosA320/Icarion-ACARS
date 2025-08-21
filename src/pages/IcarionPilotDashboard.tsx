@@ -4,7 +4,7 @@ import { showError } from '@/utils/toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import DynamicBackground from '@/components/DynamicBackground';
-import { ExternalLink } from 'lucide-react'; // Import ExternalLink icon
+import { Link } from 'react-router-dom'; // Import Link
 
 const icarionPilotBackgroundImages = [
   '/images/backgrounds/profile-bg-new.png', // Example background image
@@ -100,46 +100,20 @@ const IcarionPilotDashboard: React.FC = () => {
             </CardContent>
           </Card>
 
-          <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
-            <CardHeader>
-              <CardTitle>Pilot Resources</CardTitle>
-              <CardDescription>Essential tools and links for your flights.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 text-gray-800 dark:text-gray-200">
-                <li>
-                  <a href="https://simbrief.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center">
-                    SimBrief (Flight Planning) <ExternalLink className="inline-block h-4 w-4 ml-1" />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://skyvector.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center">
-                    SkyVector (Charts & Planning) <ExternalLink className="inline-block h-4 w-4 ml-1" />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://www.windy.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center">
-                    Windy.com (Aviation Weather) <ExternalLink className="inline-block h-4 w-4 ml-1" />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://charts.navigraph.com/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center">
-                    Navigraph Charts (Subscription Required) <ExternalLink className="inline-block h-4 w-4 ml-1" />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://www.vatsim.net/pilots/pilots-resources" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center">
-                    VATSIM Pilot Resources <ExternalLink className="inline-block h-4 w-4 ml-1" />
-                  </a>
-                </li>
-                <li>
-                  <a href="https://ivao.aero/training/documentation/manuals/index.htm" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline flex items-center">
-                    IVAO Training Documentation <ExternalLink className="inline-block h-4 w-4 ml-1" />
-                  </a>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+          {/* Pilot Resources Card - now a link */}
+          <Link to="/icarion-pilot-dashboard/resources" className="block">
+            <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50 h-full hover:bg-white/60 dark:hover:bg-gray-700/60 transition-colors cursor-pointer">
+              <CardHeader>
+                <CardTitle>Pilot Resources</CardTitle>
+                <CardDescription>Essential tools and links for your flights.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-800 dark:text-gray-200">
+                  Access a comprehensive list of external flight planning, weather, and ATC resources.
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
 
           <Card className="shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
             <CardHeader>

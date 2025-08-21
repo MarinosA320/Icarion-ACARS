@@ -16,7 +16,8 @@ import LogFlight from "./pages/LogFlight";
 import FlightBriefing from "./pages/FlightBriefing";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
-import IcarionPilotDashboard from "./pages/IcarionPilotDashboard"; // New import
+import IcarionPilotDashboard from "./pages/IcarionPilotDashboard";
+import IcarionPilotResources from "./pages/IcarionPilotResources"; // New import
 import Navbar from "./components/Navbar";
 import { supabase } from "./integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -191,11 +192,20 @@ const App = () => {
                 }
               />
               <Route
-                path="/icarion-pilot-dashboard" // New route
+                path="/icarion-pilot-dashboard"
                 element={
                   <ProtectedRoute>
                     <Navbar />
                     <IcarionPilotDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/icarion-pilot-dashboard/resources" {/* New route for resources */}
+                element={
+                  <ProtectedRoute>
+                    <Navbar />
+                    <IcarionPilotResources />
                   </ProtectedRoute>
                 }
               />
