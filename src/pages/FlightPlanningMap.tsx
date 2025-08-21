@@ -12,7 +12,11 @@ import { mockAirports, mockNavaids } from '@/utils/mockAviationData'; // Import 
 import DynamicBackground from '@/components/DynamicBackground';
 import { Plane, MapPin, Plus, Trash2, Download } from 'lucide-react';
 
-// Fix for default marker icon not showing up
+// Fix for default marker icon not showing up in React-Leaflet
+// This ensures Leaflet's default icon paths are correctly set for Webpack/Vite
+// and explicitly defines the _getIconUrl method if it's missing or problematic.
+// This is a common workaround for Leaflet in React applications.
+delete L.Icon.Default.prototype._getIconUrl; // Remove existing problematic definition if any
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
