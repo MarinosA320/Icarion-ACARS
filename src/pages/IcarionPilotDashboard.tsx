@@ -4,6 +4,7 @@ import { showError } from '@/utils/toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import DynamicBackground from '@/components/DynamicBackground';
+import { Button } from '@/components/ui/button'; // Import Button
 
 const icarionPilotBackgroundImages = [
   '/images/backgrounds/profile-bg-new.png', // Example background image
@@ -71,6 +72,7 @@ const IcarionPilotDashboard: React.FC = () => {
         </div>
       </div>
     );
+  );
   }
 
   return (
@@ -92,10 +94,16 @@ const IcarionPilotDashboard: React.FC = () => {
               <CardTitle>Exclusive Briefings</CardTitle>
               <CardDescription>Access internal flight briefings and operational updates.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-gray-800 dark:text-gray-200">
+            <CardContent className="flex flex-col justify-between h-full">
+              <p className="text-gray-800 dark:text-gray-200 mb-4">
                 Details about upcoming events, new routes, and fleet updates will appear here.
               </p>
+              <Button 
+                onClick={() => window.open('https://example.com/icarion-briefings', '_blank')}
+                className="w-full mt-auto"
+              >
+                View Briefings
+              </Button>
             </CardContent>
           </Card>
 
@@ -104,10 +112,16 @@ const IcarionPilotDashboard: React.FC = () => {
               <CardTitle>Pilot Resources</CardTitle>
               <CardDescription>Download custom liveries, flight planning tools, and more.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-gray-800 dark:text-gray-200">
+            <CardContent className="flex flex-col justify-between h-full">
+              <p className="text-gray-800 dark:text-gray-200 mb-4">
                 Links to essential tools and documents for your Icarion flights.
               </p>
+              <Button 
+                onClick={() => window.open('https://example.com/icarion-resources', '_blank')}
+                className="w-full mt-auto"
+              >
+                Access Resources
+              </Button>
             </CardContent>
           </Card>
 
