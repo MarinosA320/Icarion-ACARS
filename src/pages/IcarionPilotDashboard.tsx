@@ -100,6 +100,7 @@ const IcarionPilotDashboard: React.FC = () => {
               <Button 
                 onClick={() => window.open('https://example.com/icarion-briefings', '_blank')}
                 className="w-full mt-auto"
+                variant="default"
               >
                 View Briefings
               </Button>
@@ -118,6 +119,7 @@ const IcarionPilotDashboard: React.FC = () => {
               <Button 
                 onClick={() => window.open('https://example.com/icarion-resources', '_blank')}
                 className="w-full mt-auto"
+                variant="default"
               >
                 Access Resources
               </Button>
@@ -129,10 +131,17 @@ const IcarionPilotDashboard: React.FC = () => {
               <CardTitle>Internal Communications</CardTitle>
               <CardDescription>Direct messages and announcements from Icarion staff.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-gray-800 dark:text-gray-200">
+            <CardContent className="flex flex-col justify-between h-full">
+              <p className="text-gray-800 dark:text-gray-200 mb-4">
                 Stay connected with the latest news and direct communications.
               </p>
+              <Button 
+                onClick={() => window.open('https://example.com/icarion-communications', '_blank')}
+                className="w-full mt-auto"
+                variant="default"
+              >
+                View Communications
+              </Button>
             </CardContent>
           </Card>
         </div>
