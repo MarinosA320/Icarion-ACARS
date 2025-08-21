@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Map, { Marker, Source, Layer } from 'react-map-gl';
-// Removed: import 'mapbox-gl/dist/mapbox-gl.css'; // Import Mapbox GL CSS
+import { MapContainer, TileLayer, Marker, Polyline, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
+import L from 'leaflet'; // Import Leaflet library for custom icon
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,10 +12,13 @@ import { mockAirports, mockNavaids } from '@/utils/mockAviationData';
 import DynamicBackground from '@/components/DynamicBackground';
 import { Plus, Trash2, Download } from 'lucide-react';
 
-// IMPORTANT: Replace 'YOUR_MAPBOX_ACCESS_TOKEN' with your actual Mapbox Public Access Token.
-// You can get one from https://account.mapbox.com/access-tokens/
-// For production, consider loading this from an environment variable.
-const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_ACCESS_TOKEN || 'YOUR_MAPBOX_ACCESS_TOKEN';
+// Fix for default Leaflet icon issue with Webpack/Vite
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+});
 
 interface Waypoint {
   id: string;
@@ -32,13 +36,7 @@ const flightPlanningBackgroundImages = [
 const FlightPlanningMap: React.FC = () => {
   const [routeWaypoints, setRouteWaypoints] = useState<Waypoint[]>([]);
   const [newWaypointInput, setNewWaypointInput] = useState('');
-  const mapRef = useRef<mapboxgl.Map | null>(null);
-
-  const [viewState, setViewState] = useState({
-    longitude: 23.0,
-    latitude: 38.0,
-    zoom: 5,
-  });
+  const mapRef = useRef<L.Map | null>(null); // Ref for Leaflet map instance
 
   const addWaypoint = useCallback((waypoint: Waypoint) => {
     setRouteWaypoints((prev) => {
@@ -87,8 +85,8 @@ const FlightPlanningMap: React.FC = () => {
     setNewWaypointInput('');
   };
 
-  const handleMapClick = useCallback((e: mapboxgl.MapMouseEvent) => {
-    const { lng, lat } = e.lngLat;
+  const handleMapClick = useCallback((e: L.LeafletMouseEvent) => {
+    const { lat, lng } = e.latlng;
     addWaypoint({
       id: `custom-${Date.now()}`,
       type: 'custom',
@@ -101,9 +99,8 @@ const FlightPlanningMap: React.FC = () => {
   // Fit map to bounds of waypoints
   useEffect(() => {
     if (mapRef.current && routeWaypoints.length > 0) {
-      const bounds = new mapboxgl.LngLatBounds();
-      routeWaypoints.forEach(wp => bounds.extend([wp.lng, wp.lat]));
-      mapRef.current.fitBounds(bounds, { padding: 50, duration: 1000 });
+      const bounds = L.latLngBounds(routeWaypoints.map(wp => [wp.lat, wp.lng]));
+      mapRef.current.fitBounds(bounds, { padding: 50, duration: 1 }); // duration 1 for instant fit
     }
   }, [routeWaypoints]);
 
@@ -130,13 +127,7 @@ const FlightPlanningMap: React.FC = () => {
     showSuccess('GeoJSON file downloaded!');
   };
 
-  const lineGeoJson = {
-    type: 'Feature',
-    geometry: {
-      type: 'LineString',
-      coordinates: routeWaypoints.map(wp => [wp.lng, wp.lat]),
-    },
-  };
+  const lineGeoJsonPositions = routeWaypoints.map(wp => [wp.lat, wp.lng]); // Leaflet expects [lat, lng]
 
   return (
     <div className="relative min-h-screen flex flex-col">
@@ -159,67 +150,42 @@ const FlightPlanningMap: React.FC = () => {
               <CardDescription>Click to add waypoints or drag to pan.</CardDescription>
             </CardHeader>
             <CardContent className="p-0 h-[500px]">
-              <Map
-                mapboxAccessToken={MAPBOX_ACCESS_TOKEN}
-                {...viewState}
-                onMove={evt => setViewState(evt.viewState)}
+              <MapContainer
+                center={[38.0, 23.0]} // Initial center, will be overridden by fitBounds
+                zoom={5} // Initial zoom
+                scrollWheelZoom={true}
                 style={{ width: '100%', height: '100%' }}
-                mapStyle="mapbox://styles/mapbox/streets-v11" // You can change this style
                 onClick={handleMapClick}
-                ref={mapRef}
+                whenCreated={mapInstance => { mapRef.current = mapInstance; }} // Get map instance
+                className="rounded-md"
               >
+                <TileLayer
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
                 {routeWaypoints.map((wp) => (
                   <Marker
                     key={wp.id}
-                    longitude={wp.lng}
-                    latitude={wp.lat}
-                    anchor="bottom"
+                    position={[wp.lat, wp.lng]}
                   >
-                    <div className="relative">
-                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs px-2 py-1 rounded-md whitespace-nowrap">
-                        {wp.name}
-                      </div>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="lucide lucide-map-pin text-red-500"
-                      >
-                        <path d="M12 17.5L12 17.5" />
-                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
-                        <circle cx="12" cy="9" r="3" />
-                      </svg>
+                    <Popup>
+                      <div className="font-semibold">{wp.name}</div>
+                      <div className="text-xs text-muted-foreground">Lat: {wp.lat.toFixed(2)}, Lng: {wp.lng.toFixed(2)}</div>
                       <Button
                         variant="destructive"
                         size="sm"
-                        className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs h-6 px-2 py-0"
+                        className="mt-2 text-xs h-6 px-2 py-0"
                         onClick={() => removeWaypoint(wp.id)}
                       >
                         Remove
                       </Button>
-                    </div>
+                    </Popup>
                   </Marker>
                 ))}
                 {routeWaypoints.length > 1 && (
-                  <Source id="route-line" type="geojson" data={lineGeoJson}>
-                    <Layer
-                      id="line-layer"
-                      type="line"
-                      paint={{
-                        'line-color': '#007bff',
-                        'line-width': 3,
-                        'line-dasharray': [2, 2],
-                      }}
-                    />
-                  </Source>
+                  <Polyline positions={lineGeoJsonPositions} color="#007bff" weight={3} dashArray="5, 5" />
                 )}
-              </Map>
+              </MapContainer>
             </CardContent>
           </Card>
 

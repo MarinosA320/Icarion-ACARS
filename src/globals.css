@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* Import Mapbox GL CSS globally */
-@import 'mapbox-gl/dist/mapbox-gl.css';
+/* Removed: @import 'mapbox-gl/dist/mapbox-gl.css'; */
 
 @layer base {
   :root {
@@ -140,11 +140,6 @@
 .animate-fade-in-up {
   animation: fadeInUp 0.8s ease-out forwards;
 }
-
-/* Animation Delays */
-.delay-200 { animation-delay: 0.2s; }
-.delay-400 { animation-delay: 0.4s; }
-.delay-600 { animation-delay: 0.6s; }
 
 /* Logbook Page Slide Transition */
 .page-slide-enter {
