@@ -72,7 +72,6 @@ const IcarionPilotDashboard: React.FC = () => {
         </div>
       </div>
     );
-  );
   }
 
   return (
