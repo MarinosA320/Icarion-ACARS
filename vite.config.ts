@@ -11,9 +11,11 @@ export default defineConfig(() => ({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Explicitly alias mapbox-gl to its ES module build
+      "mapbox-gl": "mapbox-gl/dist/mapbox-gl.js",
     },
   },
   optimizeDeps: {
-    include: ['react-map-gl', 'mapbox-gl'], // Explicitly include these for optimization
+    include: ['react-map-gl', 'mapbox-gl'],
   },
 }));
