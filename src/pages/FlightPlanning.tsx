@@ -48,6 +48,17 @@ const FlightPlanning: React.FC = () => {
   const [routeWaypoints, setRouteWaypoints] = useState<Waypoint[]>([]);
   const mapRef = useRef<L.Map | null>(null);
 
+  // Effect to explicitly clean up the Leaflet map instance
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        console.log('FlightPlanning: Cleaning up Leaflet map instance.');
+        mapRef.current.remove(); // Remove the map from the DOM and destroy its internal state
+        mapRef.current = null; // Clear the ref
+      }
+    };
+  }, []); // Empty dependency array ensures this runs once on mount and cleanup on unmount
+
   // Function to parse route string and add waypoints
   const parseAndPlotRoute = useCallback(() => {
     const newWaypoints: Waypoint[] = [];
@@ -225,7 +236,7 @@ const FlightPlanning: React.FC = () => {
           </CardHeader>
           <CardContent className="p-0 h-[500px]">
             <MapContainer
-              key={Date.now()} // Add a dynamic key to force re-mount on re-render (common fix for Leaflet HMR issues)
+              key={Date.now()} // Keep this to force re-mount on re-render (common fix for Leaflet HMR issues)
               center={[38.0, 23.0]}
               zoom={3}
               scrollWheelZoom={true}
