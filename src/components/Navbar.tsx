@@ -15,19 +15,17 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { MenuIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import NotificationMenu from '@/components/NotificationMenu';
+import NotificationMenu from '@/components/NotificationMenu'; // New import
 
 interface Profile {
   display_name: string | null;
   avatar_url: string | null;
   is_staff: boolean;
-  authorized_airlines: string[] | null; // Added authorized_airlines
 }
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [isIcarionPilot, setIsIcarionPilot] = useState(false); // New state for Icarion pilot status
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -36,7 +34,7 @@ const Navbar = () => {
       if (user) {
         const { data, error } = await supabase
           .from('profiles')
-          .select('display_name, avatar_url, is_staff, authorized_airlines') // Select authorized_airlines
+          .select('display_name, avatar_url, is_staff')
           .eq('id', user.id)
           .single();
 
@@ -44,8 +42,6 @@ const Navbar = () => {
           console.error('Error fetching profile:', error);
         } else {
           setProfile(data);
-          // Check if 'Icarion Virtual' is in authorized_airlines
-          setIsIcarionPilot(data?.authorized_airlines?.includes('Icarion Virtual') || false);
         }
       }
     };
@@ -57,7 +53,6 @@ const Navbar = () => {
         fetchProfile();
       } else if (event === 'SIGNED_OUT') {
         setProfile(null);
-        setIsIcarionPilot(false); // Reset on sign out
       }
     });
 
@@ -73,14 +68,12 @@ const Navbar = () => {
     <>
       <Link to="/logbook" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Logbook</Link>
       <Link to="/social-media" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Social Media</Link>
+      {/* Removed My Bookings Link */}
       <Link to="/announcements" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Announcements</Link>
       <Link to="/flight-briefing" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Flight Briefing (Beta)</Link>
       <Link to="/careers" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Careers</Link>
       <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Contact</Link>
       <Link to="/profile-settings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Profile Settings</Link>
-      {isIcarionPilot && ( // Conditionally render for Icarion pilots
-        <Link to="/icarion-pilot-dashboard" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Icarion Pilot Dashboard</Link>
-      )}
       {profile?.is_staff && (
         <Link to="/staff-dashboard" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Staff Dashboard</Link>
       )}
@@ -103,7 +96,7 @@ const Navbar = () => {
           <SheetContent side="left" className="w-[250px] sm:w-[300px] bg-white dark:bg-gray-800 p-4">
             <div className="flex flex-col space-y-4 mt-6">
               {navLinks}
-              <NotificationMenu />
+              <NotificationMenu /> {/* Added NotificationMenu here for mobile */}
               <Button onClick={handleLogout} variant="outline" className="w-full">Logout</Button>
             </div>
           </SheetContent>
@@ -111,7 +104,7 @@ const Navbar = () => {
       ) : (
         <div className="flex items-center space-x-6">
           {navLinks}
-          <NotificationMenu />
+          <NotificationMenu /> {/* Added NotificationMenu here for desktop */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
