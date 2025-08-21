@@ -1,3 +1,4 @@
+import React from "react"; // Added React import
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "sonner";
 import { toast } from "sonner";
@@ -17,7 +18,7 @@ import FlightBriefing from "./pages/FlightBriefing";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
 import IcarionPilotDashboard from "./pages/IcarionPilotDashboard";
-import IcarionPilotResources from "./pages/IcarionPilotResources"; // New import
+import IcarionPilotResources from "./pages/IcarionPilotResources";
 import Navbar from "./components/Navbar";
 import { supabase } from "./integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -201,7 +202,7 @@ const App = () => {
                 }
               />
               <Route
-                path="/icarion-pilot-dashboard/resources" {/* New route for resources */}
+                path="/icarion-pilot-dashboard/resources"
                 element={
                   <ProtectedRoute>
                     <Navbar />
