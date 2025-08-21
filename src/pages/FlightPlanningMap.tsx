@@ -38,6 +38,16 @@ const FlightPlanningMap: React.FC = () => {
   const [newWaypointInput, setNewWaypointInput] = useState('');
   const mapRef = useRef<L.Map | null>(null); // Ref for Leaflet map instance
 
+  // Effect to clean up the map instance when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null; // Clear the ref
+      }
+    };
+  }, []);
+
   const addWaypoint = useCallback((waypoint: Waypoint) => {
     setRouteWaypoints((prev) => {
       const newWaypoints = [...prev, waypoint];
@@ -151,6 +161,7 @@ const FlightPlanningMap: React.FC = () => {
             </CardHeader>
             <CardContent className="p-0 h-[500px]">
               <MapContainer
+                key="flight-planning-map" // Keep the key for React's re-mounting
                 center={[38.0, 23.0]} // Initial center, will be overridden by fitBounds
                 zoom={5} // Initial zoom
                 scrollWheelZoom={true}
