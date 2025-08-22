@@ -1,6 +1,6 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
+// Removed 'leaflet/dist/leaflet.css' import as it's now in globals.css
 import L from 'leaflet';
 
 // Fix for default marker icon not showing up
@@ -17,6 +17,16 @@ if (typeof L.Icon.Default.prototype._getIconUrl === 'undefined') {
   };
 }
 
+// Helper component to force map invalidation
+const MapResizer: React.FC = () => {
+  const map = useMap();
+  useEffect(() => {
+    map.invalidateSize();
+    console.log("Leaflet map invalidateSize() called.");
+  }, [map]);
+  return null;
+};
+
 const IfrFlightPlanning: React.FC = () => {
   const defaultCenter: [number, number] = [51.505, -0.09]; // London coordinates
   const defaultZoom = 13;
@@ -31,6 +41,7 @@ const IfrFlightPlanning: React.FC = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           <Marker position={defaultCenter} />
+          <MapResizer /> {/* Add the MapResizer component */}
         </MapContainer>
       </div>
       <div className="w-full max-w-4xl mt-4 p-2 rounded-md text-xs text-gray-900 dark:text-white bg-white/80 dark:bg-gray-800/80">
