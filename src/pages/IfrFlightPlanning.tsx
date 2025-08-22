@@ -2,17 +2,32 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'; // Corrected import
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import { showSuccess, showError } from '@/utils/toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import FlightPathMap from '@/components/FlightPathMap'; // Reusing existing map component
-import DynamicBackground from '@/components/DynamicBackground';
+import { MapContainer, TileLayer, Polyline, Marker } from 'react-leaflet'; // Directly import MapContainer, etc.
+import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS directly
+import L from 'leaflet'; // Import Leaflet for marker icon fix
 
-const ifrFlightPlanningBackgroundImages = [
-  '/images/backgrounds/ifr-planning-bg.jpg', // Assuming you'll add this image
-];
+// Fix for default marker icon not showing up
+// Instead of deleting, explicitly set the _getIconUrl method
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+});
+
+// Define the _getIconUrl method on the prototype
+// This is a common workaround for Leaflet icons not appearing in some environments
+if (typeof L.Icon.Default.prototype._getIconUrl === 'undefined') {
+  L.Icon.Default.prototype._getIconUrl = function (name: string) {
+    return L.Icon.Default.prototype.options[name];
+  };
+}
+
+// Removed DynamicBackground import and usage
 
 const IfrFlightPlanning: React.FC = () => {
   const [departureIcao, setDepartureIcao] = useState('');
@@ -72,76 +87,71 @@ const IfrFlightPlanning: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col">
-      <DynamicBackground images={ifrFlightPlanningBackgroundImages} interval={10000} />
-      <div className="fixed inset-0 bg-black opacity-50 z-0"></div>
-      
-      <div className="relative z-10 w-full max-w-7xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-8 text-center">IFR Flight Planning Map</h1>
+    <div className="min-h-screen flex flex-col items-center justify-start p-4 pt-24 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+      <h1 className="text-3xl font-bold mb-8 text-center">IFR Flight Planning Map</h1>
 
-        <Card className="w-full h-[70vh] shadow-md rounded-lg bg-white/80 dark:bg-gray-800/80 text-gray-900 dark:text-white relative overflow-hidden">
-          <CardHeader className="absolute top-0 left-0 right-0 z-20 bg-white/90 dark:bg-gray-800/90 p-4 rounded-t-lg">
-            <CardTitle>Interactive IFR Map</CardTitle>
-            <CardDescription>Visualize your route and key aviation points.</CardDescription>
-            <div className="flex flex-col md:flex-row gap-2 mt-4">
-              <Input
-                placeholder="Departure ICAO (e.g., KLAX)"
-                value={departureIcao}
-                onChange={(e) => setDepartureIcao(e.target.value.toUpperCase())}
-                maxLength={4}
-                className="flex-1"
+      <Card className="w-full max-w-7xl h-[70vh] shadow-md rounded-lg bg-white dark:bg-gray-800 relative overflow-hidden">
+        <CardHeader className="absolute top-0 left-0 right-0 z-20 bg-white/90 dark:bg-gray-800/90 p-4 rounded-t-lg">
+          <CardTitle>Interactive IFR Map</CardTitle>
+          <CardDescription>Visualize your route and key aviation points.</CardDescription>
+          <div className="flex flex-col md:flex-row gap-2 mt-4">
+            <Input
+              placeholder="Departure ICAO (e.g., KLAX)"
+              value={departureIcao}
+              onChange={(e) => setDepartureIcao(e.target.value.toUpperCase())}
+              maxLength={4}
+              className="flex-1"
+            />
+            <Input
+              placeholder="Arrival ICAO (e.g., KJFK)"
+              value={arrivalIcao}
+              onChange={(e) => setArrivalIcao(e.target.value.toUpperCase())}
+              maxLength={4}
+              className="flex-1"
+            />
+            <Button onClick={handleLoadMap} className="w-full md:w-auto">Load Map</Button>
+          </div>
+        </CardHeader>
+        <CardContent className="p-0 h-full w-full relative">
+          <MapContainer
+            center={mapCenter}
+            zoom={mapZoom}
+            scrollWheelZoom={true}
+            className="h-full w-full"
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            {depCoords && <Marker position={depCoords} title={`Departure: ${departureIcao}`} />}
+            {arrCoords && <Marker position={arrCoords} title={`Arrival: ${arrivalIcao}`} />}
+            {depCoords && arrCoords && (
+              <Polyline positions={[depCoords, arrCoords]} color="#007bff" weight={3} opacity={0.7} />
+            )}
+            {/* Placeholder for IFR Airways/Navaids - In a real app, this would load GeoJSON data */}
+            {depCoords && arrCoords && (
+              <Polyline
+                positions={[
+                  [depCoords[0] + 1, depCoords[1] + 1],
+                  [mapCenter[0], mapCenter[1]],
+                  [arrCoords[0] - 1, arrCoords[1] - 1],
+                ]}
+                color="#ff7800"
+                weight={2}
+                dashArray="5, 5"
+                opacity={0.5}
+                tooltip="Simulated Airway"
               />
-              <Input
-                placeholder="Arrival ICAO (e.g., KJFK)"
-                value={arrivalIcao}
-                onChange={(e) => setArrivalIcao(e.target.value.toUpperCase())}
-                maxLength={4}
-                className="flex-1"
-              />
-              <Button onClick={handleLoadMap} className="w-full md:w-auto">Load Map</Button>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0 h-full w-full relative">
-            <MapContainer
-              center={mapCenter}
-              zoom={mapZoom}
-              scrollWheelZoom={true}
-              className="h-full w-full"
-            >
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              {depCoords && <Marker position={depCoords} title={`Departure: ${departureIcao}`} />}
-              {arrCoords && <Marker position={arrCoords} title={`Arrival: ${arrivalIcao}`} />}
-              {depCoords && arrCoords && (
-                <Polyline positions={[depCoords, arrCoords]} color="#007bff" weight={3} opacity={0.7} />
-              )}
-              {/* Placeholder for IFR Airways/Navaids - In a real app, this would load GeoJSON data */}
-              {depCoords && arrCoords && (
-                <Polyline
-                  positions={[
-                    [depCoords[0] + 1, depCoords[1] + 1],
-                    [mapCenter[0], mapCenter[1]],
-                    [arrCoords[0] - 1, arrCoords[1] - 1],
-                  ]}
-                  color="#ff7800"
-                  weight={2}
-                  dashArray="5, 5"
-                  opacity={0.5}
-                  tooltip="Simulated Airway"
-                />
-              )}
-            </MapContainer>
-            <div className="absolute bottom-4 left-4 bg-white/80 dark:bg-gray-800/80 p-2 rounded-md text-xs text-gray-900 dark:text-white z-20">
-              <p>Map data from OpenStreetMap contributors.</p>
-              <p className="text-red-600">
-                Note: Official IFR charts and detailed airway data are copyrighted and cannot be freely embedded. This map provides a basic visualization.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            )}
+          </MapContainer>
+          <div className="absolute bottom-4 left-4 bg-white/80 dark:bg-gray-800/80 p-2 rounded-md text-xs text-gray-900 dark:text-white z-20">
+            <p>Map data from OpenStreetMap contributors.</p>
+            <p className="text-red-600">
+              Note: Official IFR charts and detailed airway data are copyrighted and cannot be freely embedded. This map provides a basic visualization.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
