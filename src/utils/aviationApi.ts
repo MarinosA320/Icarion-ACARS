@@ -1,37 +1,11 @@
 import { showError } from './toast';
 
-interface MetarData {
-  rawText: string;
-  stationId: string;
-  observationTime: string;
-  temp: { value: number; unit: string };
-  dewpoint: { value: number; unit: string };
-  wind: { speed: number; direction: string; unit: string };
-  visibility: { value: number; unit: string };
-  altimeter: { value: number; unit: string };
-  flightCategory: string;
-  clouds: Array<{ coverage: string; altitude: number; type?: string }>;
-}
-
-interface TafData {
-  rawText: string;
-  stationId: string;
-  issueTime: string;
-  forecast: Array<{
-    period: { from: string; to: string };
-    wind: { speed: number; direction: string; unit: string };
-    visibility: { value: number; unit: string };
-    clouds: Array<{ coverage: string; altitude: number; type?: string }>;
-    changeIndicator?: string;
-  }>;
-}
-
 /**
  * Fetches METAR data for a given ICAO station.
  * @param icao The ICAO code of the airport (e.g., 'KJFK').
  * @returns METAR data or null if not found/error.
  */
-export async function fetchMetar(icao: string): Promise<MetarData | null> {
+export async function fetchMetar(icao: string): Promise<any | null> { // Changed to any for simplicity
   try {
     const response = await fetch(`https://aviationweather.gov/api/data/metar?ids=${icao}&format=json`);
     if (!response.ok) {
@@ -42,7 +16,7 @@ export async function fetchMetar(icao: string): Promise<MetarData | null> {
     }
     const data = await response.json();
     if (data && data.length > 0) {
-      return data[0] as MetarData;
+      return data[0];
     }
     showError(`No METAR data found for ${icao}.`);
     return null;
@@ -58,7 +32,7 @@ export async function fetchMetar(icao: string): Promise<MetarData | null> {
  * @param icao The ICAO code of the airport (e.g., 'KJFK').
  * @returns TAF data or null if not found/error.
  */
-export async function fetchTaf(icao: string): Promise<TafData | null> {
+export async function fetchTaf(icao: string): Promise<any | null> { // Changed to any for simplicity
   try {
     const response = await fetch(`https://aviationweather.gov/api/data/taf?ids=${icao}&format=json`);
     if (!response.ok) {
@@ -69,7 +43,7 @@ export async function fetchTaf(icao: string): Promise<TafData | null> {
     }
     const data = await response.json();
     if (data && data.length > 0) {
-      return data[0] as TafData;
+      return data[0];
     }
     showError(`No TAF data found for ${icao}.`);
     return null;
