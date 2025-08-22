@@ -1,9 +1,8 @@
+@import 'leaflet/dist/leaflet.css'; /* Moved to the top */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Ensure Leaflet CSS is loaded globally and early */
-@import 'leaflet/dist/leaflet.css';
 
 @layer base {
   :root {

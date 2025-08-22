@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
-// Removed 'leaflet/dist/leaflet.css' import as it's now in globals.css
 import L from 'leaflet';
 
 // Fix for default marker icon not showing up
