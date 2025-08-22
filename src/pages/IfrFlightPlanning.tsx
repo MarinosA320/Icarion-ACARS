@@ -60,11 +60,15 @@ const IfrFlightPlanning: React.FC = () => {
     }
   };
 
+  // Use a key to force re-render of the map when relevant props change
+  const mapKey = `${mapCenter[0]}-${mapCenter[1]}-${mapZoom}-${depCoords?.[0]}-${arrCoords?.[0]}`;
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-start p-4 pt-24 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
       <h1 className="text-3xl font-bold mb-8 text-center">IFR Flight Planning Map</h1>
 
-      <div className="w-full max-w-7xl h-[70vh] shadow-md rounded-lg bg-white dark:bg-gray-800 relative overflow-hidden">
+      {/* Map container with fixed height and no background */}
+      <div className="w-full max-w-7xl h-[600px] shadow-md rounded-lg relative overflow-hidden border border-blue-500"> {/* Added border for visibility */}
         {/* Input fields as an overlay */}
         <div className="absolute top-0 left-0 right-0 z-20 bg-white/90 dark:bg-gray-800/90 p-4 rounded-t-lg flex flex-col md:flex-row gap-2">
           <Input
@@ -86,6 +90,7 @@ const IfrFlightPlanning: React.FC = () => {
 
         {/* Map Component */}
         <SimpleMap
+          key={mapKey} // Added key to force re-render
           center={mapCenter}
           zoom={mapZoom}
           depCoords={depCoords}
