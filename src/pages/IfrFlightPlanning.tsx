@@ -2,7 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent } => {
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'; // Corrected import
+import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
+import { showSuccess, showError } from '@/utils/toast';
+import { Skeleton } from '@/components/ui/skeleton';
+import FlightPathMap from '@/components/FlightPathMap'; // Reusing existing map component
+import DynamicBackground from '@/components/DynamicBackground';
+
+const ifrFlightPlanningBackgroundImages = [
+  '/images/backgrounds/ifr-planning-bg.jpg', // Assuming you'll add this image
+];
+
+const IfrFlightPlanning: React.FC = () => {
   const [departureIcao, setDepartureIcao] = useState('');
   const [arrivalIcao, setArrivalIcao] = useState('');
   const [mapCenter, setMapCenter] = useState<[number, number]>([34.0522, -118.2437]); // Default to Los Angeles
