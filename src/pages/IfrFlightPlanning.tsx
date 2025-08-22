@@ -67,30 +67,29 @@ const IfrFlightPlanning: React.FC = () => {
     <div className="min-h-screen flex flex-col items-center justify-start p-4 pt-24 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
       <h1 className="text-3xl font-bold mb-8 text-center">IFR Flight Planning Map</h1>
 
-      {/* Map container with fixed height and no background */}
-      <div className="w-full max-w-7xl h-[600px] shadow-md rounded-lg relative overflow-hidden border border-blue-500"> {/* Added border for visibility */}
-        {/* Input fields as an overlay */}
-        <div className="absolute top-0 left-0 right-0 z-20 bg-white/90 dark:bg-gray-800/90 p-4 rounded-t-lg flex flex-col md:flex-row gap-2">
-          <Input
-            placeholder="Departure ICAO (e.g., KLAX)"
-            value={departureIcao}
-            onChange={(e) => setDepartureIcao(e.target.value.toUpperCase())}
-            maxLength={4}
-            className="flex-1"
-          />
-          <Input
-            placeholder="Arrival ICAO (e.g., KJFK)"
-            value={arrivalIcao}
-            onChange={(e) => setArrivalIcao(e.target.value.toUpperCase())}
-            maxLength={4}
-            className="flex-1"
-          />
-          <Button onClick={handleLoadMap} className="w-full md:w-auto">Load Map</Button>
-        </div>
+      {/* Input fields section - completely separate from map */}
+      <div className="w-full max-w-7xl mb-4 p-4 rounded-lg shadow-md bg-white dark:bg-gray-800 flex flex-col md:flex-row gap-2">
+        <Input
+          placeholder="Departure ICAO (e.g., KLAX)"
+          value={departureIcao}
+          onChange={(e) => setDepartureIcao(e.target.value.toUpperCase())}
+          maxLength={4}
+          className="flex-1"
+        />
+        <Input
+          placeholder="Arrival ICAO (e.g., KJFK)"
+          value={arrivalIcao}
+          onChange={(e) => setArrivalIcao(e.target.value.toUpperCase())}
+          maxLength={4}
+          className="flex-1"
+        />
+        <Button onClick={handleLoadMap} className="w-full md:w-auto">Load Map</Button>
+      </div>
 
-        {/* Map Component */}
+      {/* Map container - now truly isolated with a debugging background */}
+      <div className="w-full max-w-7xl h-[600px] shadow-md rounded-lg overflow-hidden border border-blue-500 bg-red-300"> {/* Added bg-red-300 for debugging */}
         <SimpleMap
-          key={mapKey} // Added key to force re-render
+          key={mapKey}
           center={mapCenter}
           zoom={mapZoom}
           depCoords={depCoords}
@@ -98,13 +97,14 @@ const IfrFlightPlanning: React.FC = () => {
           departureIcao={departureIcao}
           arrivalIcao={arrivalIcao}
         />
+      </div>
 
-        <div className="absolute bottom-4 left-4 bg-white/80 dark:bg-gray-800/80 p-2 rounded-md text-xs text-gray-900 dark:text-white z-20">
-          <p>Map data from OpenStreetMap contributors.</p>
-          <p className="text-red-600">
-            Note: Official IFR charts and detailed airway data are copyrighted and cannot be freely embedded. This map provides a basic visualization.
-          </p>
-        </div>
+      {/* Notes section - also completely separate */}
+      <div className="w-full max-w-7xl mt-4 p-2 rounded-md text-xs text-gray-900 dark:text-white bg-white/80 dark:bg-gray-800/80">
+        <p>Map data from OpenStreetMap contributors.</p>
+        <p className="text-red-600">
+          Note: Official IFR charts and detailed airway data are copyrighted and cannot be freely embedded. This map provides a basic visualization.
+        </p>
       </div>
     </div>
   );
