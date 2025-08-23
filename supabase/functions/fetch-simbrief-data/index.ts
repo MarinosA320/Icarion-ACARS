@@ -124,7 +124,8 @@ serve(async (req) => {
       weatherSource: '',
     };
 
-    if (url.pathname.includes('dispatch.php')) {
+    // Updated condition to correctly identify SimBrief Dispatch Options URLs
+    if (url.pathname.includes('/options/custom') || url.pathname.includes('dispatch.php')) {
       console.log('Detected SimBrief Dispatch Options URL.');
       const params = new URLSearchParams(url.search);
       console.log('URLSearchParams:', params.toString());
