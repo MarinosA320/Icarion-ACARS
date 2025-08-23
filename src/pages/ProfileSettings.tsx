@@ -23,7 +23,7 @@ interface Profile {
   vatsim_ivao_id: string | null;
   avatar_url: string | null;
   type_ratings: string[] | null;
-  rank: string | null; // Updated to allow null
+  rank: string | null;
 }
 
 interface Flight {
@@ -222,24 +222,50 @@ const ProfileSettings = () => {
       
       {/* Content container, scrollable */}
       <div className="relative z-10 w-full max-w-5xl mx-auto text-white flex-grow flex flex-col items-center justify-start p-4 pt-24 overflow-y-auto">
-        <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Profile Settings</h1>
+        <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Pilot Dashboard</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
+          {/* Pilot Overview Card */}
+          <Card className="col-span-full lg:col-span-1 shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
+            <CardHeader className="flex flex-col items-center text-center">
+              <Avatar className="h-24 w-24 mb-4">
+                <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.display_name || "User"} />
+                <AvatarFallback>{profile?.display_name ? profile.display_name.charAt(0) : 'VA'}</AvatarFallback>
+              </Avatar>
+              <CardTitle className="text-2xl">{profile?.display_name || 'Virtual Pilot'}</CardTitle>
+              <CardDescription className="text-lg">{profile?.rank || 'Visitor'}</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Total Flights:</span>
+                <span>{totalFlights}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Total Flight Time:</span>
+                <span>{totalFlightTime}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="font-medium">Average Landing Rate:</span>
+                <span>{averageLandingRate}</span>
+              </div>
+              <div>
+                <span className="font-medium">Type Ratings:</span>
+                <p className="text-sm text-gray-700 dark:text-gray-300 mt-1">
+                  {profile?.type_ratings && profile.type_ratings.length > 0 ? profile.type_ratings.join(', ') : 'None'}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Profile Information Card */}
-          <Card className="col-span-1 shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
+          <Card className="col-span-full lg:col-span-2 shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
             <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Update your public display name and contact details.</CardDescription>
+              <CardTitle>Update Profile Information</CardTitle>
+              <CardDescription>Manage your public display name and contact details.</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleProfileUpdate} className="space-y-4">
-                <div className="flex flex-col items-center space-y-4">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src={profile?.avatar_url || undefined} alt={profile?.display_name || "User"} />
-                    <AvatarFallback>{profile?.display_name ? profile.display_name.charAt(0) : 'VA'}</AvatarFallback>
-                  </Avatar>
-                </div>
-                <div>
+              <form onSubmit={handleProfileUpdate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-1">
                   <Label htmlFor="firstName">First Name</Label>
                   <Input
                     id="firstName"
@@ -249,7 +275,7 @@ const ProfileSettings = () => {
                     required
                   />
                 </div>
-                <div>
+                <div className="md:col-span-1">
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input
                     id="lastName"
@@ -259,7 +285,7 @@ const ProfileSettings = () => {
                     required
                   />
                 </div>
-                <div>
+                <div className="md:col-span-1">
                   <Label htmlFor="displayName">Display Name</Label>
                   <Input
                     id="displayName"
@@ -269,7 +295,7 @@ const ProfileSettings = () => {
                     required
                   />
                 </div>
-                <div>
+                <div className="md:col-span-1">
                   <Label htmlFor="discordUsername">Discord Username</Label>
                   <Input
                     id="discordUsername"
@@ -279,7 +305,7 @@ const ProfileSettings = () => {
                     required
                   />
                 </div>
-                <div>
+                <div className="md:col-span-1">
                   <Label htmlFor="vatsimIvaoId">VATSIM ID (CID) or IVAO ID (VID)</Label>
                   <Input
                     id="vatsimIvaoId"
@@ -288,29 +314,24 @@ const ProfileSettings = () => {
                     placeholder="Your VATSIM or IVAO ID (optional)"
                   />
                 </div>
-                {profile && (
-                  <>
-                    <div>
-                      <Label>Your Current Rank</Label>
-                      <Input value={profile.rank || 'N/A'} disabled className="bg-gray-100 dark:bg-gray-700" />
-                    </div>
-                    <div>
-                      <Label>Your Type Ratings</Label>
-                      <Input
-                        value={profile.type_ratings && profile.type_ratings.length > 0 ? profile.type_ratings.join(', ') : 'None'}
-                        disabled
-                        className="bg-gray-100 dark:bg-gray-700"
-                      />
-                    </div>
-                  </>
-                )}
-                <Button type="submit" className="w-full">Update Profile</Button>
+                <div className="md:col-span-1">
+                  <Label htmlFor="avatarFile">Update Avatar (Optional)</Label>
+                  <Input
+                    id="avatarFile"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setAvatarFile(e.target.files ? e.target.files[0] : null)}
+                  />
+                </div>
+                <div className="col-span-full">
+                  <Button type="submit" className="w-full">Update Profile</Button>
+                </div>
               </form>
             </CardContent>
           </Card>
 
           {/* Account Security Card */}
-          <Card className="col-span-1 shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
+          <Card className="col-span-full lg:col-span-1 shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
             <CardHeader>
               <CardTitle>Account Security</CardTitle>
               <CardDescription>Manage your password and email address.</CardDescription>
@@ -352,30 +373,8 @@ const ProfileSettings = () => {
             </CardContent>
           </Card>
 
-          {/* Flight Statistics Card */}
-          <Card className="col-span-1 shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
-            <CardHeader>
-              <CardTitle>Flight Statistics</CardTitle>
-              <CardDescription>Your flight performance and activity.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Total Flights:</span>
-                <span>{totalFlights}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Total Flight Time:</span>
-                <span>{totalFlightTime}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="font-medium">Average Landing Rate:</span>
-                <span>{averageLandingRate}</span>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Day/Night Mode Toggle Card */}
-          <Card className="col-span-full lg:col-span-1 shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
+          <Card className="col-span-full lg:col-span-2 shadow-md rounded-lg bg-white/50 dark:bg-gray-800/50">
             <CardHeader>
               <CardTitle>Display Mode</CardTitle>
               <CardDescription>Toggle between light and dark themes.</CardDescription>

@@ -1,5 +1,5 @@
-import React from 'react';
-import { MapContainer, TileLayer, Polyline, Marker } from 'react-leaflet';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Polyline, Marker, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -18,6 +18,20 @@ if (typeof L.Icon.Default.prototype._getIconUrl === 'undefined') {
     return L.Icon.Default.prototype.options[name];
   };
 }
+
+// Helper component to force map invalidation
+const MapInvalidator: React.FC = () => {
+  const map = useMap();
+  useEffect(() => {
+    // Invalidate size after a short delay to ensure container is fully rendered
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+      console.log("Leaflet map invalidateSize() called.");
+    }, 100); 
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+};
 
 
 interface FlightPathMapProps {
@@ -53,6 +67,7 @@ const FlightPathMap: React.FC<FlightPathMapProps> = ({ geoJsonData }) => {
       <Polyline positions={pathCoordinates} color="#007bff" weight={3} />
       <Marker position={startPoint} title="Departure" />
       <Marker position={endPoint} title="Arrival" />
+      <MapInvalidator /> {/* Add the MapInvalidator component here */}
     </MapContainer>
   );
 };
