@@ -15,7 +15,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { MenuIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import NotificationMenu from '@/components/NotificationMenu';
+import NotificationMenu from '@/components/NotificationMenu'; // New import
 
 interface Profile {
   display_name: string | null;
@@ -68,9 +68,9 @@ const Navbar = () => {
     <>
       <Link to="/logbook" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Logbook</Link>
       <Link to="/social-media" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Social Media</Link>
+      {/* Removed My Bookings Link */}
       <Link to="/announcements" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Announcements</Link>
       <Link to="/flight-briefing" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Flight Briefing (Beta)</Link>
-      <Link to="/ifr-flight-planning" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">IFR Flight Planning</Link> {/* New Link */}
       <Link to="/careers" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Careers</Link>
       <Link to="/contact" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Contact</Link>
       <Link to="/profile-settings" className="text-gray-700 dark:text-gray-300 hover:text-icarion-blue-DEFAULT dark:hover:text-icarion-gold-DEFAULT transition-colors">Profile Settings</Link>
@@ -96,7 +96,7 @@ const Navbar = () => {
           <SheetContent side="left" className="w-[250px] sm:w-[300px] bg-white dark:bg-gray-800 p-4">
             <div className="flex flex-col space-y-4 mt-6">
               {navLinks}
-              <NotificationMenu />
+              <NotificationMenu /> {/* Added NotificationMenu here for mobile */}
               <Button onClick={handleLogout} variant="outline" className="w-full">Logout</Button>
             </div>
           </SheetContent>
@@ -104,7 +104,7 @@ const Navbar = () => {
       ) : (
         <div className="flex items-center space-x-6">
           {navLinks}
-          <NotificationMenu />
+          <NotificationMenu /> {/* Added NotificationMenu here for desktop */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-10 w-10 rounded-full">
