@@ -216,12 +216,13 @@ const Logbook = () => {
 
   const handleLogSimbriefFlight = async () => {
     setIsLoggingSimbriefFlight(true);
-    const expectedSimbriefUrlPrefix = 'https://dispatch.simbrief.com/options/dispatch.php';
-    if (!simbriefUrl.startsWith(expectedSimbriefUrlPrefix)) {
-      showError('Invalid SimBrief URL format. Please provide a SimBrief Dispatch URL (e.g., starting with "https://dispatch.simbrief.com/options/dispatch.php").');
-      setIsLoggingSimbriefFlight(false);
-      return;
-    }
+    // No longer need to check prefix here, the Edge Function handles it
+    // const expectedSimbriefUrlPrefix = 'https://dispatch.simbrief.com/options/dispatch.php';
+    // if (!simbriefUrl.startsWith(expectedSimbriefUrlPrefix)) {
+    //   showError('Invalid SimBrief URL format. Please provide a SimBrief Dispatch URL (e.g., starting with "https://dispatch.simbrief.com/options/dispatch.php").');
+    //   setIsLoggingSimbriefFlight(false);
+    //   return;
+    // }
 
     console.log('Logbook.tsx: Attempting to fetch SimBrief data for URL:', simbriefUrl);
     try {
@@ -242,6 +243,12 @@ const Logbook = () => {
           eta: simbriefData.eta,
           aircraftRegistration: simbriefData.aircraftRegistration,
           airlineName: airline,
+          actualFuelBurnKg: simbriefData.actualFuelBurnKg, // Pass new fields
+          averageAltitudeFt: simbriefData.averageAltitudeFt,
+          averageSpeedKts: simbriefData.averageSpeedKts,
+          maxPitchDeg: simbriefData.maxPitchDeg,
+          maxBankDeg: simbriefData.maxBankDeg,
+          weatherSource: simbriefData.weatherSource,
         };
         console.log('Logbook.tsx: Data prepared for LogFlight page (SimBrief):', dataToPass);
         try {
@@ -326,7 +333,7 @@ const Logbook = () => {
                 <div className="flex flex-col md:flex-row gap-2 items-center">
                   <Input
                     type="url"
-                    placeholder="Paste SimBrief Dispatch URL here..."
+                    placeholder="Paste SimBrief Dispatch URL or OFP XML URL here..."
                     value={simbriefUrl}
                     onChange={(e) => setSimbriefUrl(e.target.value)}
                     className="flex-grow"

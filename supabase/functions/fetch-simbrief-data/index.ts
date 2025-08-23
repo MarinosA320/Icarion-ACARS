@@ -5,24 +5,37 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Helper to extract text content from an XML tag
+const extractXmlTagContent = (xml: string, tagName: string): string | undefined => {
+  const regex = new RegExp(`<${tagName}>(.*?)</${tagName}>`, 's');
+  const match = xml.match(regex);
+  return match ? match[1].trim() : undefined;
+};
+
+// Helper to extract attribute from an XML tag (basic, for simple cases)
+const extractXmlAttribute = (xml: string, tagName: string, attributeName: string): string | undefined => {
+  const regex = new RegExp(`<${tagName}\\s+[^>]*?${attributeName}="(.*?)"`, 's');
+  const match = xml.match(regex);
+  return match ? match[1].trim() : undefined;
+};
+
 // Helper to convert SimBrief date format (e.g., "06 Aug 2025 - 14:50") to YYYY-MM-DDTHH:MM
 const formatSimbriefDateTime = (simbriefDate: string | undefined): string => {
   if (!simbriefDate) return '';
   try {
-    // Example: "06 Aug 2025 - 14:50"
     const parts = simbriefDate.split(' - ');
     if (parts.length !== 2) {
       console.warn("formatSimbriefDateTime: Invalid date format received:", simbriefDate);
       return '';
     }
 
-    const datePart = parts[0]; // "06 Aug 2025"
-    const timePart = parts[1]; // "14:50"
+    const datePart = parts[0];
+    const timePart = parts[1];
 
     const [day, monthStr, year] = datePart.split(' ');
     const monthMap: { [key: string]: string } = {
       'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
-      'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12',
+      'Jul': '07', 'Aug': '09', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12',
     };
     const month = monthMap[monthStr];
 
@@ -36,6 +49,17 @@ const formatSimbriefDateTime = (simbriefDate: string | undefined): string => {
     console.error("Error parsing SimBrief date:", e);
     return '';
   }
+};
+
+// Helper to convert Zulu date format (YYYYMMDDHHMM) to YYYY-MM-DDTHH:MM
+const formatZuluDateTime = (zuluDate: string | undefined): string => {
+  if (!zuluDate || zuluDate.length !== 12) return '';
+  const year = zuluDate.substring(0, 4);
+  const month = zuluDate.substring(4, 6);
+  const day = zuluDate.substring(6, 8);
+  const hour = zuluDate.substring(8, 10);
+  const minute = zuluDate.substring(10, 12);
+  return `${year}-${month}-${day}T${hour}:${minute}`;
 };
 
 serve(async (req) => {
@@ -66,36 +90,93 @@ serve(async (req) => {
         status: 400,
       });
     }
-    
-    const params = new URLSearchParams(url.search);
 
-    // Use defensive access with default empty strings
-    const departure = params.get('orig')?.toUpperCase() || '';
-    const arrival = params.get('dest')?.toUpperCase() || '';
-    const aircraftType = params.get('basetype')?.toUpperCase() || '';
-    const flightNumber = params.get('fltnum')?.toUpperCase() || '';
-    const route = decodeURIComponent(params.get('route') || '').replace(/\+/g, ' '); // Decode and replace '+' with space
-    const date = params.get('date') || '';
-    const registration = params.get('reg')?.toUpperCase() || '';
-    const airlineIcao = params.get('airline')?.toUpperCase() || '';
-
-    const etd = formatSimbriefDateTime(date);
-    // ETA is not directly in the URL, so we'll leave it empty for now.
-    // In a more advanced integration, you'd fetch the OFP XML for precise times.
-
-    const responseData = {
-      departureAirport: departure,
-      arrivalAirport: arrival,
-      aircraftType: aircraftType,
-      flightNumber: flightNumber,
-      flightPlan: route,
-      etd: etd,
-      eta: '', // ETA is not directly available in the URL params
-      aircraftRegistration: registration,
-      airlineIcao: airlineIcao, // Pass ICAO to map to full name on client
+    let responseData = {
+      departureAirport: '',
+      arrivalAirport: '',
+      aircraftType: '',
+      flightNumber: '',
+      flightPlan: '',
+      etd: '',
+      eta: '',
+      aircraftRegistration: '',
+      airlineIcao: '',
+      actualFuelBurnKg: '',
+      averageAltitudeFt: '',
+      averageSpeedKts: '',
+      maxPitchDeg: '',
+      maxBankDeg: '',
+      weatherSource: '',
     };
 
-    console.log('Edge Function: Parsed SimBrief data:', responseData);
+    if (url.pathname.includes('dispatch.php')) {
+      // Handle Dispatch Options URL
+      const params = new URLSearchParams(url.search);
+
+      responseData.departureAirport = params.get('orig')?.toUpperCase() || '';
+      responseData.arrivalAirport = params.get('dest')?.toUpperCase() || '';
+      responseData.aircraftType = params.get('basetype')?.toUpperCase() || '';
+      responseData.flightNumber = params.get('fltnum')?.toUpperCase() || '';
+      responseData.flightPlan = decodeURIComponent(params.get('route') || '').replace(/\+/g, ' ');
+      responseData.etd = formatSimbriefDateTime(params.get('date'));
+      responseData.aircraftRegistration = params.get('reg')?.toUpperCase() || '';
+      responseData.airlineIcao = params.get('airline')?.toUpperCase() || '';
+      // ETA and other monitoring fields are not directly in dispatch URL
+      console.log('Edge Function: Parsed SimBrief Dispatch data:', responseData);
+
+    } else if (url.pathname.includes('xml.php')) {
+      // Handle OFP XML URL
+      console.log('Edge Function: Fetching SimBrief OFP XML from:', simbriefUrl);
+      const xmlResponse = await fetch(simbriefUrl);
+
+      if (!xmlResponse.ok) {
+        const errorText = await xmlResponse.text();
+        console.error(`Edge Function: SimBrief OFP XML fetch failed with status: ${xmlResponse.status}, response: ${errorText}`);
+        return new Response(JSON.stringify({ error: `Failed to fetch SimBrief OFP XML: ${xmlResponse.status}` }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: xmlResponse.status,
+        });
+      }
+
+      const xmlText = await xmlResponse.text();
+      console.log('Edge Function: Successfully fetched SimBrief OFP XML.');
+
+      // Basic XML parsing using string manipulation
+      responseData.airlineIcao = extractXmlTagContent(xmlText, 'icao_airline')?.toUpperCase() || '';
+      responseData.aircraftType = extractXmlTagContent(xmlText, 'icao_aircraft')?.toUpperCase() || '';
+      responseData.flightNumber = extractXmlTagContent(xmlText, 'flight_number')?.toUpperCase() || '';
+      responseData.departureAirport = extractXmlTagContent(xmlText, 'origin_icao')?.toUpperCase() || '';
+      responseData.arrivalAirport = extractXmlTagContent(xmlText, 'destination_icao')?.toUpperCase() || '';
+      responseData.aircraftRegistration = extractXmlTagContent(xmlText, 'reg')?.toUpperCase() || '';
+      responseData.flightPlan = extractXmlTagContent(xmlText, 'route') || '';
+      responseData.etd = formatZuluDateTime(extractXmlTagContent(xmlText, 'etd_zulu'));
+      responseData.eta = formatZuluDateTime(extractXmlTagContent(xmlText, 'eta_zulu'));
+
+      // Extract new monitoring fields from XML
+      responseData.actualFuelBurnKg = extractXmlTagContent(xmlText, 'burn') || '';
+      responseData.averageAltitudeFt = extractXmlTagContent(xmlText, 'avg_alt') || '';
+      // SimBrief OFP often gives avg_mach, convert to kts if possible, or leave as is
+      const avgMach = extractXmlTagContent(xmlText, 'avg_mach');
+      if (avgMach) {
+        // A very rough conversion from Mach to IAS/TAS at typical cruise altitudes
+        // This is a simplification; real conversion needs altitude and temperature.
+        // Mach 0.78 is roughly 450-500 kts TAS. Let's just store Mach for now or a rough estimate.
+        // For simplicity, I'll just store the Mach number as a string for now, or leave empty.
+        // If the user wants to input speed in KTS, they can do so.
+        // For now, I'll leave averageSpeedKts empty as direct conversion is complex.
+      }
+      // Max pitch/bank are not typically in SimBrief OFP XML
+      responseData.weatherSource = 'SimBrief OFP'; // Indicate source
+
+      console.log('Edge Function: Parsed SimBrief OFP XML data:', responseData);
+
+    } else {
+      return new Response(JSON.stringify({ error: 'Unsupported SimBrief URL format. Please provide a Dispatch Options URL or an OFP XML URL.' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
+
     return new Response(JSON.stringify(responseData), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
@@ -103,7 +184,6 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Edge Function error:', error);
-    // Include the specific error message in the response for better client-side debugging
     return new Response(JSON.stringify({ error: `An unexpected error occurred in the SimBrief data function: ${error.message || 'Unknown error'}` }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
