@@ -17,10 +17,13 @@ import FlightPlanAndRemarks from '@/components/log-flight/FlightPlanAndRemarks';
 import FlightImageUpload from '@/components/log-flight/FlightImageUpload';
 import FlightActionButtons from '@/components/log-flight/FlightActionButtons';
 import FlightPathMap from '@/components/FlightPathMap'; // Import FlightPathMap
+import SimulateLiveFlightForm from '@/components/SimulateLiveFlightForm'; // New import
 
 const LogFlight = () => {
   const navigate = useNavigate();
   const [loadingSubmission, setLoadingSubmission] = useState(false); // Renamed to avoid conflict with userProfile loading
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [userVatsimIvaoId, setUserVatsimIvaoId] = useState<string | null>(null);
 
   const {
     formState,
@@ -45,6 +48,26 @@ const LogFlight = () => {
   const [loadingProfile, setLoadingProfile] = useState(true);
 
   useEffect(() => {
+    const fetchUserData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+        // Fetch user profile to get VATSIM/IVAO ID for simulation form
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('vatsim_ivao_id')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching user profile for VATSIM ID:', profileError);
+        } else {
+          setUserVatsimIvaoId(profileData?.vatsim_ivao_id || null);
+        }
+      }
+    };
+    fetchUserData();
+
     // userProfile will be null initially, then populated by useUserProfileAndAircraftData
     // We consider profile loaded once userProfile is not null
     if (userProfile !== null) {
@@ -189,6 +212,9 @@ const LogFlight = () => {
   return (
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Log Your Flight</h1>
+
+      {/* Simulate Live Flight Section */}
+      <SimulateLiveFlightForm currentUserId={currentUserId} userVatsimIvaoId={userVatsimIvaoId} />
 
       <Card className="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
         <CardHeader className="p-0 pb-4">
