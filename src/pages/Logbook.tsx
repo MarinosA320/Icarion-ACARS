@@ -215,12 +215,13 @@ const Logbook = () => {
   };
 
   const handleLogSimbriefFlight = async () => {
+    console.log('Logbook.tsx: handleLogSimbriefFlight entered.');
     setIsLoggingSimbriefFlight(true);
 
-    console.log('Logbook.tsx: Attempting to fetch SimBrief data for URL:', simbriefUrl);
     try {
+      console.log('Logbook.tsx: Attempting to fetch SimBrief data for URL:', simbriefUrl);
       const simbriefData = await fetchSimbriefData(simbriefUrl);
-      console.log('Logbook.tsx: SimBrief data received:', simbriefData);
+      console.log('Logbook.tsx: SimBrief data received from Edge Function:', simbriefData);
 
       if (simbriefData) {
         console.log('Logbook.tsx: SimBrief data successfully retrieved:', simbriefData);
@@ -243,21 +244,24 @@ const Logbook = () => {
           maxBankDeg: simbriefData.maxBankDeg,
           weatherSource: simbriefData.weatherSource,
         };
-        console.log('Logbook.tsx: Data prepared for LogFlight page (SimBrief):', dataToPass); // Added log
+        console.log('Logbook.tsx: Data prepared for LogFlight page (SimBrief):', dataToPass);
         try {
           navigate('/log-flight', { state: { initialFlightData: dataToPass } });
+          console.log('Logbook.tsx: Navigation to /log-flight attempted.');
         } catch (navError) {
           console.error('Logbook.tsx: Error during navigation after SimBrief data:', navError);
           showError('An error occurred while preparing the flight form. Please try again.');
         }
       } else {
-        console.log('Logbook.tsx: SimBrief data retrieval failed or was empty. Error handled by fetchSimbriefData.');
+        console.log('Logbook.tsx: SimBrief data retrieval failed or was empty. Displaying error toast.');
+        showError('Failed to retrieve SimBrief data. Please check the URL and try again.');
       }
     } catch (error) {
-      console.error('Logbook.tsx: Error during SimBrief data fetching or processing:', error);
-      showError('An unexpected error occurred while processing SimBrief data.');
+      console.error('Logbook.tsx: Unexpected error during SimBrief data fetching or processing:', error);
+      showError('An unexpected error occurred while processing SimBrief data. Please check the console for details.');
     } finally {
       setIsLoggingSimbriefFlight(false);
+      console.log('Logbook.tsx: handleLogSimbriefFlight finished.');
     }
   };
 
