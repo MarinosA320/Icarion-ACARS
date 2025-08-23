@@ -40,6 +40,12 @@ interface Flight {
   } | null;
   volanta_tracking_link: string | null;
   flight_path_geojson: any | null; // Added for GeoJSON
+  actual_fuel_burn_kg: number | null; // New
+  average_altitude_ft: number | null; // New
+  average_speed_kts: number | null; // New
+  max_pitch_deg: number | null; // New
+  max_bank_deg: number | null; // New
+  weather_source: string | null; // New
 }
 
 interface LogbookEntryManagementTabProps {
@@ -121,6 +127,15 @@ const LogbookEntryManagementTab: React.FC<LogbookEntryManagementTabProps> = ({
                         <div><span className="font-medium">Arrival Gate:</span> {flight.gates_used_arr || 'N/A'}</div>
                         <div><span className="font-medium">Departure Type:</span> {flight.departure_type || 'N/A'}</div>
                         <div><span className="font-medium">Arrival Type:</span> {flight.arrival_type || 'N/A'}</div>
+
+                        {/* New section for Flight Monitoring Data */}
+                        <div className="col-span-2 font-semibold text-lg mt-4">Flight Monitoring Data</div>
+                        <div><span className="font-medium">Actual Fuel Burn:</span> {flight.actual_fuel_burn_kg !== null ? `${flight.actual_fuel_burn_kg} kg` : 'N/A'}</div>
+                        <div><span className="font-medium">Average Altitude:</span> {flight.average_altitude_ft !== null ? `${flight.average_altitude_ft} ft` : 'N/A'}</div>
+                        <div><span className="font-medium">Average Speed:</span> {flight.average_speed_kts !== null ? `${flight.average_speed_kts} kts` : 'N/A'}</div>
+                        <div><span className="font-medium">Max Pitch:</span> {flight.max_pitch_deg !== null ? `${flight.max_pitch_deg}°` : 'N/A'}</div>
+                        <div><span className="font-medium">Max Bank:</span> {flight.max_bank_deg !== null ? `${flight.max_bank_deg}°` : 'N/A'}</div>
+                        <div><span className="font-medium">Weather Source:</span> {flight.weather_source || 'N/A'}</div>
 
                         {flight.volanta_tracking_link && (
                           <div className="col-span-2 mt-4">

@@ -165,6 +165,12 @@ const LogFlight = () => {
       remarks: formState.remarks || null,
       volanta_tracking_link: formState.volantaTrackingLink || null,
       flight_path_geojson: parsedGeoJSON, // Save GeoJSON data
+      actual_fuel_burn_kg: formState.actualFuelBurnKg ? parseFloat(formState.actualFuelBurnKg) : null, // New
+      average_altitude_ft: formState.averageAltitudeFt ? parseInt(formState.averageAltitudeFt) : null, // New
+      average_speed_kts: formState.averageSpeedKts ? parseInt(formState.averageSpeedKts) : null, // New
+      max_pitch_deg: formState.maxPitchDeg ? parseFloat(formState.maxPitchDeg) : null, // New
+      max_bank_deg: formState.maxBankDeg ? parseFloat(formState.maxBankDeg) : null, // New
+      weather_source: formState.weatherSource || null, // New
     });
 
     if (error) {

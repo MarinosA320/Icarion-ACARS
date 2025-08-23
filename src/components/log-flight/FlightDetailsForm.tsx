@@ -28,6 +28,12 @@ interface FlightDetailsFormProps {
     departureType: string;
     arrivalType: string;
     volantaTrackingLink: string;
+    actualFuelBurnKg: string; // New
+    averageAltitudeFt: string; // New
+    averageSpeedKts: string; // New
+    maxPitchDeg: string; // New
+    maxBankDeg: string; // New
+    weatherSource: string; // New
   };
   userRank: string;
   filteredAircraftTypes: string[];
@@ -234,6 +240,43 @@ const FlightDetailsForm: React.FC<FlightDetailsFormProps> = ({
       <div className="col-span-full">
         <Label htmlFor="volantaTrackingLink">Volanta Tracking Link (Optional)</Label>
         <Input id="volantaTrackingLink" type="url" value={formState.volantaTrackingLink || ''} onChange={(e) => handleChange('volantaTrackingLink', e.target.value)} placeholder="e.g., https://volanta.app/flights/..." />
+      </div>
+
+      {/* New fields for Smart Flight Monitoring */}
+      <div className="col-span-full md:col-span-1">
+        <Label htmlFor="actualFuelBurnKg">Actual Fuel Burn (kg)</Label>
+        <Input id="actualFuelBurnKg" type="number" value={formState.actualFuelBurnKg || ''} onChange={(e) => handleChange('actualFuelBurnKg', e.target.value)} placeholder="e.g., 15000" />
+      </div>
+      <div className="col-span-full md:col-span-1">
+        <Label htmlFor="averageAltitudeFt">Average Altitude (ft)</Label>
+        <Input id="averageAltitudeFt" type="number" value={formState.averageAltitudeFt || ''} onChange={(e) => handleChange('averageAltitudeFt', e.target.value)} placeholder="e.g., 35000" />
+      </div>
+      <div className="col-span-full md:col-span-1">
+        <Label htmlFor="averageSpeedKts">Average Speed (kts)</Label>
+        <Input id="averageSpeedKts" type="number" value={formState.averageSpeedKts || ''} onChange={(e) => handleChange('averageSpeedKts', e.target.value)} placeholder="e.g., 450" />
+      </div>
+      <div className="col-span-full md:col-span-1">
+        <Label htmlFor="maxPitchDeg">Max Pitch (deg)</Label>
+        <Input id="maxPitchDeg" type="number" step="0.1" value={formState.maxPitchDeg || ''} onChange={(e) => handleChange('maxPitchDeg', e.target.value)} placeholder="e.g., 15.2" />
+      </div>
+      <div className="col-span-full md:col-span-1">
+        <Label htmlFor="maxBankDeg">Max Bank (deg)</Label>
+        <Input id="maxBankDeg" type="number" step="0.1" value={formState.maxBankDeg || ''} onChange={(e) => handleChange('maxBankDeg', e.target.value)} placeholder="e.g., 30.5" />
+      </div>
+      <div className="col-span-full md:col-span-1">
+        <Label htmlFor="weatherSource">Weather Source</Label>
+        <Select value={formState.weatherSource || ''} onValueChange={(value) => handleChange('weatherSource', value)}>
+          <SelectTrigger id="weatherSource">
+            <SelectValue placeholder="Select weather source" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Live Weather">Live Weather</SelectItem>
+            <SelectItem value="Preset">Preset</SelectItem>
+            <SelectItem value="VATSIM">VATSIM</SelectItem>
+            <SelectItem value="IVAO">IVAO</SelectItem>
+            <SelectItem value="Custom">Custom</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
     </>
   );

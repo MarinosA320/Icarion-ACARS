@@ -14,6 +14,12 @@ interface InitialFlightData {
   flightPlan?: string | null;
   flightTime?: string | null;
   flightPathGeoJSON?: any | null; // Added for GeoJSON
+  actualFuelBurnKg?: string | null; // New
+  averageAltitudeFt?: string | null; // New
+  averageSpeedKts?: string | null; // New
+  maxPitchDeg?: string | null; // New
+  maxBankDeg?: string | null; // New
+  weatherSource?: string | null; // New
 }
 
 interface FlightFormState {
@@ -42,6 +48,12 @@ interface FlightFormState {
   remarks: string;
   volantaTrackingLink: string;
   flightPathGeoJSON: any | null; // Added for GeoJSON
+  actualFuelBurnKg: string; // New
+  averageAltitudeFt: string; // New
+  averageSpeedKts: string; // New
+  maxPitchDeg: string; // New
+  maxBankDeg: string; // New
+  weatherSource: string; // New
 }
 
 const initialFormState: FlightFormState = {
@@ -70,6 +82,12 @@ const initialFormState: FlightFormState = {
   remarks: '',
   volantaTrackingLink: '',
   flightPathGeoJSON: null, // Initialize as null
+  actualFuelBurnKg: '', // New
+  averageAltitudeFt: '', // New
+  averageSpeedKts: '', // New
+  maxPitchDeg: '', // New
+  maxBankDeg: '', // New
+  weatherSource: '', // New
 };
 
 export const useFlightForm = () => {
@@ -108,6 +126,12 @@ export const useFlightForm = () => {
           flightPlan: currentInitialFlightData.flightPlan || '',
           flightTime: currentInitialFlightData.flightTime || '',
           flightPathGeoJSON: currentInitialFlightData.flightPathGeoJSON || null, // Apply GeoJSON
+          actualFuelBurnKg: currentInitialFlightData.actualFuelBurnKg || '', // New
+          averageAltitudeFt: currentInitialFlightData.averageAltitudeFt || '', // New
+          averageSpeedKts: currentInitialFlightData.averageSpeedKts || '', // New
+          maxPitchDeg: currentInitialFlightData.maxPitchDeg || '', // New
+          maxBankDeg: currentInitialFlightData.maxBankDeg || '', // New
+          weatherSource: currentInitialFlightData.weatherSource || '', // New
 
           // Ensure all other fields from initialFormState are also explicitly handled
           pilotRole: initialFormState.pilotRole,
