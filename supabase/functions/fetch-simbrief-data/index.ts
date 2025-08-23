@@ -21,6 +21,7 @@ const extractXmlAttribute = (xml: string, tagName: string, attributeName: string
 
 // Helper to convert SimBrief date format (e.g., "06 Aug 2025 - 14:50") to YYYY-MM-DDTHH:MM
 const formatSimbriefDateTime = (simbriefDate: string | undefined): string => {
+  console.log(`formatSimbriefDateTime: Input received: "${simbriefDate}"`); // Added log
   if (!simbriefDate) {
     console.log("formatSimbriefDateTime: Input date is undefined or empty.");
     return '';
@@ -38,7 +39,7 @@ const formatSimbriefDateTime = (simbriefDate: string | undefined): string => {
     const [day, monthStr, year] = datePart.split(' ');
     const monthMap: { [key: string]: string } = {
       'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
-      'Jul': '07', 'Aug': '08', // Corrected from '09' to '08'
+      'Jul': '07', 'Aug': '08', 
       'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12',
     };
     const month = monthMap[monthStr];
@@ -59,6 +60,7 @@ const formatSimbriefDateTime = (simbriefDate: string | undefined): string => {
 
 // Helper to convert Zulu date format (YYYYMMDDHHMM) to YYYY-MM-DDTHH:MM
 const formatZuluDateTime = (zuluDate: string | undefined): string => {
+  console.log(`formatZuluDateTime: Input received: "${zuluDate}"`); // Added log
   if (!zuluDate || zuluDate.length !== 12) {
     console.log("formatZuluDateTime: Input date is undefined, empty, or incorrect length.");
     return '';
@@ -133,6 +135,7 @@ serve(async (req) => {
       responseData.flightNumber = params.get('fltnum')?.toUpperCase() || '';
       responseData.flightPlan = decodeURIComponent(params.get('route') || '').replace(/\+/g, ' ');
       responseData.etd = formatSimbriefDateTime(params.get('date'));
+      responseData.eta = ''; // Explicitly set ETA to empty for dispatch.php as it's not in params
       responseData.aircraftRegistration = params.get('reg')?.toUpperCase() || '';
       responseData.airlineIcao = params.get('airline')?.toUpperCase() || '';
       

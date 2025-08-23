@@ -216,13 +216,6 @@ const Logbook = () => {
 
   const handleLogSimbriefFlight = async () => {
     setIsLoggingSimbriefFlight(true);
-    // No longer need to check prefix here, the Edge Function handles it
-    // const expectedSimbriefUrlPrefix = 'https://dispatch.simbrief.com/options/dispatch.php';
-    // if (!simbriefUrl.startsWith(expectedSimbriefUrlPrefix)) {
-    //   showError('Invalid SimBrief URL format. Please provide a SimBrief Dispatch URL (e.g., starting with "https://dispatch.simbrief.com/options/dispatch.php").');
-    //   setIsLoggingSimbriefFlight(false);
-    //   return;
-    // }
 
     console.log('Logbook.tsx: Attempting to fetch SimBrief data for URL:', simbriefUrl);
     try {
@@ -250,7 +243,7 @@ const Logbook = () => {
           maxBankDeg: simbriefData.maxBankDeg,
           weatherSource: simbriefData.weatherSource,
         };
-        console.log('Logbook.tsx: Data prepared for LogFlight page (SimBrief):', dataToPass);
+        console.log('Logbook.tsx: Data prepared for LogFlight page (SimBrief):', dataToPass); // Added log
         try {
           navigate('/log-flight', { state: { initialFlightData: dataToPass } });
         } catch (navError) {
