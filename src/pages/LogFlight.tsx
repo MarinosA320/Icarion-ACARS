@@ -17,7 +17,7 @@ import FlightPlanAndRemarks from '@/components/log-flight/FlightPlanAndRemarks';
 import FlightImageUpload from '@/components/log-flight/FlightImageUpload';
 import FlightActionButtons from '@/components/log-flight/FlightActionButtons';
 import FlightPathMap from '@/components/FlightPathMap'; // Import FlightPathMap
-import SimulateLiveFlightForm from '@/components/SimulateLiveFlightForm'; // New import
+// Removed SimulateLiveFlightForm import
 
 const LogFlight = () => {
   const navigate = useNavigate();
@@ -213,8 +213,7 @@ const LogFlight = () => {
     <div className="container mx-auto p-4 pt-24">
       <h1 className="text-3xl font-bold mb-8 text-center text-gray-900 dark:text-white">Log Your Flight</h1>
 
-      {/* Simulate Live Flight Section */}
-      <SimulateLiveFlightForm currentUserId={currentUserId} userVatsimIvaoId={userVatsimIvaoId} />
+      {/* Removed Simulate Live Flight Section */}
 
       <Card className="max-w-3xl mx-auto bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
         <CardHeader className="p-0 pb-4">

@@ -16,7 +16,6 @@ import LogFlight from "./pages/LogFlight";
 import FlightBriefing from "./pages/FlightBriefing";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
-import LiveFlightTracking from "./pages/LiveFlightTracking"; // New import
 import Navbar from "./components/Navbar";
 import { supabase } from "./integrations/supabase/client";
 import { useEffect, useState } from "react";
@@ -190,15 +189,7 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
-              <Route
-                path="/live-tracking"
-                element={
-                  <ProtectedRoute>
-                    <Navbar />
-                    <LiveFlightTracking />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Removed LiveFlightTracking Route */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
